@@ -148,5 +148,4 @@ const TreeSelectedEntity: React.FC<TreeSelectedEntityProps> = ({
   );
 };
 
-
 export default TreeSelectedEntity;
