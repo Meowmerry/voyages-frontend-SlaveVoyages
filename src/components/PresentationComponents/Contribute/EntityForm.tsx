@@ -4,7 +4,7 @@ import {
   MaterializedEntity,
   PropertyAccessLevel,
 } from '@dotproductdev/voyages-contribute';
-import {  CollapseProps, Form, Typography } from 'antd';
+import { CollapseProps, Form, Typography } from 'antd';
 import React, { ReactNode, useMemo, useEffect } from 'react';
 import { EntityPropertyComponent } from './EntityPropertyComponent';
 import { StyledCollapse } from '@/styleMUI/stylesMenu/styleCollapse';

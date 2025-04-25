@@ -9,7 +9,7 @@ import {
   getSchemaProp,
 } from '@dotproductdev/voyages-contribute';
 import { Alert, Select, Spin } from 'antd';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { EntityFormProps } from './EntityForm';
 import { EntityPropertyChangeCommentBox } from './EntityPropertyChangeCommentBox';
 import { useEnumeration } from '@/hooks/useEnumeration';

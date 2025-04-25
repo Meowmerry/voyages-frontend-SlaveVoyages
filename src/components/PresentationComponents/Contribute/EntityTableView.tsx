@@ -19,9 +19,9 @@ import {
   TableRow,
 } from '@mui/material';
 import { Typography } from 'antd';
-import  { useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Add } from '@mui/icons-material';
-import {  EntityFormProps } from './EntityForm';
+import { EntityFormProps } from './EntityForm';
 import { EntityTableRow } from './EntityTableRow';
 
 export interface EntityTableViewProps {

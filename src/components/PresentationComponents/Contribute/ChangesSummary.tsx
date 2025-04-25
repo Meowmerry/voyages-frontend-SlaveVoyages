@@ -9,6 +9,8 @@ import { EntityChange } from '@dotproductdev/voyages-contribute';
 import { Button, Typography, Row, Timeline } from 'antd';
 
 import PropertyChangesList from './PropertyChangesList';
+
+import { EntityChange } from '@/models/changeSets';
 const { Text } = Typography;
 
 const iconMap = {

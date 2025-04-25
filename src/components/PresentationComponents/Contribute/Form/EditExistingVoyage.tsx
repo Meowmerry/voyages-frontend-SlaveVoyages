@@ -3,21 +3,19 @@ import '@/style/newVoyages.scss';
 import { Form, Input, Button, Divider } from 'antd';
 import { useState } from 'react';
 import { ContributionForm } from '../ContributionForm';
-import sampleVoyage from '../sample_11586.json';
 import { MaterializedEntity } from '@dotproductdev/voyages-contribute';
 import { fetchSubmitEditVoaygesForm } from '@/fetch/contributeFetch/fetchSubmitEditVoaygesForm';
 import LOADINGLOGO from '@/assets/sv-logo_v2_notext.svg';
 
 const initialExistingVoyageEntity: MaterializedEntity = {
   entityRef: {
-    type: 'existing',  // or 'new' if you're creating
+    type: 'existing',
     schema: 'Voyage',
     id: 0,
   },
-  data: {},  // <-- initially empty, you can add more fields if needed
+  data: {},
   state: 'original',
 };
-
 
 interface EditExistingVoyageProps {
   openSideBar: boolean;
@@ -37,18 +35,16 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
       const res = await fetchSubmitEditVoaygesForm(voyageId)
       if (res.status === 200) {
         setEntity(res.data);
-        setLoading(true);
+        setLoading(false);
       } else {
         alert(`Voyage not found/error on api`);
-        setLoading(true);
+        setLoading(false);
       }
     } else {
       alert(`Please enter a voyage ID`);
-      setLoading(true);
+      setLoading(false);
     }
   };
-
-
 
   return (
     <div
@@ -102,12 +98,11 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
               Begin
             </Button>
           </Form.Item>
-          </Form>
+        </Form>
         <Divider />
         {entity && entity.entityRef.id !== 0 ? (
           <ContributionForm
             entity={entity}
-            height={120}
           />
         ) : (
           <div

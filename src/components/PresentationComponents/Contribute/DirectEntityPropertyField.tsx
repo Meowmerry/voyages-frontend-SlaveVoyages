@@ -1,3 +1,5 @@
+import { useState, useCallback, useEffect } from 'react';
+
 import {
   DirectPropertyChange,
   MaterializedEntity,
@@ -6,7 +8,7 @@ import {
   BoolProperty,
 } from '@dotproductdev/voyages-contribute';
 import { Input } from 'antd';
-import { useState, useCallback, useEffect } from 'react';
+
 import { EntityFormProps } from './EntityForm';
 import { EntityPropertyChangeCommentBox } from './EntityPropertyChangeCommentBox';
 
@@ -28,7 +30,6 @@ export const DirectEntityPropertyField = ({
   const value = lastChange
     ? lastChange.changed
     : (entity.data[label] as DirectPropertyChange['changed']);
-
   const handleChange = useCallback(
     (changed: DirectPropertyChange['changed']) => {
       if (
@@ -52,7 +53,6 @@ export const DirectEntityPropertyField = ({
     },
     [onChange, entity, property, lastChange, value, comments],
   );
-
   useEffect(() => handleChange(value), [handleChange, value, comments]);
   if (
     value !== null &&
@@ -64,7 +64,6 @@ export const DirectEntityPropertyField = ({
       <span>BUG: Value type is incorrect for DirectEntityPropertyField</span>
     );
   }
-
   return (
     <>
       <Input
@@ -77,7 +76,7 @@ export const DirectEntityPropertyField = ({
       />
       <EntityPropertyChangeCommentBox
         property={property}
-        current={lastChange?.comments}
+        current={comments}
         onComment={setComments}
       />
     </>
