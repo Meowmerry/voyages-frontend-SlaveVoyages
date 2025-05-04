@@ -103,7 +103,7 @@ const TreeSelectedEntity: React.FC<TreeSelectedEntityProps> = ({
       setExpandedKeys(allKeys);
     }
   };
-  
+
   const treeSelectProps: ExtendedTreeSelectProps = {
     className: lastChange ? 'changedEntityProperty' : undefined,
     value: value ? String(value.entityRef.id) : undefined,
@@ -134,11 +134,11 @@ const TreeSelectedEntity: React.FC<TreeSelectedEntityProps> = ({
     maxTagCount: 8,
     maxTagPlaceholder: (omittedValues) => `+ ${omittedValues.length} locations ...`,
   };
-  
+
   return (
-    <TreeSelect<string | number, TreeSelectNode> 
-      {...treeSelectProps} 
-      treeDefaultExpandAll 
+    <TreeSelect<string | number, TreeSelectNode>
+      {...treeSelectProps}
+      treeDefaultExpandAll
       styles={{
         popup: {
           root: { overflow: 'auto', zIndex: 9999 }

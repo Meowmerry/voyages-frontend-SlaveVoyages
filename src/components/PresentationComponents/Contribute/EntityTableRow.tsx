@@ -142,11 +142,11 @@ export const EntityTableRow = ({
         ? []
         : [
             {
-              type: 'update',
-              entityRef: entity.entityRef,
-              changes: rowPropChanges,
-            },
-          ],
+            type: 'update',
+            entityRef: entity.entityRef,
+            changes: rowPropChanges,
+          },
+        ],
     [entity, rowPropChanges],
   );
 

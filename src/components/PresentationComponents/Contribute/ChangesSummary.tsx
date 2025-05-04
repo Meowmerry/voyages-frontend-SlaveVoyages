@@ -5,9 +5,8 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
+import { EntityChange } from '@dotproductdev/voyages-contribute';
 import { Button, Typography, Row, Timeline } from 'antd';
-
-import { EntityChange } from '@/models/changeSets';
 
 import PropertyChangesList from './PropertyChangesList';
 const { Text } = Typography;
@@ -32,7 +31,7 @@ const ChangesSummary = ({
   handleSaveChanges,
 }: ChangesSummaryProps) => {
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Row style={{ margin: '12px 0', gap: 8 }}>
         <Button
           className="button-reset-contribute"
@@ -52,54 +51,41 @@ const ChangesSummary = ({
         </Button>
       </Row>
 
-      <div style={{ marginTop: 16 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 8 }}>
         {changes.length === 0 ? (
           <Text type="secondary" italic>
             No changes have been made yet
           </Text>
         ) : (
-          <Timeline mode="left">
-            {changes.map((change, index) => {
-              return (
-                <Timeline.Item
-                  key={index}
-                  dot={iconMap[change.type]}
-                  color="blue"
-                >
-                  <Text strong style={{ color: 'rgb(55, 148, 141)' }}>
-                    {change.type.toUpperCase()} @{' '}
-                    <Text type="secondary">
-                      {change.entityRef.schema}#{change.entityRef.id}
+          <Timeline
+            mode="left"
+            items={changes.map((change, index) => ({
+              key: index,
+              color: 'blue',
+              dot: iconMap[change.type],
+              children: (
+                <div style={{ marginTop: 10, marginBottom: 10 }}>
+                  <div style={{ marginBottom: 8 }}>
+                    <Text strong style={{ color: 'rgb(55, 148, 141)' }}>
+                      {change.type.toUpperCase()} @{' '}
+                      <Text type="secondary">
+                        {change.entityRef.schema}#{change.entityRef.id}
+                      </Text>
                     </Text>
-                  </Text>
-                  <div style={{ marginTop: 10, marginBottom: 10 }}>
-                    {change.type === 'update' ? (
-                      <PropertyChangesList changes={change.changes} />
-                    ) : change.type === 'delete' ? (
-                      <div>Delete</div>
-                    ) : (
-                      <div>Un Delete</div>
-                    )}
                   </div>
-                </Timeline.Item>
-              );
-            })}
-          </Timeline>
+                  {change.type === 'update' ? (
+                    <PropertyChangesList changes={change.changes} />
+                  ) : change.type === 'delete' ? (
+                    <div>Delete</div>
+                  ) : (
+                    <div>Un Delete</div>
+                  )}
+                </div>
+              ),
+            }))}
+          />
         )}
       </div>
-
-      {changes.length > 0 && (
-        <Row style={{ justifyContent: 'center', paddingTop: 12 }}>
-          <Button
-            icon={<SaveOutlined />}
-            className="button-submit-contribute"
-            onClick={submitChanges}
-            disabled={changes.length === 0}
-          >
-            Submit Changes
-          </Button>
-        </Row>
-      )}
     </div>
   );
 };
