@@ -30,6 +30,7 @@ export const DirectEntityPropertyField = ({
   const value = lastChange
     ? lastChange.changed
     : (entity.data[label] as DirectPropertyChange['changed']);
+
   const handleChange = useCallback(
     (changed: DirectPropertyChange['changed']) => {
      
@@ -54,6 +55,7 @@ export const DirectEntityPropertyField = ({
     },
     [onChange, entity, property, lastChange, value, comments],
   );
+
   useEffect(() => handleChange(value), [handleChange, value, comments]);
   if (
     value !== null &&
@@ -65,6 +67,7 @@ export const DirectEntityPropertyField = ({
       <span>BUG: Value type is incorrect for DirectEntityPropertyField</span>
     );
   }
+
   return (
     <>
       <Input
@@ -79,7 +82,7 @@ export const DirectEntityPropertyField = ({
       />
       <EntityPropertyChangeCommentBox
         property={property}
-        current={comments}
+        current={lastChange?.comments}
         onComment={setComments}
       />
     </>
