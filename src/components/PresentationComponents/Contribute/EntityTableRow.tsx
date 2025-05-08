@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from 'react';
-
 import {
   applyUpdate,
   cloneEntity,
+  expandMaterialized,
   MaterializedEntity,
   EntitySchema,
   areMatch,
@@ -12,21 +11,18 @@ import {
   OwnedEntityListChange,
   PropertyChange,
   OwnedEntityListProperty,
-  materializeNew,
-  getSchema,
-  OwnedEntityChange,
 } from '@dotproductdev/voyages-contribute';
 import {
-  Delete,
-  Restore,
-  KeyboardArrowUp,
-  KeyboardArrowDown,
-} from '@mui/icons-material';
-import { Box, IconButton, TableCell, TableRow, Collapse } from '@mui/material';
-
-import { useDebounce } from '@/hooks/useDebounce';
-
+  Box,
+  IconButton,
+  TableCell,
+  TableRow,
+  Collapse,
+} from '@mui/material';
+import React, { useCallback, useMemo } from 'react';
+import { Add, Delete, Restore } from '@mui/icons-material';
 import { EntityForm, EntityFormProps } from './EntityForm';
+import { KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
 import { createEmptyChange } from './EntityTableView';
 
 interface EntityTableRowProps {
@@ -46,7 +42,7 @@ export const EntityTableRow = ({
   onChange,
   ...other
 }: EntityTableRowProps & EntityFormProps) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
   const isDeleted =
     lastChange &&
@@ -80,14 +76,7 @@ export const EntityTableRow = ({
         ],
       });
     }
-  }, [
-    isDeleted,
-    lastChange,
-    onChange,
-    entity.entityRef,
-    parent.entityRef,
-    property.uid,
-  ]);
+  }, [isDeleted, lastChange, onChange]);
 
   const handleRowChange = useCallback(
     (c: EntityChange) => {
@@ -97,16 +86,12 @@ export const EntityTableRow = ({
         alert('Not supported change in nested table entry!');
         return;
       }
-      if (!areMatch(c.entityRef, entity.entityRef)) {
-        alert('Unexpected entityRef in nested table entry!');
-        return;
-      }
       const prev = change.modified.find((m) =>
-        areMatch(m.ownedEntity.entityRef, c.entityRef),
+        areMatch(m.ownedEntityId, c.entityRef),
       );
-      const next = mergePropertyChange(prev as OwnedEntityChange, {
+      const next = mergePropertyChange(prev, {
         kind: 'owned',
-        ownedEntity: prev?.ownedEntity ?? entity,
+        ownedEntityId: c.entityRef,
         property: property.uid,
         changes: c.changes,
       });
@@ -118,7 +103,7 @@ export const EntityTableRow = ({
             ...change,
             modified: [
               ...change.modified.filter(
-                (m) => !areMatch(m.ownedEntity.entityRef, c.entityRef),
+                (m) => !areMatch(m.ownedEntityId, c.entityRef),
               ),
               next,
             ],
@@ -126,13 +111,13 @@ export const EntityTableRow = ({
         ],
       });
     },
-    [lastChange, parent, entity, property, onChange],
+    [lastChange, parent, property, onChange],
   );
 
   const rowPropChanges: PropertyChange[] = useMemo(() => {
     if (!lastChange) return [];
     return lastChange.modified
-      .filter((v) => areMatch(v.ownedEntity.entityRef, entity.entityRef))
+      .filter((v) => areMatch(v.ownedEntityId, entity.entityRef))
       .flatMap((v) => v.changes);
   }, [entity, lastChange]);
 
@@ -142,11 +127,11 @@ export const EntityTableRow = ({
         ? []
         : [
             {
-            type: 'update',
-            entityRef: entity.entityRef,
-            changes: rowPropChanges,
-          },
-        ],
+              type: 'update',
+              entityRef: entity.entityRef,
+              changes: rowPropChanges,
+            },
+          ],
     [entity, rowPropChanges],
   );
 
@@ -156,46 +141,28 @@ export const EntityTableRow = ({
       ? '#e8f5e9'
       : '#f9f9f9';
 
-  const debouncedPropChanges = useDebounce(rowPropChanges, 800);
-
   const updatedEntity = useMemo(() => {
-    let e = entity;
-    if (debouncedPropChanges.length > 0) {
-      e = cloneEntity(entity);
-      if (
-        entity.entityRef.type === 'new' &&
-        Object.keys(entity.data).length === 0
-      ) {
-        // A new entity may be empty to avoid unnecessary data.
-        e = materializeNew(
-          getSchema(entity.entityRef.schema),
-          entity.entityRef.id,
-        );
-      }
-      applyUpdate(e, debouncedPropChanges);
+    const e = rowPropChanges.length > 0 ? cloneEntity(entity) : entity;
+    if (rowPropChanges.length > 0) {
+      applyUpdate(e, expandMaterialized(e), rowPropChanges);
     }
     return e;
-  }, [entity, debouncedPropChanges]);
+  }, [entity, rowPropChanges]);
 
   return (
-    <>
+    <React.Fragment>
       <TableRow
         sx={{
           '& > *': {
             borderBottom: 'unset',
-            background,
+            background
           },
           '&:hover': {
             backgroundColor: '#f0f0f0',
-          },
+          }
         }}
       >
-        <TableCell
-          sx={{
-            padding: '2px 16px',
-            borderColor: 'divider',
-          }}
-        >
+        <TableCell >
           {schema.contributionMode !== 'ReadOnly' && (
             <IconButton
               aria-label="expand row"
@@ -209,21 +176,11 @@ export const EntityTableRow = ({
         <TableCell
           component="th"
           scope="row"
-          sx={{ fontWeight: 500, color: '#333', padding: '2px 16px' }}
+          sx={{ fontWeight: 500, color: '#333' }}
         >
-          <span
-            dangerouslySetInnerHTML={{
-              __html: schema.getLabel(updatedEntity.data),
-            }}
-          ></span>
+         {schema.getLabel(updatedEntity.data)}
         </TableCell>
-        <TableCell
-          align="right"
-          sx={{
-            padding: '2px 16px',
-            borderColor: 'divider',
-          }}
-        >
+        <TableCell align="right">
           <IconButton
             size="small"
             color={isDeleted ? 'primary' : 'error'}
@@ -250,6 +207,6 @@ export const EntityTableRow = ({
           </Collapse>
         </TableCell>
       </TableRow>
-    </>
+    </React.Fragment>
   );
 };

@@ -5,12 +5,11 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { EntityChange } from '@dotproductdev/voyages-contribute';
+import { EntityChange, MaterializedEntity } from '@dotproductdev/voyages-contribute';
 import { Button, Typography, Row, Timeline } from 'antd';
 
 import PropertyChangesList from './PropertyChangesList';
 
-import { EntityChange } from '@/models/changeSets';
 const { Text } = Typography;
 
 const iconMap = {
@@ -21,6 +20,7 @@ const iconMap = {
 
 interface ChangesSummaryProps {
   changes: EntityChange[];
+  entity?: MaterializedEntity;
   resetAllChanges: () => void;
   submitChanges: () => void;
   handleSaveChanges: () => void;
@@ -28,6 +28,7 @@ interface ChangesSummaryProps {
 
 const ChangesSummary = ({
   changes,
+  entity,
   resetAllChanges,
   submitChanges,
   handleSaveChanges,

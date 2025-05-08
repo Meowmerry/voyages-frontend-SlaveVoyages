@@ -5,7 +5,6 @@ import { MaterializedEntity, LinkedEntitySelectionChange } from '@dotproductdev/
 import { convertToTreeSelectFormat, TreeSelectNode } from './convertToTreeSelectFormat';
 import { ContribuitLocation } from '@/share/InterfaceTypes';
 import '@/style/page.scss';
-import { lowerCaseFirstLetter } from '../DirectEntityPropertyField';
 
 type SafeKey = string | number;
 
@@ -27,6 +26,10 @@ export interface TreeSelectedEntityProps {
   options: optionsProps[];
   locationsList: ContribuitLocation[];
 }
+
+const lowerCaseFirstLetter = (str: string) => {
+  return str.charAt(0).toLowerCase() + str.slice(1);
+};
 
 const TreeSelectedEntity: React.FC<TreeSelectedEntityProps> = ({
   handleChange,

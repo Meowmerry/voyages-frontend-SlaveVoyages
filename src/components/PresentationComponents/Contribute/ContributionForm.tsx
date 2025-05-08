@@ -290,6 +290,7 @@ export const ContributionForm = ({ entity }: { entity: MaterializedEntity }) => 
                 resetAllChanges={resetAllChanges}
                 submitChanges={submitChanges}
                 handleSaveChanges={handleSaveChanges}
+                entity={entity}
               />
             </div>
           </Card>
