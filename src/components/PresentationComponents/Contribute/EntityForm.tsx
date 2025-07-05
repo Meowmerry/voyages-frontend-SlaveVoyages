@@ -73,7 +73,7 @@ export const EntityForm = ({
           p.kind === 'text' ||
           p.kind === 'number' ||
           p.kind === 'linkedEntity'
-          ? addLabel(component, p.label)
+          ? addLabel(component, p.label, p.schema)
           : component;
       }),
     [
@@ -149,7 +149,37 @@ export const EntityForm = ({
   );
 };
 
-const addLabel = (item: ReactNode, label: string) => {
+const addLabel = (item: ReactNode, label: string, schema: string) => {
+  const isVoyageSparseDate = schema === 'VoyageSparseDate';
+
+  if (isVoyageSparseDate) {
+    // For date fields, use a more compact layout with better alignment
+    return (
+      <Form.Item
+        label={<span className="form-contribute-label">{label}</span>}
+        name={label}
+        style={{
+          margin: '8px 0px',
+          marginBottom: '12px',
+        }}
+        labelCol={{ span: 24 }}
+        wrapperCol={{ span: 24 }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {item}
+        </div>
+      </Form.Item>
+    );
+  }
+
+  // For regular fields
   return (
     <Form.Item
       label={<span className="form-contribute-label">{label}</span>}

@@ -1,17 +1,24 @@
 import { PropertyChange } from '@dotproductdev/voyages-contribute';
+
 import PropertyChangeCard from './PropertyChangeCard';
 
 interface PropertyChangesListProps {
   changes: PropertyChange[];
-  handleDeleteChange: (propertyToDelete: string) => void
+  handleDeleteChange: (propertyToDelete: string) => void;
   property?: string;
 }
 
-const PropertyChangesList = ({ changes, handleDeleteChange }: PropertyChangesListProps) => {
+const PropertyChangesList = ({
+  changes,
+  handleDeleteChange,
+}: PropertyChangesListProps) => {
   // Group ownedList changes by property name
   const ownedListGroups: Record<string, any[]> = {};
   changes
-    .filter((c): c is Extract<PropertyChange, { kind: 'ownedList' }> => c.kind === 'ownedList')
+    .filter(
+      (c): c is Extract<PropertyChange, { kind: 'ownedList' }> =>
+        c.kind === 'ownedList',
+    )
     .forEach((c) => {
       if (!ownedListGroups[c.property]) ownedListGroups[c.property] = [];
       ownedListGroups[c.property].push(...c.modified, ...c.removed);
@@ -44,7 +51,11 @@ const PropertyChangesList = ({ changes, handleDeleteChange }: PropertyChangesLis
         .filter((pc) => pc.kind !== 'ownedList')
         .map((pc, idxPC) => (
           <div key={`change-${idxPC}`} className="property-card">
-            <PropertyChangeCard change={pc} property={pc.property} handleDeleteChange={handleDeleteChange}/>
+            <PropertyChangeCard
+              change={pc}
+              property={pc.property}
+              handleDeleteChange={handleDeleteChange}
+            />
           </div>
         ))}
     </>
