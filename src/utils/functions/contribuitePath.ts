@@ -1,8 +1,11 @@
 //https://www.slavevoyages.org/contribute/interim/new/2976
 import { createElement } from 'react';
-import { Add, Edit, Merge, Delete, List } from '@mui/icons-material';
+
+import { Add, Edit, Merge, Delete, List, Download } from '@mui/icons-material';
 const generateId = '';
-export const getDisplayButtons = (translatedContribute: any) => [
+export const getDisplayButtons = (
+  translatedContribute: Record<string, string>,
+) => [
   {
     nameBtn: translatedContribute.contributeNewVoyage,
     path: `/contribute/interim/new/${generateId}`,
@@ -24,8 +27,53 @@ export const getDisplayButtons = (translatedContribute: any) => [
     icon: createElement(Delete),
   },
   {
-    nameBtn: 'TEMP EDITORIAL PLAT',
-    path: `/contribute/TEMP_EDITORIAL`,
+    nameBtn: translatedContribute.contributeEditorialPlatform,
+    path: `/contribute/editorial_platform`,
     icon: createElement(List),
+  },
+];
+
+export const getDisplayButtonsEditorial = (
+  translatedContribute: Record<string, string>,
+) => [
+  {
+    nameBtn: translatedContribute.contributeVoyages,
+    path: `/contribute/editor_main/pending`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributeRequests,
+    path: `/contribute/editorial_platform`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributeEnslavers,
+    path: `/contribute/editor_main/enslavers_contrib`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributeEnslaved,
+    path: `/contribute/editor_main/enslaved_contrib`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributeUsers,
+    path: `/contribute/editor_main/users`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributeSourceCodes,
+    path: `/contribute/editor_main/sources`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributePublish,
+    path: `/contribute/editor_main/publish`,
+    icon: createElement(List),
+  },
+  {
+    nameBtn: translatedContribute.contributeDownloadVoyages,
+    path: `/contribute/editor_main/downloads`,
+    icon: createElement(Download),
   },
 ];

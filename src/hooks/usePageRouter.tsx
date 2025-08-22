@@ -10,6 +10,7 @@ export function usePageRouter() {
   const endpointPeopleDirect = `${pathParts[1]}/${pathParts[2]}`;
   const endpointPath = location.pathname.split('/').at(1);
   const contributePath = location.pathname.split('/').at(2);
+  const contributePathEditorial = `${pathParts[2]}/${pathParts[3]}`;
   const endpointPathEstimate = location.pathname.split('/').at(2);
   const nodeTypeURL = location.pathname.split('/').at(-2);
   const voyageURLID = location.pathname.split('/').at(-1);
@@ -32,5 +33,6 @@ export function usePageRouter() {
     endpointPathEstimate,
     endpointPeopleDirect,
     pathName,
+    contributePathEditorial,
   };
 }

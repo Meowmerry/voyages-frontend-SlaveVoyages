@@ -180,10 +180,41 @@ const App: React.FC = () => {
       <Route path={`${ACCOUNTS}password_change`} element={<ContributePage />} />
       <Route path={`${CONTRIBUTE}legal`} element={<ContributePage />} />
       <Route path={`${CONTRIBUTE}interim/new/`} element={<ContributePage />} />
-      <Route path={`${CONTRIBUTE}TEMP_EDITORIAL`} element={<ContributePage />} />
       <Route path={`${CONTRIBUTE}edit_voyage`} element={<ContributePage />} />
       <Route path={`${CONTRIBUTE}merge_voyages`} element={<ContributePage />} />
       <Route path={`${CONTRIBUTE}delete_voyage`} element={<ContributePage />} />
+      <Route
+        path={`${CONTRIBUTE}editor_main/pending`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editorial_platform`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editor_main/enslavers_contrib`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editor_main/enslaved_contrib`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editor_main/users`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editor_main/sources`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editor_main/publish`}
+        element={<ContributePage />}
+      />
+      <Route
+        path={`${CONTRIBUTE}editor_main/downloads`}
+        element={<ContributePage />}
+      />
       <Route path={`${LESSONPLANS}/`} element={<LessonPlans />} />
       <Route path={`${INTRODUCTORYMAPS}/`} element={<IntroductoryMaps />} />
       <Route path={`${ABOUTPAGE}`} element={<AboutPage />} />

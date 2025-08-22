@@ -347,3 +347,123 @@
     border-radius: 4px;
     border-bottom: 1px solid rgba(249, 249, 249, 0.2509803922);
 }
+
+/* Add these styles to your existing table.scss file */
+
+.compact-table {
+  .ag-header {
+    background-color: #f8f9fa !important;
+    border-bottom: 2px solid #e9ecef !important;
+    font-weight: 600 !important;
+  }
+
+  .ag-header-cell {
+    border-right: 1px solid #e9ecef !important;
+    color: rgb(55, 148, 141)!important;
+  }
+
+  .compact-header {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+  }
+
+  .ag-cell {
+    padding: 8px 12px !important;
+    border-right: 1px solid #f1f3f4 !important;
+    border-bottom: 1px solid #f1f3f4 !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+  }
+
+  .even-row {
+    background-color: #ffffff !important;
+  }
+
+  .odd-row {
+    background-color: #f8f9fa !important;
+  }
+
+  .ag-row:hover {
+    background-color: #e3f2fd !important;
+    cursor: pointer;
+  }
+
+  /* Remove default row selection styling */
+  .ag-row-selected {
+    background-color: #e3f2fd !important;
+  }
+
+  /* Compact scrollbars */
+  .ag-body-horizontal-scroll {
+    height: 12px !important;
+  }
+
+  .ag-body-vertical-scroll {
+    width: 12px !important;
+  }
+
+  /* Header sorting icons */
+  .ag-icon-asc,
+  .ag-icon-desc {
+    font-size: 12px !important;
+  }
+
+  /* Remove extra padding from cells */
+  .ag-cell-value {
+    line-height: 1.2 !important;
+  }
+}
+
+/* Custom pointer row styling */
+.custom-pointer-row {
+  cursor: pointer !important;
+}
+
+.custom-pointer-row:hover {
+  background-color: #f0f8ff !important;
+}
+
+/* Status chip custom styling */
+.status-chip {
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  height: 20px !important;
+  padding: 0 8px !important;
+}
+
+/* Table container improvements */
+.tableContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  border-radius: 0 0 8px 8px;
+}
+
+.pagination-contribute {
+  display: flex;
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .compact-table {
+    .ag-header-cell,
+    .ag-cell {
+      padding: 6px 8px !important;
+      font-size: 12px !important;
+    }
+  }
+  
+  .tableContainer {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+.list-edittorial-container{
+  margin: 5px 0 30px 0;
+}

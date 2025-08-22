@@ -8,7 +8,15 @@ import {
   materializeNew,
   PropertyAccessLevel,
 } from '@dotproductdev/voyages-contribute';
-import { Box, Typography, Button, Pagination } from '@mui/material';
+import { Edit } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Button,
+  Pagination,
+  Chip,
+  IconButton,
+} from '@mui/material';
 import { AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/styles/ag-grid.css';
@@ -17,7 +25,10 @@ import '@/style/table.scss';
 import { BASEURLNODE } from '@/share/AUTH_BASEURL';
 import { CustomTablePagination } from '@/styleMUI';
 
-import { ContributionForm } from './ContributionForm';
+import '@/style/contributeContent.scss';
+
+import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
+import ContributionForm from '../ContributionForm';
 
 const tempContrib: EntityUpdate = {
   type: 'update',
@@ -319,6 +330,7 @@ const tempContrib: EntityUpdate = {
     },
   ],
 };
+
 const _contribs: ChangeSet[] = [tempContrib].map((u) => ({
   id: 1,
   author: 'Mock author',
@@ -327,11 +339,46 @@ const _contribs: ChangeSet[] = [tempContrib].map((u) => ({
   comments: 'This is a mock contribution for testing purposes.',
   timestamp: new Date().getTime(),
 }));
-interface TempEditorialPlatProps {
+
+// Status renderer component
+const StatusCellRenderer = ({ value }: { value: string }) => {
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return { color: '#2e7d32', backgroundColor: '#e8f5e8' };
+      case 'rejected':
+        return { color: '#d32f2f', backgroundColor: '#fdeaea' };
+      case 'pending':
+        return { color: '#ed6c02', backgroundColor: '#fff4e6' };
+      case 'posted':
+        return { color: '#1976d2', backgroundColor: '#e3f2fd' };
+      default:
+        return { color: '#666', backgroundColor: '#f5f5f5' };
+    }
+  };
+
+  const statusStyle = getStatusColor(value);
+
+  return (
+    <Chip
+      label={value}
+      size="small"
+      sx={{
+        fontSize: '12px',
+        height: '20px',
+        ...statusStyle,
+        border: 'none',
+        fontWeight: 500,
+      }}
+    />
+  );
+};
+
+interface EditorialPlatformPlatProps {
   openSideBar: boolean;
 }
 
-export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
+const EditorialPlatform: React.FC<EditorialPlatformPlatProps> = ({
   openSideBar,
 }) => {
   const [active, setActive] = useState<ChangeSet | undefined>(undefined);
@@ -343,31 +390,54 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
 
   const columnDefs = [
     {
+      headerName: 'Type',
+      field: 'type',
+      cellRenderer: () => (
+        <IconButton
+          style={{
+            color: 'rgb(55, 148, 141)',
+            position: 'relative',
+            bottom: 2,
+            background: 'transparent',
+          }}
+          // onClick={() => onClose(false)}
+        >
+          <Edit style={{ fontSize: '1rem', position: 'relative', bottom: 2 }} />
+        </IconButton>
+      ),
+      width: 60,
+      sortable: false,
+    },
+    {
       headerName: 'Title',
       field: 'title',
       valueGetter: (params: any) => params.data?.title,
       tooltipValueGetter: (params: any) => params.data?.title,
-      flex: 1,
+      width: 200,
     },
     {
-      headerName: 'Author',
+      headerName: 'Contributor',
       field: 'author',
-      valueGetter: (params: any) => params.data?.author,
+      valueGetter: (params: any) => params.data?.author || 'Unknown',
+      width: 120,
       tooltipValueGetter: (params: any) => params.data?.author,
-      flex: 1,
     },
     {
       headerName: 'Comments',
       valueGetter: (params: any) => params.data?.comments,
       tooltipValueGetter: (params: any) => params.data?.comments,
-      flex: 1,
+      width: 250,
     },
     {
       headerName: 'Date',
       field: 'timestamp',
       valueFormatter: ({ value }: { value: number }) =>
-        new Date(value).toLocaleDateString(),
-      flex: 1,
+        new Date(value).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }),
+      width: 100,
     },
     {
       headerName: 'Voyage ID',
@@ -375,10 +445,11 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
         params.data?.changes?.[0]?.entityRef?.id || '',
       tooltipValueGetter: (params: any) =>
         `Voyage ID: ${params.data?.changes?.[0]?.entityRef?.id || ''}`,
+      width: 100,
       flex: 1,
     },
     {
-      headerName: 'Ship Name',
+      headerName: 'Ship',
       valueGetter: (params: any) => {
         const ship = params.data?.changes?.[0]?.changes?.find(
           (c: any) => c.kind === 'owned' && c.property === 'Voyage_Ship',
@@ -388,6 +459,8 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
             ?.changed || ''
         );
       },
+      width: 150,
+      flex: 1,
       tooltipValueGetter: (params: any) => {
         const ship = params.data?.changes?.[0]?.changes?.find(
           (c: any) => c.kind === 'owned' && c.property === 'Voyage_Ship',
@@ -397,7 +470,6 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
             ?.changed || '-'
         );
       },
-      flex: 1,
     },
     {
       headerName: 'Port of Departure',
@@ -421,6 +493,39 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
           )?.changed || '-'
         );
       },
+      with: 200,
+    },
+    {
+      headerName: 'Reviewer',
+      valueGetter: () => 'David Ellis', // Mock reviewer
+      width: 120,
+      flex: 1,
+    },
+    // {
+    //   headerName: 'Action',
+    //   cellRenderer: ActionCellRenderer,
+    //   width: 70,
+    //   resizable: false,
+    //   sortable: false,
+    //   flex: 1,
+    //   cellStyle: {
+    //     textAlign: 'center',
+    //     cursor: 'pointer',
+    //     fontSize: '18px',
+    //     fontWeight: 'bold',
+    //   },
+    // },
+    {
+      headerName: 'Response',
+      valueGetter: () => 'Posted', // Mock response
+      width: 100,
+      flex: 1,
+    },
+    {
+      headerName: 'Status',
+      valueGetter: () => 'Rejected', // Mock status
+      cellRenderer: StatusCellRenderer,
+      width: 100,
       flex: 1,
     },
   ];
@@ -444,7 +549,6 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
           const rows = data.data.map((c: any) => c.changeSet);
           params.successCallback(rows, data.total);
           setTotalResultsCount(data.total);
-          console.log({ rows });
           setContribs(rows);
         } catch (err) {
           console.error('Error fetching data:', err);
@@ -454,6 +558,7 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
     }),
     [rowsPerPage],
   );
+
   const pageCount = Math.ceil(
     totalResultsCount && rowsPerPage ? totalResultsCount / rowsPerPage : 1,
   );
@@ -476,84 +581,128 @@ export const TempEditorialPlat: React.FC<TempEditorialPlatProps> = ({
     },
     [],
   );
+  const getRowRowStyle = useCallback(
+    () => ({
+      fontSize: '0.8rem',
+      fontWeight: 500,
+      color: '#000',
+      fontFamily: 'sans-serif',
+    }),
+    [],
+  );
+  const defaultColDef = useMemo(
+    () => ({
+      sortable: true,
+      resizable: true,
+      filter: false,
+      cellStyle: {
+        paddingTop: '8px',
+        paddingBottom: '8px',
+        fontSize: '13px',
+        lineHeight: '1.2',
+      },
+    }),
+    [],
+  );
 
   return (
-    <Box sx={{ p: 2, width: '100%' }}>
-      {active === undefined ? (
-        <>
-          <Typography variant="h4" sx={{ mb: 2 }}>
-            Editorial Contributions
-          </Typography>
+    <>
+      <Box sx={{ p: 2, width: '100%' }}>
+        <ListEditorialPlatForm />
+        {active === undefined ? (
+          <>
+            <Typography
+              variant="h4"
+              sx={{ mb: 3, fontSize: '24px', fontWeight: 600 }}
+            >
+              Editorial Contributions
+            </Typography>
 
-          <div
-            className="ag-theme-alpine"
-            style={{
-              height: 'calc(90vh - 220px)',
-              width: openSideBar
-                ? 'calc(100vw - 340px)'
-                : 'calc(100vw - 120px)',
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              overflowY: 'auto',
-            }}
-          >
-            <AgGridReact<ChangeSet>
-              ref={gridRef}
-              columnDefs={columnDefs as any}
-              defaultColDef={{ flex: 1, minWidth: 100 }}
-              rowModelType="infinite"
-              datasource={datasource}
-              cacheBlockSize={rowsPerPage}
-              paginationPageSize={rowsPerPage}
-              onRowClicked={({ data }) => setActive(data)}
-              theme="legacy"
-              pagination={true}
-              suppressPaginationPanel={true}
-              getRowClass={() => 'custom-pointer-row'}
-            />
-          </div>
-          <div className="tableContainer">
-            <CustomTablePagination
-              component="div"
-              count={totalResultsCount}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPageOptions={[5, 10, 15, 20, 25, 30, 45, 50, 100]}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-            <div className="pagination-contribute">
-              <Pagination
-                count={pageCount}
-                page={page + 1}
-                onChange={handleChangePagePagination}
+            <div
+              className="ag-theme-alpine compact-table"
+              style={{
+                height: 'calc(90vh - 220px)',
+                width: openSideBar
+                  ? 'calc(100vw - 340px)'
+                  : 'calc(100vw - 120px)',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                overflowY: 'auto',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+              }}
+            >
+              <AgGridReact<ChangeSet>
+                theme="legacy"
+                ref={gridRef}
+                columnDefs={columnDefs as any}
+                defaultColDef={defaultColDef}
+                getRowStyle={getRowRowStyle}
+                enableBrowserTooltips={true}
+                rowModelType="infinite"
+                datasource={datasource}
+                cacheBlockSize={rowsPerPage}
+                paginationPageSize={rowsPerPage}
+                onRowClicked={({ data }) => setActive(data)}
+                pagination={true}
+                suppressPaginationPanel={true}
+                getRowClass={(params) =>
+                  params.rowIndex % 2 === 0 ? 'even-row' : 'odd-row'
+                }
+                rowHeight={40}
+                headerHeight={36}
+                suppressHorizontalScroll={false}
               />
             </div>
-          </div>
-        </>
-      ) : (
-        <Box>
-          <Box sx={{ mb: 2 }}>
-            <Button onClick={handleBackToTable} variant="outlined">
-              ← Back to Table
-            </Button>
-            <Typography variant="h5" sx={{ mt: 2 }}>
-              Contribution from {active?.author}
-            </Typography>
-          </Box>
-          <div className="contribute-content">
-            {empty && (
-              <ContributionForm
-                entity={empty}
-                changeSet={active}
-                onChange={setActive}
-                accessLevel={PropertyAccessLevel.Editor}
+            <div className="tableContainer">
+              <CustomTablePagination
+                component="div"
+                count={totalResultsCount}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPageOptions={[5, 10, 15, 20, 25, 30, 45, 50, 100]}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
               />
-            )}
-          </div>
-        </Box>
-      )}
-    </Box>
+              <div className="pagination-contribute">
+                <Pagination
+                  count={pageCount}
+                  page={page + 1}
+                  onChange={handleChangePagePagination}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <Box>
+            <Box sx={{ mb: 2 }}>
+              <Button
+                onClick={handleBackToTable}
+                variant="outlined"
+                size="small"
+              >
+                ← Back to Table
+              </Button>
+              <Typography variant="h5" sx={{ mt: 2 }}>
+                Contribution from {active?.author}
+              </Typography>
+            </Box>
+            <div className="contribute-content">
+              {empty && (
+                <ContributionForm
+                  entity={empty}
+                  changeSet={active}
+                  onChange={setActive}
+                  accessLevel={PropertyAccessLevel.Editor}
+                />
+              )}
+            </div>
+          </Box>
+        )}
+      </Box>
+    </>
   );
 };
+
+export default EditorialPlatform;
