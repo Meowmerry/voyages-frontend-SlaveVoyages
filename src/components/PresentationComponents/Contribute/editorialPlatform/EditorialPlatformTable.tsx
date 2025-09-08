@@ -3,7 +3,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import {
-  EditOutlined,
   ClearOutlined,
   SearchOutlined,
   DownOutlined,
@@ -549,41 +548,14 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     () =>
       [
         {
-          headerName: '',
+          headerName: 'Action',
           field: undefined,
+          tooltipField: 'Select row',
           checkboxSelection: true,
           headerCheckboxSelection: true,
-          width: 50,
-          minWidth: 50,
-          maxWidth: 50,
-          sortable: false,
-          resizable: false,
-          suppressMovable: true,
-          pinned: 'left',
-        },
-        {
-          headerName: 'Type',
-          field: undefined as any,
-          cellRenderer: () => (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-              }}
-            >
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                size="small"
-                style={{ color: 'rgb(55, 148, 141)' }}
-              />
-            </div>
-          ),
-          width: 60,
-          minWidth: 60,
-          maxWidth: 60,
+          width: 65,
+          minWidth: 65,
+          maxWidth: 65,
           sortable: false,
           resizable: false,
           suppressMovable: true,
@@ -595,6 +567,40 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
             padding: '4px',
           },
         },
+        // {
+        //   headerName: 'Type',
+        //   field: undefined as any,
+        //   cellRenderer: () => (
+        //     <div
+        //       style={{
+        //         display: 'flex',
+        //         justifyContent: 'center',
+        //         alignItems: 'center',
+        //         height: '100%',
+        //       }}
+        //     >
+        //       <Button
+        //         type="text"
+        //         icon={<EditOutlined />}
+        //         size="small"
+        //         style={{ color: 'rgb(55, 148, 141)' }}
+        //       />
+        //     </div>
+        //   ),
+        //   width: 60,
+        //   minWidth: 60,
+        //   maxWidth: 60,
+        //   sortable: false,
+        //   resizable: false,
+        //   suppressMovable: true,
+        //   pinned: 'left',
+        //   cellStyle: {
+        //     display: 'flex',
+        //     alignItems: 'center',
+        //     justifyContent: 'center',
+        //     padding: '4px',
+        //   },
+        // },
         {
           headerName: 'Title',
           field: 'title' as any,
@@ -782,7 +788,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   return (
     <div style={{ padding: '16px', width: '100%' }}>
       <ListEditorialPlatForm />
-
       {/* Header */}
       <div
         style={{
@@ -840,8 +845,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
             </Button>
           </Space>
         </div>
-      </div>
-
+      </div>{' '}
       {/* Bulk Actions Bar */}
       {selectedRows.length > 0 && (
         <Card
@@ -895,7 +899,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           </div>
         </Card>
       )}
-
       {/* Filters */}
       {showFilters && (
         <FilterPanel
@@ -907,7 +910,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           hasActiveFilters={hasActiveFilters}
         />
       )}
-
       {/* Table */}
       <div
         className="ag-theme-alpine compact-table"
@@ -944,7 +946,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           suppressRowClickSelection={true}
         />
       </div>
-
       {/* Pagination */}
       <div
         style={{
@@ -967,7 +968,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           style={{ margin: 0 }}
         />
       </div>
-
       {/* Batch Management Modal */}
       <BatchManagement
         visible={batchManagementVisible}
@@ -977,7 +977,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           message.success('Batch updated successfully');
         }}
       />
-
       {/* Batch Assignment Modal */}
       <BatchAssignmentModal
         visible={batchAssignmentVisible}
