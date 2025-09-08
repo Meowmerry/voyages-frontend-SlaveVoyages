@@ -61,6 +61,7 @@ const SelectBatchAutoCompleted: FunctionComponent<
               selectedBatch ? selectedBatch.title : 'Type to search batches...'
             }
             style={{ padding: 8 }}
+            size="small"
           />
         )}
         renderOption={(props, option) => (

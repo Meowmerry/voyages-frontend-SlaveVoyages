@@ -76,6 +76,7 @@ export const batchApi = {
         batch_id: batchId,
       }),
     });
+    console.log({ response });
 
     if (!response.ok) {
       const error = await response.json();
