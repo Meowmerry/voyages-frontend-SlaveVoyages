@@ -1,3 +1,4 @@
+// //* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useMemo, useRef, useState } from 'react';
 
@@ -7,6 +8,9 @@ import {
   SearchOutlined,
   DownOutlined,
   UpOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
 import {
   ChangeSet,
@@ -31,6 +35,9 @@ import {
   Input,
   Badge,
   Divider,
+  message,
+  Dropdown,
+  Menu,
 } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -40,6 +47,8 @@ import '@/style/table.scss';
 import { BASEURLNODE } from '@/share/AUTH_BASEURL';
 import '@/style/contributeContent.scss';
 
+import BatchManagement from '../BatchComponent/BatchManagement';
+import BatchAssignmentModal from '../BatchComponent/Modal/BatchAssignmentModal';
 import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
 import StatusCellRenderer from '../commons/StatusCellRenderer';
 import { ContributionForm } from '../ContributionForm';
@@ -143,7 +152,7 @@ const transformContributionData = (contribution: any) => {
 };
 
 // Custom hooks
-const useFilters = (form: any, gridRef: any) => {
+const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
   const [filters, setFilters] = useState<ContributionFilters>(initialFilters);
 
   const buildFilterQuery = useCallback(
@@ -315,7 +324,7 @@ const FilterPanel = ({
       boxShadow: '0 2px 4px rgba(0, 0, 0, 0.03)',
       background: 'white',
     }}
-    bodyStyle={{ padding: '16px' }}
+    styles={{ body: { padding: '16px' } }}
   >
     <div
       style={{
@@ -464,19 +473,22 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   const [totalResultsCount, setTotalResultsCount] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [batchManagementVisible, setBatchManagementVisible] = useState(false);
+  const [batchAssignmentVisible, setBatchAssignmentVisible] = useState(false);
   const [form] = Form.useForm();
   const gridRef = useRef<any>(null);
 
   const {
     filters,
-    // setFilters,
+    setFilters,
     buildFilterQuery,
     handleFilterChange,
     handleClearFilters,
     handleApplyFilters,
     hasActiveFilters,
     activeFilterCount,
-  } = useFilters(form, gridRef);
+  } = useSearchEditRequestsFilters(form, gridRef);
 
   // Auto-apply search filter with debounce
   const handleSearchChange = useCallback(
@@ -493,12 +505,65 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     [filters.search, handleApplyFilters, handleFilterChange],
   );
 
+  // Handle row selection
+  const onSelectionChanged = useCallback(() => {
+    const selectedNodes = gridRef.current?.api.getSelectedNodes();
+    const selectedIds = selectedNodes?.map((node: any) => node.data.id) || [];
+    setSelectedRows(selectedIds);
+  }, []);
+
+  // Bulk actions menu
+  const bulkActionsMenu = (
+    <Menu>
+      <Menu.Item
+        key="assign-batch"
+        icon={<TeamOutlined />}
+        onClick={() => {
+          if (selectedRows.length === 0) {
+            message.warning('Please select contributions to assign');
+            return;
+          }
+          setBatchAssignmentVisible(true);
+        }}
+      >
+        Assign to Batch
+      </Menu.Item>
+      <Menu.Item
+        key="approve"
+        icon={<CheckCircleOutlined />}
+        onClick={() => {
+          if (selectedRows.length === 0) {
+            message.warning('Please select contributions to approve');
+            return;
+          }
+          // Handle bulk approval
+          message.info('Bulk approval functionality coming soon');
+        }}
+      >
+        Bulk Approve
+      </Menu.Item>
+    </Menu>
+  );
+
   const columnDefs = useMemo(
     () =>
       [
         {
+          headerName: '',
+          field: undefined,
+          checkboxSelection: true,
+          headerCheckboxSelection: true,
+          width: 50,
+          minWidth: 50,
+          maxWidth: 50,
+          sortable: false,
+          resizable: false,
+          suppressMovable: true,
+          pinned: 'left',
+        },
+        {
           headerName: 'Type',
-          field: undefined as any, // No field needed for custom renderer
+          field: undefined as any,
           cellRenderer: () => (
             <div
               style={{
@@ -737,10 +802,10 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
         >
           <div>
             <Title level={2} style={{ margin: 0, color: '#333' }}>
-              Editorial Contributions
+              Edit Requests
             </Title>
             <div style={{ marginTop: '4px', color: '#6b7280' }}>
-              Manage and review editorial contributions
+              Manage and review Edit Requests
             </div>
           </div>
 
@@ -759,9 +824,77 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
               showFilters={showFilters}
               onClick={() => setShowFilters(!showFilters)}
             />
+            <Button
+              icon={<SettingOutlined />}
+              onClick={() => setBatchManagementVisible(true)}
+              style={{
+                borderRadius: '6px',
+                height: '30px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                color: 'white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+            >
+              Batch Management
+            </Button>
           </Space>
         </div>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedRows.length > 0 && (
+        <Card
+          style={{
+            marginBottom: '16px',
+            borderRadius: '6px',
+            border: '1px solid #e5e7eb',
+            background: '#f8fafc',
+          }}
+          styles={{ body: { padding: '12px 16px' } }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <Badge
+                count={selectedRows.length}
+                style={{ backgroundColor: '#1890ff' }}
+              />
+              <span style={{ marginLeft: '8px', fontWeight: 500 }}>
+                {selectedRows.length} contribution(s) selected
+              </span>
+            </div>
+            <Space>
+              <Dropdown overlay={bulkActionsMenu} trigger={['click']}>
+                <Button
+                  type="primary"
+                  style={{
+                    background:
+                      'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
+                    border: 'none',
+                  }}
+                >
+                  Bulk Actions <DownOutlined />
+                </Button>
+              </Dropdown>
+              <Button
+                size="small"
+                onClick={() => {
+                  gridRef.current?.api.deselectAll();
+                  setSelectedRows([]);
+                }}
+              >
+                Clear Selection
+              </Button>
+            </Space>
+          </div>
+        </Card>
+      )}
 
       {/* Filters */}
       {showFilters && (
@@ -806,6 +939,9 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           rowHeight={40}
           headerHeight={36}
           suppressHorizontalScroll={false}
+          rowSelection="multiple"
+          onSelectionChanged={onSelectionChanged}
+          suppressRowClickSelection={true}
         />
       </div>
 
@@ -831,6 +967,29 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           style={{ margin: 0 }}
         />
       </div>
+
+      {/* Batch Management Modal */}
+      <BatchManagement
+        visible={batchManagementVisible}
+        onClose={() => setBatchManagementVisible(false)}
+        onBatchAssigned={() => {
+          handleApplyFilters();
+          message.success('Batch updated successfully');
+        }}
+      />
+
+      {/* Batch Assignment Modal */}
+      <BatchAssignmentModal
+        visible={batchAssignmentVisible}
+        onClose={() => setBatchAssignmentVisible(false)}
+        contributionIds={selectedRows}
+        onSuccess={() => {
+          setBatchAssignmentVisible(false);
+          setSelectedRows([]);
+          gridRef.current?.api.deselectAll();
+          handleApplyFilters();
+        }}
+      />
     </div>
   );
 };

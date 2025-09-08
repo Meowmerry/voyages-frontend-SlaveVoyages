@@ -219,6 +219,18 @@ export const PaperDraggablePreviewStyle = {
   overflow: 'hidden',
 };
 
+export const PaperDraggableBatchStyle = {
+  maxWidth: '50%',
+  minWidth: 500,
+  overflow: 'hidden',
+};
+
+export const PaperDraggableBatchManangmentStyle = {
+  maxWidth: '80%',
+  minWidth: 800,
+  overflow: 'hidden',
+};
+
 export const TextFieldSearch = styled(TextField)`
   & label.Mui-focused {
     color: white;
