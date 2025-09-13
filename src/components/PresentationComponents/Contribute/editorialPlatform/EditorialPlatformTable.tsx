@@ -32,6 +32,7 @@ import dayjs from 'dayjs';
 import '@/style/table.scss';
 import { fetchContributionsData } from '@/fetch/contributeFetch/fetchContributionsData';
 import { updateContributionStatus } from '@/fetch/contributeFetch/updateContributionStatus';
+import { useBatchManagement } from '@/hooks/useBatchManagement';
 import { useSearchEditRequestsFilters } from '@/hooks/useSearchEditRequestsFilters';
 import '@/style/contributeContent.scss';
 
@@ -61,6 +62,10 @@ interface EditorialPlatformPlatProps {
 const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   openSideBar,
 }) => {
+  const { batches } = useBatchManagement({
+    autoFetch: true,
+  });
+
   const [active, setActive] = useState<ChangeSet | undefined>(undefined);
   const [contribs, setContribs] = useState<ChangeSet[]>([]);
   const [page, setPage] = useState(1);
@@ -93,6 +98,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
         const transformedRows = contributionsArray.map(
           transformContributionData,
         );
+        console.log({ transformedRows });
         setContribs(transformedRows);
         setTotalResultsCount(response?.total || transformedRows.length);
       } catch (err) {
@@ -207,6 +213,16 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           field: 'comments' as any,
           tooltipField: 'comments',
           width: 250,
+          sortable: true,
+        },
+        {
+          headerName: 'Batch',
+          field: 'batch' as any,
+          tooltipField: 'batch',
+          valueGetter: (params: any) => {
+            return params.data?.batch?.title || 'Unknown';
+          },
+          width: 180,
           sortable: true,
         },
         {
@@ -477,6 +493,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
       {/* Filters */}
       {showFilters && (
         <FilterPanel
+          batches={batches}
           filters={filters}
           form={form}
           onFilterChange={handleFilterChange}
@@ -540,7 +557,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           getRowClass={(params) =>
             params.rowIndex % 2 === 0 ? 'even-row' : 'odd-row'
           }
-          rowHeight={40}
           headerHeight={36}
           suppressHorizontalScroll={false}
           rowSelection={{

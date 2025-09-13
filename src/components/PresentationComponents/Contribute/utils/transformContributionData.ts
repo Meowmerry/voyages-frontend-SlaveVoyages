@@ -5,7 +5,6 @@ import { extractShipData } from './extractShipData';
 export const transformContributionData = (contribution: any) => {
   const changeSetData = contribution.changeSet || contribution;
   const changeStatus = contribution?.status;
-
   return {
     ...changeSetData,
     voyageId: changeSetData.changes?.[0]?.entityRef?.id || '',
@@ -18,5 +17,6 @@ export const transformContributionData = (contribution: any) => {
       'Nation name',
     ),
     tonnage: extractShipData(changeSetData, 'VoyageShip_tonnage'),
+    batch: contribution?.batch,
   };
 };

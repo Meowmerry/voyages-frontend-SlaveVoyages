@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useMemo, useState } from 'react';
 
 import { ContributionStatus } from '@dotproductdev/voyages-contribute';
@@ -10,7 +11,7 @@ export interface ContributionFilters {
   shipName: string;
   nationality: string;
   dateRange: [Dayjs | null, Dayjs | null] | null;
-  publicationBatch: string;
+  publicationBatch: number | string;
   reviewer: string;
   search?: string;
 }
@@ -28,6 +29,7 @@ const initialFilters: ContributionFilters = {
 };
 
 // Custom hooks
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
   const [filters, setFilters] = useState<ContributionFilters>(initialFilters);
 
@@ -43,7 +45,7 @@ export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
       if (filters.nationality)
         params.append('nationality', filters.nationality);
       if (filters.publicationBatch)
-        params.append('publicationBatch', filters.publicationBatch);
+        params.append('publicationBatch', String(filters.publicationBatch));
       if (filters.reviewer) params.append('reviewer', filters.reviewer);
       if (filters.search) params.append('search', filters.search);
       if (filters.dateRange?.[0])

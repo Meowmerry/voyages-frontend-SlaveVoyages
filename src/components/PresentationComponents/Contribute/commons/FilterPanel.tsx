@@ -1,5 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ClearOutlined, SearchOutlined } from '@ant-design/icons';
-import { ContributionStatus } from '@dotproductdev/voyages-contribute';
+import {
+  ContributionStatus,
+  PublicationBatch,
+} from '@dotproductdev/voyages-contribute';
 import {
   Button,
   Select,
@@ -21,14 +25,6 @@ const { Title } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-// Constants
-const PUBLICATION_BATCHES = [
-  'Batch 2024-Q1',
-  'Batch 2024-Q2',
-  'Batch 2024-Q3',
-  'Batch 2024-Q4',
-];
-
 export const FilterPanel = ({
   filters,
   form,
@@ -36,7 +32,9 @@ export const FilterPanel = ({
   onClearFilters,
   onApplyFilters,
   hasActiveFilters,
+  batches,
 }: {
+  batches: PublicationBatch[];
   filters: ContributionFilters;
   form: any;
   onFilterChange: (field: keyof ContributionFilters, value: any) => void;
@@ -157,9 +155,9 @@ export const FilterPanel = ({
               style={{ borderRadius: '4px' }}
               size="small"
             >
-              {PUBLICATION_BATCHES.map((batch) => (
-                <Option key={batch} value={batch}>
-                  {batch}
+              {batches.map((batch) => (
+                <Option key={batch.id} value={batch.id}>
+                  {batch.title}
                 </Option>
               ))}
             </Select>
