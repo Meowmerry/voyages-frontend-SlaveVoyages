@@ -16,6 +16,7 @@ export const useBatchManagement = (options: UseBatchManagementOptions = {}) => {
 
   const [batches, setBatches] = useState<PublicationBatch[]>([]);
   const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(0);
   const [filter, setFilter] = useState<'all' | 'pending' | 'published'>(
     initialFilter,
   );
@@ -30,7 +31,10 @@ export const useBatchManagement = (options: UseBatchManagementOptions = {}) => {
 
       try {
         const response = await batchApi.getBatches(currentFilter);
-        setBatches(response.batches);
+        const { batches: fetchedBatches, filter, count } = response;
+        setBatches(fetchedBatches);
+        setFilter(filter as 'all' | 'pending' | 'published');
+        setCount(count);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : 'Failed to fetch batches';
@@ -159,6 +163,59 @@ export const useBatchManagement = (options: UseBatchManagementOptions = {}) => {
     }
   }, []);
 
+  // Update batch
+  const updateBatch = useCallback(
+    async (
+      batchId: number,
+      data: Partial<PublicationBatch>,
+    ): Promise<boolean> => {
+      setLoading(true);
+
+      try {
+        await batchApi.updateBatch(batchId, data);
+        message.success('Batch updated successfully');
+
+        // Refresh batches to show updated data
+        await fetchBatches();
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to update batch';
+        setError(errorMessage);
+        message.error(`Error updating batch: ${errorMessage}`);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBatches],
+  );
+
+  // Delete batch
+  const deleteBatch = useCallback(
+    async (batchId: number): Promise<boolean> => {
+      setLoading(true);
+
+      try {
+        await batchApi.deleteBatch(batchId);
+        message.success('Batch deleted successfully');
+
+        // Refresh batches to remove deleted batch
+        await fetchBatches();
+        return true;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to delete batch';
+        setError(errorMessage);
+        message.error(`Error deleting batch: ${errorMessage}`);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBatches],
+  );
+
   // Refresh batches
   const refreshBatches = useCallback(() => {
     return fetchBatches();
@@ -181,6 +238,8 @@ export const useBatchManagement = (options: UseBatchManagementOptions = {}) => {
     // Actions
     fetchBatches,
     createBatch,
+    updateBatch,
+    deleteBatch,
     assignContributionToBatch,
     bulkAssignContributionsToBatch,
     changeFilter,
@@ -197,7 +256,7 @@ export const useBatchManagement = (options: UseBatchManagementOptions = {}) => {
     publishedBatches: batches.filter(
       (batch) => getBatchStatus(batch) === 'published',
     ),
-    batchCount: batches.length,
+    batchCount: count,
   };
 };
 

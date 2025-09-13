@@ -67,7 +67,7 @@ export const batchApi = {
   async assignContributionToBatch(
     contributionId: string,
     batchId: number | null,
-  ): Promise<any> {
+  ): Promise<unknown> {
     const response = await fetch(`${BASEURLNODE}/assign_to_batch`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
@@ -90,7 +90,7 @@ export const batchApi = {
   async bulkAssignContributionsToBatch(
     contributionIds: string[],
     batchId: number | null,
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     const promises = contributionIds.map((contributionId) =>
       this.assignContributionToBatch(contributionId, batchId),
     );
@@ -106,7 +106,7 @@ export const batchApi = {
 
     return results
       .filter((result) => result.status === 'fulfilled')
-      .map((result) => (result as PromiseFulfilledResult<any>).value);
+      .map((result) => (result as PromiseFulfilledResult<unknown>).value);
   },
 
   // Get pending batches (utility function)
@@ -125,5 +125,39 @@ export const batchApi = {
   async getAllBatches(): Promise<PublicationBatch[]> {
     const response = await this.getBatches('all');
     return response.batches;
+  },
+
+  // Update batch
+  async updateBatch(
+    batchId: number,
+    data: Partial<PublicationBatch>,
+  ): Promise<PublicationBatch> {
+    const response = await fetch(`${BASEURLNODE}/batches/${batchId}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update batch');
+    }
+
+    return response.json();
+  },
+
+  // Delete batch
+  async deleteBatch(batchId: number): Promise<void> {
+    const response = await fetch(`${BASEURLNODE}/batches/${batchId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete batch');
+    }
   },
 };

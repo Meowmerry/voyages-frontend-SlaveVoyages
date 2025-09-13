@@ -1,466 +1,61 @@
 // //* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-  ClearOutlined,
-  SearchOutlined,
   DownOutlined,
-  UpOutlined,
   SettingOutlined,
   TeamOutlined,
   CheckCircleOutlined,
 } from '@ant-design/icons';
 import {
   ChangeSet,
+  ContributionStatus,
   getSchema,
   materializeNew,
   PropertyAccessLevel,
-  ContributionStatus,
 } from '@dotproductdev/voyages-contribute';
 import { AgGridReact } from 'ag-grid-react';
 import {
   Button,
-  Select,
-  DatePicker,
-  Row,
-  Col,
   Card,
-  Tag,
   Space,
   Typography,
   Form,
   Pagination,
-  Input,
   Badge,
-  Divider,
   message,
   Dropdown,
-  Menu,
 } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+
+import '@/style/table.scss';
+import { fetchContributionsData } from '@/fetch/contributeFetch/fetchContributionsData';
+import { updateContributionStatus } from '@/fetch/contributeFetch/updateContributionStatus';
+import { useSearchEditRequestsFilters } from '@/hooks/useSearchEditRequestsFilters';
+import '@/style/contributeContent.scss';
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import '@/style/table.scss';
-import { BASEURLNODE } from '@/share/AUTH_BASEURL';
-import '@/style/contributeContent.scss';
 
 import BatchManagement from '../BatchComponent/BatchManagement';
 import BatchAssignmentModal from '../BatchComponent/Modal/BatchAssignmentModal';
+import { ActiveFiltersTag } from '../commons/ActiveFiltersTag';
+import { FilterPanel } from '../commons/FilterPanel';
+import { FilterToggleButton } from '../commons/FilterToggleButton';
 import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
+import { SearchInput } from '../commons/SearchInput';
 import StatusCellRenderer from '../commons/StatusCellRenderer';
 import { ContributionForm } from '../ContributionForm';
+import { transformContributionData } from '../utils/transformContributionData';
 
 const { Title } = Typography;
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-// Constants
-const PUBLICATION_BATCHES = [
-  'Batch 2024-Q1',
-  'Batch 2024-Q2',
-  'Batch 2024-Q3',
-  'Batch 2024-Q4',
-];
 
 const SEARCH_DEBOUNCE_DELAY = 500;
-
-// Types
-interface ContributionFilters {
-  status: ContributionStatus | 'all';
-  author: string;
-  voyageId: string;
-  shipName: string;
-  nationality: string;
-  dateRange: [Dayjs | null, Dayjs | null] | null;
-  publicationBatch: string;
-  reviewer: string;
-  search?: string;
-}
 
 interface EditorialPlatformPlatProps {
   openSideBar: boolean;
 }
-
-const initialFilters: ContributionFilters = {
-  status: 'all',
-  author: '',
-  voyageId: '',
-  shipName: '',
-  nationality: '',
-  dateRange: null,
-  publicationBatch: '',
-  reviewer: '',
-  search: '',
-};
-
-// Helper functions
-const extractShipData = (changeSetData: any, property: string) => {
-  const shipChange = changeSetData.changes?.[0]?.changes?.find(
-    (c: any) => c.kind === 'owned' && c.property === 'Voyage_Ship',
-  );
-  return (
-    shipChange?.changes?.find((s: any) => s.property === property)?.changed ||
-    ''
-  );
-};
-
-const extractLinkedShipData = (
-  changeSetData: any,
-  property: string,
-  dataKey: string,
-) => {
-  const shipChange = changeSetData.changes?.[0]?.changes?.find(
-    (c: any) => c.kind === 'owned' && c.property === 'Voyage_Ship',
-  );
-  return (
-    shipChange?.changes?.find((s: any) => s.property === property)?.changed
-      ?.data?.[dataKey] || ''
-  );
-};
-
-const extractItineraryData = (changeSetData: any) => {
-  const itineraryChange = changeSetData.changes?.[0]?.changes?.find(
-    (c: any) => c.kind === 'owned' && c.property === 'Voyage_Itinerary',
-  );
-  return (
-    itineraryChange?.changes?.find(
-      (c: any) => c.property === 'VoyageItinerary_port_of_departure_id',
-    )?.changed?.data?.Name || ''
-  );
-};
-
-const transformContributionData = (contribution: any) => {
-  const changeSetData = contribution.changeSet || contribution;
-  const changeStatus = contribution?.status;
-
-  return {
-    ...changeSetData,
-    voyageId: changeSetData.changes?.[0]?.entityRef?.id || '',
-    status: changeStatus,
-    shipName: extractShipData(changeSetData, 'VoyageShip_ship_name'),
-    portOfDeparture: extractItineraryData(changeSetData),
-    nationality: extractLinkedShipData(
-      changeSetData,
-      'VoyageShip_nationality_ship_id',
-      'Nation name',
-    ),
-    tonnage: extractShipData(changeSetData, 'VoyageShip_tonnage'),
-  };
-};
-
-// Custom hooks
-const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
-  const [filters, setFilters] = useState<ContributionFilters>(initialFilters);
-
-  const buildFilterQuery = useCallback(
-    (filters: ContributionFilters): string => {
-      const params = new URLSearchParams();
-
-      if (filters.status !== 'all')
-        params.append('status', String(filters.status));
-      if (filters.author) params.append('author', String(filters.author));
-      if (filters.voyageId) params.append('voyageId', String(filters.voyageId));
-      if (filters.shipName) params.append('shipName', String(filters.shipName));
-      if (filters.nationality)
-        params.append('nationality', filters.nationality);
-      if (filters.publicationBatch)
-        params.append('publicationBatch', filters.publicationBatch);
-      if (filters.reviewer) params.append('reviewer', filters.reviewer);
-      if (filters.search) params.append('search', filters.search);
-      if (filters.dateRange?.[0])
-        params.append('dateFrom', filters.dateRange[0].toISOString());
-      if (filters.dateRange?.[1])
-        params.append('dateTo', filters.dateRange[1].toISOString());
-
-      return params.toString();
-    },
-    [],
-  );
-
-  const handleFilterChange = useCallback(
-    (field: keyof ContributionFilters, value: any) => {
-      setFilters((prev) => ({ ...prev, [field]: value }));
-    },
-    [],
-  );
-
-  const handleClearFilters = useCallback(() => {
-    setFilters(initialFilters);
-    form.resetFields();
-    gridRef.current?.api.refreshInfiniteCache();
-  }, [form, gridRef]);
-
-  const handleApplyFilters = useCallback(() => {
-    gridRef.current?.api.refreshInfiniteCache();
-  }, [gridRef]);
-
-  const hasActiveFilters = useMemo(() => {
-    return Object.entries(filters).some(([key, value]) => {
-      if (key === 'status') return value !== 'all';
-      if (key === 'dateRange')
-        return value !== null && (value[0] !== null || value[1] !== null);
-      return value !== '';
-    });
-  }, [filters]);
-
-  const activeFilterCount = useMemo(() => {
-    return Object.entries(filters).filter(([key, value]) => {
-      if (key === 'status') return value !== 'all';
-      if (key === 'dateRange')
-        return value !== null && (value[0] !== null || value[1] !== null);
-      return value !== '';
-    }).length;
-  }, [filters]);
-
-  return {
-    filters,
-    setFilters,
-    buildFilterQuery,
-    handleFilterChange,
-    handleClearFilters,
-    handleApplyFilters,
-    hasActiveFilters,
-    activeFilterCount,
-  };
-};
-
-// Components
-const SearchInput = ({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) => (
-  <Input
-    placeholder="Search contributions..."
-    prefix={<SearchOutlined style={{ color: '#9ca3af' }} />}
-    value={value}
-    onChange={onChange}
-    style={{
-      width: '300px',
-      borderRadius: '8px',
-      height: '32px',
-    }}
-    allowClear
-  />
-);
-
-const FilterToggleButton = ({
-  showFilters,
-  onClick,
-}: {
-  showFilters: boolean;
-  onClick: () => void;
-}) => (
-  <Button
-    type={showFilters ? 'primary' : 'default'}
-    icon={showFilters ? <UpOutlined /> : <DownOutlined />}
-    onClick={onClick}
-    style={{
-      borderRadius: '6px',
-      height: '30px',
-      paddingLeft: '10px',
-      paddingRight: '10px',
-      background: showFilters
-        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        : 'white',
-      border: showFilters ? 'none' : '1px solid #d1d5db',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    }}
-  >
-    {showFilters ? 'Hide Filters' : 'Show Filters'}
-  </Button>
-);
-
-const ActiveFiltersTag = ({
-  count,
-  onClose,
-}: {
-  count: number;
-  onClose: () => void;
-}) => (
-  <Badge count={count} offset={[-8, 8]}>
-    <Tag
-      closable
-      onClose={onClose}
-      style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        border: 'none',
-        borderRadius: '20px',
-        padding: '4px 12px',
-        fontSize: '12px',
-      }}
-    >
-      {count} filter{count > 1 ? 's' : ''} active
-    </Tag>
-  </Badge>
-);
-
-const FilterPanel = ({
-  filters,
-  form,
-  onFilterChange,
-  onClearFilters,
-  onApplyFilters,
-  hasActiveFilters,
-}: {
-  filters: ContributionFilters;
-  form: any;
-  onFilterChange: (field: keyof ContributionFilters, value: any) => void;
-  onClearFilters: () => void;
-  onApplyFilters: () => void;
-  hasActiveFilters: boolean;
-}) => (
-  <Card
-    style={{
-      marginBottom: '16px',
-      borderRadius: '6px',
-      border: '1px solid #e5e7eb',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.03)',
-      background: 'white',
-    }}
-    styles={{ body: { padding: '16px' } }}
-  >
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '12px',
-      }}
-    >
-      <Title level={5} style={{ margin: 0, color: '#374151' }}>
-        Filter Options
-      </Title>
-
-      <Space size="small">
-        <Button
-          icon={<ClearOutlined />}
-          onClick={onClearFilters}
-          style={{
-            borderRadius: '4px',
-            border: '1px solid #fca5a5',
-            color: '#dc2626',
-            background: '#fef2f2',
-            height: '28px',
-            fontSize: '12px',
-          }}
-          disabled={!hasActiveFilters}
-          size="small"
-        >
-          Clear All
-        </Button>
-        <Button
-          type="primary"
-          icon={<SearchOutlined />}
-          onClick={onApplyFilters}
-          style={{
-            borderRadius: '4px',
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            border: 'none',
-            boxShadow: '0 1px 2px rgba(16, 185, 129, 0.2)',
-            height: '28px',
-            fontSize: '12px',
-          }}
-          size="small"
-        >
-          Apply Filters
-        </Button>
-      </Space>
-    </div>
-
-    <Divider style={{ margin: '12px 0' }} />
-
-    <Form form={form} layout="vertical">
-      <Row gutter={[12, 12]}>
-        <Col xs={24} sm={12} md={6} lg={3}>
-          <Form.Item
-            label={
-              <span
-                style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}
-              >
-                Status
-              </span>
-            }
-            name="status"
-            style={{ marginBottom: '12px' }}
-          >
-            <Select
-              value={filters.status}
-              onChange={(value) => onFilterChange('status', value)}
-              placeholder="All Statuses"
-              style={{ borderRadius: '4px' }}
-              size="small"
-            >
-              <Option value="all">All Statuses</Option>
-              <Option value={ContributionStatus.WorkInProgress}>
-                Work In Progress
-              </Option>
-              <Option value={ContributionStatus.Submitted}>Submitted</Option>
-              <Option value={ContributionStatus.Accepted}>Accepted</Option>
-              <Option value={ContributionStatus.Rejected}>Rejected</Option>
-              <Option value={ContributionStatus.Published}>Published</Option>
-            </Select>
-          </Form.Item>
-        </Col>
-
-        <Col xs={24} sm={12} md={6} lg={3}>
-          <Form.Item
-            label={
-              <span
-                style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}
-              >
-                Publication Batch
-              </span>
-            }
-            name="publicationBatch"
-            style={{ marginBottom: '12px' }}
-          >
-            <Select
-              value={filters.publicationBatch}
-              onChange={(value) => onFilterChange('publicationBatch', value)}
-              placeholder="All Batches"
-              allowClear
-              style={{ borderRadius: '4px' }}
-              size="small"
-            >
-              {PUBLICATION_BATCHES.map((batch) => (
-                <Option key={batch} value={batch}>
-                  {batch}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-
-        <Col xs={24} sm={12} md={6} lg={4}>
-          <Form.Item
-            label={
-              <span
-                style={{ fontSize: '12px', fontWeight: 600, color: '#374151' }}
-              >
-                Date Range
-              </span>
-            }
-            name="dateRange"
-            style={{ marginBottom: '12px' }}
-          >
-            <RangePicker
-              value={filters.dateRange}
-              onChange={(dates) => onFilterChange('dateRange', dates)}
-              style={{ width: '100%', borderRadius: '4px' }}
-              size="small"
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-    </Form>
-  </Card>
-);
 
 // Main component
 const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
@@ -480,7 +75,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
 
   const {
     filters,
-    setFilters,
+    // setFilters,
     buildFilterQuery,
     handleFilterChange,
     handleClearFilters,
@@ -489,7 +84,25 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     activeFilterCount,
   } = useSearchEditRequestsFilters(form, gridRef);
 
-  // Auto-apply search filter with debounce
+  useEffect(() => {
+    const fetchData = async () => {
+      const filterQuery = buildFilterQuery(filters);
+      try {
+        const response = await fetchContributionsData(filterQuery);
+        const contributionsArray = response.data;
+        const transformedRows = contributionsArray.map(
+          transformContributionData,
+        );
+        setContribs(transformedRows);
+        setTotalResultsCount(response?.total || transformedRows.length);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+
+    fetchData();
+  }, [filters, buildFilterQuery]);
+
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
@@ -512,100 +125,75 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   }, []);
 
   // Bulk actions menu
-  const bulkActionsMenu = (
-    <Menu>
-      <Menu.Item
-        key="assign-batch"
-        icon={<TeamOutlined />}
-        onClick={() => {
-          if (selectedRows.length === 0) {
-            message.warning('Please select contributions to assign');
-            return;
-          }
-          setBatchAssignmentVisible(true);
-        }}
-      >
-        Assign to Batch
-      </Menu.Item>
-      <Menu.Item
-        key="approve"
-        icon={<CheckCircleOutlined />}
-        onClick={() => {
-          if (selectedRows.length === 0) {
-            message.warning('Please select contributions to approve');
-            return;
-          }
-          // Handle bulk approval
-          message.info('Bulk approval functionality coming soon');
-        }}
-      >
-        Bulk Approve
-      </Menu.Item>
-    </Menu>
-  );
+  const bulkActionsMenuItems = [
+    {
+      key: 'assign-batch',
+      icon: <TeamOutlined />,
+      label: 'Assign to Batch',
+      onClick: () => {
+        if (selectedRows.length === 0) {
+          message.warning('Please select contributions to assign');
+          return;
+        }
+        setBatchAssignmentVisible(true);
+      },
+    },
+    {
+      key: 'approve',
+      icon: <CheckCircleOutlined />,
+      label: 'Bulk Approve',
+      onClick: () => {
+        if (selectedRows.length === 0) {
+          message.warning('Please select contributions to approve');
+          return;
+        }
+        // Handle bulk approval
+        message.info('Bulk approval functionality coming soon');
+      },
+    },
+  ];
 
+  // Then update your Dropdown:
+  <Dropdown menu={{ items: bulkActionsMenuItems }} trigger={['click']}>
+    <Button type="primary">
+      Bulk Actions <DownOutlined />
+    </Button>
+  </Dropdown>;
+
+  const handleStatusChange = useCallback(
+    async (contributionId: string, newStatus: ContributionStatus) => {
+      try {
+        await updateContributionStatus(contributionId, newStatus);
+
+        // Update local state
+        setContribs((prev) =>
+          prev.map((contrib) =>
+            contrib.id === contributionId
+              ? { ...contrib, status: newStatus }
+              : contrib,
+          ),
+        );
+
+        // Refresh grid to show updated data
+        if (gridRef.current?.api) {
+          gridRef.current.api.refreshCells();
+        }
+      } catch (error) {
+        message.error('Failed to update contribution status');
+        console.error('Status update error:', error);
+      }
+    },
+    [],
+  );
   const columnDefs = useMemo(
     () =>
       [
-        {
-          headerName: 'Action',
-          field: undefined,
-          tooltipField: 'Select row',
-          checkboxSelection: true,
-          headerCheckboxSelection: true,
-          width: 65,
-          minWidth: 65,
-          maxWidth: 65,
-          sortable: false,
-          resizable: false,
-          suppressMovable: true,
-          pinned: 'left',
-          cellStyle: {
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '4px',
-          },
-        },
-        // {
-        //   headerName: 'Type',
-        //   field: undefined as any,
-        //   cellRenderer: () => (
-        //     <div
-        //       style={{
-        //         display: 'flex',
-        //         justifyContent: 'center',
-        //         alignItems: 'center',
-        //         height: '100%',
-        //       }}
-        //     >
-        //       <Button
-        //         type="text"
-        //         icon={<EditOutlined />}
-        //         size="small"
-        //         style={{ color: 'rgb(55, 148, 141)' }}
-        //       />
-        //     </div>
-        //   ),
-        //   width: 60,
-        //   minWidth: 60,
-        //   maxWidth: 60,
-        //   sortable: false,
-        //   resizable: false,
-        //   suppressMovable: true,
-        //   pinned: 'left',
-        //   cellStyle: {
-        //     display: 'flex',
-        //     alignItems: 'center',
-        //     justifyContent: 'center',
-        //     padding: '4px',
-        //   },
-        // },
         {
           headerName: 'Title',
           field: 'title' as any,
           tooltipField: 'title',
           width: 200,
+          sortable: true,
         },
         {
           headerName: 'Contributor',
@@ -619,6 +207,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           field: 'comments' as any,
           tooltipField: 'comments',
           width: 250,
+          sortable: true,
         },
         {
           headerName: 'Date',
@@ -626,6 +215,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           valueFormatter: ({ value }: { value: number }) =>
             dayjs(value).format('MM/DD/YYYY'),
           width: 100,
+          // sort: 'desc',
         },
         {
           headerName: 'Voyage ID',
@@ -634,6 +224,8 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
             `Voyage ID: ${params.data?.voyageId}`,
           width: 100,
           flex: 1,
+          // sort: 'asc',
+          sortable: true,
         },
         {
           headerName: 'Ship',
@@ -641,12 +233,14 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           width: 150,
           flex: 1,
           tooltipField: 'shipName',
+          sortable: true,
         },
         {
           headerName: 'Port of Departure',
           field: 'portOfDeparture' as any,
           tooltipField: 'portOfDeparture',
           width: 200,
+          sortable: true,
         },
         {
           headerName: 'Nationality',
@@ -654,6 +248,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           width: 120,
           flex: 1,
           tooltipField: 'nationality',
+          sortable: true,
         },
         {
           headerName: 'Tonnage',
@@ -661,6 +256,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           width: 100,
           flex: 1,
           tooltipField: 'tonnage',
+          sortable: true,
         },
         {
           headerName: 'Reviewer',
@@ -668,46 +264,22 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           valueGetter: () => 'David Ellis',
           width: 120,
           flex: 1,
+          sortable: true,
         },
         {
-          headerName: 'Status',
+          headerName: 'Status & Actions',
           field: 'status' as any,
           cellRenderer: StatusCellRenderer,
-          width: 120,
+          cellRendererParams: (params: any) => ({
+            onStatusChange: handleStatusChange,
+            data: params.data,
+          }),
+          width: 180,
           flex: 1,
+          sortable: true,
         },
       ] as any[],
-    [],
-  );
-
-  const datasource = useMemo(
-    () => ({
-      getRows: async (params: any) => {
-        const currentPage = Math.floor(params.startRow / rowsPerPage) + 1;
-        const filterQuery = buildFilterQuery(filters);
-
-        try {
-          const url = `${BASEURLNODE}/contributions?page=${currentPage}&limit=${rowsPerPage}${filterQuery ? `&${filterQuery}` : ''}`;
-          const res = await fetch(url);
-          const data = await res.json();
-
-          const transformedRows = (data.data || data).map(
-            transformContributionData,
-          );
-
-          params.successCallback(
-            transformedRows,
-            data.total || transformedRows.length,
-          );
-          setTotalResultsCount(data.total || transformedRows.length);
-          setContribs(transformedRows);
-        } catch (err) {
-          console.error('Error fetching data:', err);
-          params.failCallback();
-        }
-      },
-    }),
-    [rowsPerPage, buildFilterQuery, filters],
+    [handleStatusChange],
   );
 
   const handlePageChange = useCallback(
@@ -733,6 +305,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
       fontSize: '0.8rem',
       fontWeight: 500,
       color: '#000',
+      rowHeight: 60,
       fontFamily: 'sans-serif',
     }),
     [],
@@ -762,7 +335,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
             style={{
               marginBottom: '16px',
               borderRadius: '8px',
-              height: '40px',
+              height: '32px',
               paddingLeft: '16px',
               paddingRight: '16px',
             }}
@@ -786,9 +359,8 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   }
 
   return (
-    <div style={{ padding: '16px', width: '100%' }}>
+    <div style={{ paddingTop: '16px', paddingBottom: '16px', width: '100%' }}>
       <ListEditorialPlatForm />
-      {/* Header */}
       <div
         style={{
           background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
@@ -874,7 +446,10 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
               </span>
             </div>
             <Space>
-              <Dropdown overlay={bulkActionsMenu} trigger={['click']}>
+              <Dropdown
+                menu={{ items: bulkActionsMenuItems }}
+                trigger={['click']}
+              >
                 <Button
                   type="primary"
                   style={{
@@ -924,15 +499,42 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
         <AgGridReact<ChangeSet>
           theme="legacy"
           ref={gridRef}
+          rowData={contribs}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           getRowStyle={getRowRowStyle}
           enableBrowserTooltips={true}
-          rowModelType="infinite"
-          datasource={datasource}
-          cacheBlockSize={rowsPerPage}
+          rowHeight={60}
           paginationPageSize={rowsPerPage}
-          onRowClicked={({ data }) => setActive(data)}
+          onRowClicked={({ data, event }) => {
+            if (!event) return;
+
+            const target = event.target as HTMLElement;
+
+            // Check if clicking on checkbox elements
+            const isCheckboxClick =
+              target.closest('.ag-selection-checkbox') ||
+              target.closest('.ag-checkbox-input') ||
+              target.closest('.ag-checkbox-input-wrapper');
+
+            // Check if clicking on specific columns by checking cell attributes
+            const cellElement = target.closest('.ag-cell');
+            const colId = cellElement?.getAttribute('col-id');
+            const isCheckboxColumn =
+              !colId || colId === 'ag-Grid-SelectionColumn';
+            const disabledColumns = ['status'];
+
+            if (
+              isCheckboxColumn ||
+              (colId && disabledColumns.includes(colId))
+            ) {
+              return; // Don't trigger row click for checkbox or disabled columns
+            }
+
+            if (!isCheckboxClick) {
+              setActive(data);
+            }
+          }}
           pagination={true}
           suppressPaginationPanel={true}
           getRowClass={(params) =>
@@ -941,9 +543,12 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           rowHeight={40}
           headerHeight={36}
           suppressHorizontalScroll={false}
-          rowSelection="multiple"
+          rowSelection={{
+            mode: 'multiRow',
+            checkboxes: true,
+            enableClickSelection: false,
+          }}
           onSelectionChanged={onSelectionChanged}
-          suppressRowClickSelection={true}
         />
       </div>
       {/* Pagination */}

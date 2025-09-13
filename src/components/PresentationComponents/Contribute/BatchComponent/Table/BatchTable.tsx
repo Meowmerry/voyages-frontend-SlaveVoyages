@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useCallback } from 'react';
 
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -8,9 +9,7 @@ import {
   Chip,
   Typography as MuiTypography,
 } from '@mui/material';
-import { ColDef } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { message } from 'antd';
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -18,6 +17,8 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 interface BatchTableProps {
   batches: PublicationBatch[];
   loading: boolean;
+  onEditBatch?: (batch: PublicationBatch) => void;
+  onDeleteBatch?: (batch: PublicationBatch) => void;
 }
 
 // Custom cell renderers
@@ -28,13 +29,21 @@ const TitleCellRenderer = (params: any) => {
       <MuiTypography variant="subtitle2" sx={{ fontWeight: 600 }}>
         {batch.title}
       </MuiTypography>
-      <MuiTypography variant="caption" color="text.secondary">
-        ID: {batch.id}
-      </MuiTypography>
     </Box>
   );
 };
 
+// Custom cell renderers
+const BatchIDCellRenderer = (params: any) => {
+  const batch = params.data;
+  return (
+    <Box>
+      <MuiTypography variant="subtitle2" sx={{ fontWeight: 600 }}>
+        {batch.id}
+      </MuiTypography>
+    </Box>
+  );
+};
 const StatusCellRenderer = (params: any) => {
   const batch = params.data;
   const isPublished = batch.published !== null;
@@ -61,7 +70,7 @@ const PublishedDateCellRenderer = (params: any) => {
 };
 
 const ContributionsCellRenderer = (params: any) => {
-  const count = params.data.contribution_count || 0;
+  const count = params.data?.contributions?.length || 0;
   return (
     <Chip
       label={count}
@@ -89,19 +98,35 @@ const CommentsCellRenderer = (params: any) => {
   );
 };
 
-const ActionsCellRenderer = (params: any) => {
+const ActionsCellRenderer = (
+  params: any,
+  onEditBatch?: (batch: PublicationBatch) => void,
+  onDeleteBatch?: (batch: PublicationBatch) => void,
+) => {
+  const batch = params.data;
+
+  const handleEdit = () => {
+    if (onEditBatch) {
+      onEditBatch(batch);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDeleteBatch) {
+      onDeleteBatch(batch);
+    }
+  };
+
   return (
     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: '100%' }}>
-      <IconButton
-        size="small"
-        onClick={() => message.info('Edit functionality coming soon')}
-      >
+      <IconButton size="small" onClick={handleEdit} title="Edit batch">
         <EditOutlined style={{ fontSize: '16px' }} />
       </IconButton>
       <IconButton
         size="small"
         color="error"
-        onClick={() => message.info('Delete functionality coming soon')}
+        onClick={handleDelete}
+        title="Delete batch"
       >
         <DeleteOutlined style={{ fontSize: '16px' }} />
       </IconButton>
@@ -109,18 +134,30 @@ const ActionsCellRenderer = (params: any) => {
   );
 };
 
-const BatchTable: React.FC<BatchTableProps> = ({ batches, loading }) => {
-  const columnDefs = useMemo<ColDef[]>(
+const BatchTable: React.FC<BatchTableProps> = ({
+  batches,
+  loading,
+  onEditBatch,
+  onDeleteBatch,
+}) => {
+  const columnDefs = useMemo(
     () => [
+      {
+        headerName: 'ID',
+        field: 'id',
+        cellRenderer: BatchIDCellRenderer,
+        width: 80,
+        minWidth: 80,
+        sortable: true,
+      },
       {
         headerName: 'Title',
         field: 'title',
         cellRenderer: TitleCellRenderer,
         width: 200,
-        minWidth: 150,
+        minWidth: 120,
         flex: 1,
         sortable: true,
-        filter: 'agTextColumnFilter',
       },
       {
         headerName: 'Status',
@@ -128,7 +165,6 @@ const BatchTable: React.FC<BatchTableProps> = ({ batches, loading }) => {
         cellRenderer: StatusCellRenderer,
         width: 120,
         sortable: true,
-        filter: 'agSetColumnFilter',
         filterParams: {
           values: ['Published', 'Pending'],
           valueGetter: (params: any) => {
@@ -155,7 +191,6 @@ const BatchTable: React.FC<BatchTableProps> = ({ batches, loading }) => {
         cellRenderer: ContributionsCellRenderer,
         width: 130,
         sortable: true,
-        filter: 'agNumberColumnFilter',
       },
       {
         headerName: 'Comments',
@@ -164,23 +199,23 @@ const BatchTable: React.FC<BatchTableProps> = ({ batches, loading }) => {
         width: 200,
         flex: 1,
         sortable: true,
-        filter: 'agTextColumnFilter',
       },
       {
         headerName: 'Actions',
         field: 'actions',
-        cellRenderer: ActionsCellRenderer,
-        width: 100,
+        cellRenderer: (params: any) =>
+          ActionsCellRenderer(params, onEditBatch, onDeleteBatch),
+        width: 80,
         sortable: false,
         filter: false,
         resizable: false,
         pinned: 'right',
       },
     ],
-    [],
+    [onEditBatch, onDeleteBatch],
   );
 
-  const defaultColDef = useMemo<ColDef>(
+  const defaultColDef = useMemo(
     () => ({
       resizable: true,
       sortable: true,
@@ -198,7 +233,6 @@ const BatchTable: React.FC<BatchTableProps> = ({ batches, loading }) => {
   const gridOptions = useMemo(
     () => ({
       animateRows: true,
-      rowHeight: 60,
       headerHeight: 45,
       suppressMovableColumns: true,
       suppressFieldDotNotation: true,
@@ -232,7 +266,10 @@ const BatchTable: React.FC<BatchTableProps> = ({ batches, loading }) => {
       }}
     >
       <AgGridReact
-        columnDefs={columnDefs}
+        theme="legacy"
+        key={`batch-table-${batches.length}`}
+        // ref={gridRef}
+        columnDefs={columnDefs as any}
         rowData={batches}
         defaultColDef={defaultColDef}
         gridOptions={gridOptions}

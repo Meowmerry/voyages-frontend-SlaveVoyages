@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { ContributionStatus } from '@dotproductdev/voyages-contribute';
 import { Dayjs } from 'dayjs';
 // Types
-interface ContributionFilters {
+export interface ContributionFilters {
   status: ContributionStatus | 'all';
   author: string;
   voyageId: string;
@@ -26,6 +26,7 @@ const initialFilters: ContributionFilters = {
   reviewer: '',
   search: '',
 };
+
 // Custom hooks
 export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
   const [filters, setFilters] = useState<ContributionFilters>(initialFilters);

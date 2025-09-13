@@ -20,7 +20,7 @@ import { StyleDialog } from '@/styleMUI';
 
 import SelectBatchAutoCompleted from './SelectBatchAutoCompleted';
 
-export const BatchAssignmentModal: React.FC<{
+const BatchAssignmentModal: React.FC<{
   visible: boolean;
   onClose: () => void;
   contributionIds: string[];

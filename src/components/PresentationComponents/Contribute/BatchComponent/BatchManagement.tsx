@@ -28,10 +28,18 @@ interface BatchManagementProps {
 const BatchManagement: React.FC<BatchManagementProps> = ({
   visible,
   onClose,
-  onBatchAssigned,
 }) => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const { refreshBatches } = useBatchManagement({ autoFetch: visible });
+  const {
+    createBatch,
+    loading,
+    refreshBatches,
+    batches,
+    filter,
+    changeFilter,
+  } = useBatchManagement({
+    autoFetch: true,
+  });
 
   const handleClose = () => {
     onClose();
@@ -69,7 +77,7 @@ const BatchManagement: React.FC<BatchManagementProps> = ({
             edge="end"
             color="inherit"
             onClick={handleClose}
-            sx={{ position: 'absolute', top: 8, right: 8 }}
+            sx={{ position: 'absolute', top: 4, right: 12 }}
           >
             <Close />
           </IconButton>
@@ -77,9 +85,12 @@ const BatchManagement: React.FC<BatchManagementProps> = ({
 
         <DialogContent sx={{ p: 3 }}>
           <BatchManagementContentDialog
-            visible={visible}
             createModalVisible={createModalVisible}
             setCreateModalVisible={setCreateModalVisible}
+            batches={batches}
+            loading={loading}
+            filter={filter}
+            changeFilter={changeFilter}
           />
         </DialogContent>
 
@@ -97,10 +108,9 @@ const BatchManagement: React.FC<BatchManagementProps> = ({
       <CreateBatchModal
         visible={createModalVisible}
         onClose={() => setCreateModalVisible(false)}
-        onSuccess={() => {
-          refreshBatches();
-          if (onBatchAssigned) onBatchAssigned();
-        }}
+        onSuccess={refreshBatches}
+        createBatch={createBatch}
+        loading={loading}
       />
     </>
   );

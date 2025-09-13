@@ -1,6 +1,8 @@
-import React, { FunctionComponent } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { FunctionComponent, useState } from 'react';
 
 import { PlusOutlined, FileTextOutlined } from '@ant-design/icons';
+import { PublicationBatch } from '@dotproductdev/voyages-contribute';
 import {
   Button as MuiButton,
   Select,
@@ -13,21 +15,46 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-import { useBatchManagement } from '@/hooks/useBatchManagement';
-
+import DeleteBatchModal from './DeleteBatchModal';
+import EditBatchModal from './EditBatchModal';
 import BatchTable from '../Table/BatchTable';
 interface BatchManagementContentDialogProps {
-  visible: boolean;
   createModalVisible: boolean;
   setCreateModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  batches: PublicationBatch[];
+  loading: boolean;
+  filter: 'all' | 'pending' | 'published';
+  changeFilter: (newFilter: 'all' | 'pending' | 'published') => Promise<void>;
 }
 
 const BatchManagementContentDialog: FunctionComponent<
   BatchManagementContentDialogProps
-> = ({ visible, setCreateModalVisible }) => {
-  const { batches, loading, filter, changeFilter } = useBatchManagement({
-    autoFetch: visible,
-  });
+> = ({ setCreateModalVisible, batches, loading, filter, changeFilter }) => {
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [selectedBatch, setSelectedBatch] = useState<PublicationBatch | null>(
+    null,
+  );
+
+  const handleEditBatch = (batch: PublicationBatch) => {
+    setSelectedBatch(batch);
+    setEditModalVisible(true);
+  };
+
+  const handleDeleteBatch = (batch: PublicationBatch) => {
+    setSelectedBatch(batch);
+    setDeleteModalVisible(true);
+  };
+
+  const handleEditSuccess = () => {
+    setEditModalVisible(false);
+    setSelectedBatch(null);
+  };
+
+  const handleDeleteSuccess = () => {
+    setDeleteModalVisible(false);
+    setSelectedBatch(null);
+  };
   return (
     <>
       <Box sx={{ mb: 4, mt: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -82,7 +109,7 @@ const BatchManagementContentDialog: FunctionComponent<
           <CircularProgress />
         </Box>
       ) : batches.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
+        <Box sx={{ textAlign: 'center', py: 4 }}>
           <FileTextOutlined style={{ fontSize: '48px', color: '#ccc' }} />
           <MuiTypography
             variant="body1"
@@ -99,8 +126,35 @@ const BatchManagementContentDialog: FunctionComponent<
           </MuiButton>
         </Box>
       ) : (
-        <BatchTable batches={batches} loading={loading} />
+        <BatchTable
+          batches={batches}
+          loading={loading}
+          onEditBatch={handleEditBatch}
+          onDeleteBatch={handleDeleteBatch}
+        />
       )}
+
+      {/* Edit Batch Modal */}
+      <EditBatchModal
+        visible={editModalVisible}
+        onClose={() => {
+          setEditModalVisible(false);
+          setSelectedBatch(null);
+        }}
+        onSuccess={handleEditSuccess}
+        batch={selectedBatch}
+      />
+
+      {/* Delete Batch Modal */}
+      <DeleteBatchModal
+        visible={deleteModalVisible}
+        onClose={() => {
+          setDeleteModalVisible(false);
+          setSelectedBatch(null);
+        }}
+        onSuccess={handleDeleteSuccess}
+        batch={selectedBatch}
+      />
     </>
   );
 };
