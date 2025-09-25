@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import {
   Box,
   TextField,
-  Button,
   Typography,
-  Container,
   Checkbox,
   FormControlLabel,
   Paper,
@@ -13,98 +11,16 @@ import {
   Alert,
 } from '@mui/material';
 
-interface FormData {
-  email: string;
-  firstName: string;
-  lastName: string;
-  institution: string;
-  description: string;
-  captcha: string;
-  password: string;
-  passwordConfirm: string;
-  agreeToTerms: boolean;
-}
+import { useSignUpForm, SignUpFormData } from '@/hooks/useSignUpForm';
 
-// Define a separate interface for error messages
-interface FormErrors {
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  institution?: string;
-  description?: string;
-  captcha?: string;
-  password?: string;
-  passwordConfirm?: string;
-  agreeToTerms?: string;
-}
 interface SignUpFormProps {
   nextPath?: string;
+  onSubmit?: (data: SignUpFormData) => Promise<void> | void;
 }
 
-const SignUpForm: React.FC<SignUpFormProps> = () => {
-  const [formData, setFormData] = useState<FormData>({
-    email: '',
-    firstName: '',
-    lastName: '',
-    institution: '',
-    description: '',
-    captcha: '',
-    password: '',
-    passwordConfirm: '',
-    agreeToTerms: false,
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const validateForm = () => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Valid email is required';
-    }
-    if (!formData.firstName) {
-      newErrors.firstName = 'First name is required';
-    }
-    if (!formData.lastName) {
-      newErrors.lastName = 'Last name is required';
-    }
-    if (!formData.institution) {
-      newErrors.institution = 'Institution is required';
-    }
-    if (!formData.description) {
-      newErrors.description = 'Description is required';
-    }
-    if (!formData.captcha) {
-      newErrors.captcha = 'Captcha is required';
-    }
-    if (!formData.password || formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-    if (formData.password !== formData.passwordConfirm) {
-      newErrors.passwordConfirm = 'Passwords do not match';
-    }
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+const SignUpForm: React.FC<SignUpFormProps> = ({ onSubmit }) => {
+  const { formData, errors, isSubmitting, handleInputChange, handleSubmit } =
+    useSignUpForm();
 
   return (
     <div className="contribute-sign-in-form" id="sign-in">
@@ -115,7 +31,12 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
           sign in
         </Link>
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+      <Box
+        component="form"
+        onSubmit={(e) => handleSubmit(e, onSubmit)}
+        noValidate
+        sx={{ mt: 1 }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography
             className="label-signup"
@@ -341,7 +262,9 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
             helperText={errors.passwordConfirm}
           />
         </Box>
-        <button type="submit">Sign-up</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Signing up...' : 'Sign-up'}
+        </button>
       </Box>
     </div>
   );

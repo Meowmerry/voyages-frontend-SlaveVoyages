@@ -28,7 +28,7 @@ const NewVoyage: React.FC = ({ entity = tempNewVoyage }: NewVoyageProps) => {
   const [form] = Form.useForm();
   const [comments] = useState<{ [key: string]: string }>({});
   const [changeSet, setChangeSet] = useState<ChangeSet>({
-    id: -1,
+    id: '-1',
     author: 'Mocked',
     title: 'Mocked new voyage',
     changes: [],

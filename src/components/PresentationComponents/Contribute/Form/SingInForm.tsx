@@ -1,32 +1,40 @@
 // SignInForm.tsx
-import React, { useState } from 'react';
+import React from 'react';
+
 import '@/style/contributeContent.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '@/redux/getAuthUserSlice';
 import { useNavigate } from 'react-router-dom';
+
 import { useNavigation } from '@/hooks/useNavigation';
+import { useSignInForm, SignInFormData } from '@/hooks/useSignInForm';
+import { login } from '@/redux/getAuthUserSlice';
 import { RootState } from '@/redux/store';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
 // Define types for form values
 interface SignInFormProps {
   nextPath?: string;
+  onSubmit?: (data: SignInFormData) => Promise<void> | void;
 }
 const SignInForm: React.FC<SignInFormProps> = ({
   nextPath = '/contribute/legal',
+  onSubmit,
 }) => {
   const { handleSignUpClick, handleResetPasswordClick } = useNavigation();
   const { languageValue } = useSelector(
-    (state: RootState) => state.getLanguages
+    (state: RootState) => state.getLanguages,
   );
   const translatedContribute = translationLanguagesContribute(languageValue);
 
-  const [formValues, setFormValues] = useState({
-    email: 'meow@test.com',
-    // password: '0vije7yXjc0TqC3CqWZ4qHPfMiCd2MSbCdZgAlJHuwnmaeKIz9Ix8iDzfdQ7Ugvn',
-    password: '$12345',
-    remember: false,
-  });
+  const {
+    formData,
+    errors,
+    isSubmitting,
+    handleInputChange,
+    handleSubmit,
+    setAuthError,
+  } = useSignInForm();
+
   const mockUser = {
     email: 'meow@test.com',
     userName: 'Thasanee',
@@ -35,32 +43,23 @@ const SignInForm: React.FC<SignInFormProps> = ({
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value, type, checked } = e.target;
-    setFormValues((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
 
-  const handleFormSubmit = (e: React.FormEvent): void => {
-    e.preventDefault();
-    console.log(formValues);
-
-    if (
-      formValues.email === mockUser.email &&
-      formValues.password === mockUser.token
-    ) {
-      dispatch(
-        login({
-          email: mockUser.email,
-          userName: mockUser.userName,
-          token: mockUser.token,
-        })
-      );
-      navigate(nextPath);
+  const handleFormSubmit = async (data: SignInFormData) => {
+    if (onSubmit) {
+      await onSubmit(data);
     } else {
-      alert('Invalid email or password');
+      if (data.email === mockUser.email && data.password === mockUser.token) {
+        dispatch(
+          login({
+            email: mockUser.email,
+            userName: mockUser.userName,
+            token: mockUser.token,
+          }),
+        );
+        navigate(nextPath);
+      } else {
+        setAuthError('Invalid email or password');
+      }
     }
   };
 
@@ -79,7 +78,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
         <form
           method="post"
           action="/accounts/login/"
-          onSubmit={handleFormSubmit}
+          onSubmit={(e) => handleSubmit(e, handleFormSubmit)}
           className="sign-in-form"
         >
           {/* CSRF Token */}
@@ -104,7 +103,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     name="email"
                     id="id_email"
                     placeholder="E-mail address"
-                    value={formValues.email}
+                    value={formData.email}
                     onChange={handleInputChange}
                     required
                     autoFocus
@@ -125,7 +124,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     name="password"
                     id="id_password"
                     placeholder="Password"
-                    value={formValues.password}
+                    value={formData.password}
                     onChange={handleInputChange}
                     required
                   />
@@ -145,7 +144,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     type="checkbox"
                     name="remember"
                     id="id_remember"
-                    checked={formValues.remember}
+                    checked={formData.remember}
                     onChange={handleInputChange}
                   />
                 </td>
@@ -154,8 +153,19 @@ const SignInForm: React.FC<SignInFormProps> = ({
           </table>
           <input type="hidden" name="next" value={nextPath} />
 
-          <button type="submit" className="local_account_login_btn">
-            {translatedContribute.contributeSignInButton}
+          {errors.general && (
+            <div style={{ color: 'red', marginBottom: '1rem' }}>
+              {errors.general}
+            </div>
+          )}
+          <button
+            type="submit"
+            className="local_account_login_btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? 'Signing in...'
+              : translatedContribute.contributeSignInButton}
           </button>
         </form>
         <button onClick={handleGoogleSignIn}>
