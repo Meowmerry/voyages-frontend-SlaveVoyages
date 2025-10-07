@@ -81,13 +81,14 @@ export const EntityForm = ({
       }),
     [
       properties,
-      accessLevel,
       schema,
       expandedMenu,
       setExpandedMenu,
       entity,
       changes,
       onChange,
+      accessLevel,
+      readOnly,
     ],
   );
 

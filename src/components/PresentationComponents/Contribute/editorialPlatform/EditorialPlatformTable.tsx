@@ -119,7 +119,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     hasActiveFilters,
     activeFilterCount,
   } = useSearchEditRequestsFilters(form, gridRef);
-  console.log({ contribs });
 
   // TODO: GET By ID
   useEffect(() => {
