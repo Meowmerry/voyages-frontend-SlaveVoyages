@@ -31,7 +31,6 @@ import {
   Dropdown,
   Tag,
 } from 'antd';
-import dayjs from 'dayjs';
 import '@/style/table.scss';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -55,9 +54,8 @@ import { FilterPanel } from '../commons/FilterPanel';
 import { FilterToggleButton } from '../commons/FilterToggleButton';
 import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
 import { SearchInput } from '../commons/SearchInput';
-import StatusCellRenderer, {
-  statusConfig,
-} from '../commons/StatusCellRenderer';
+import { statusConfig } from '../commons/StatusCellRenderer';
+import { useColumnDefs } from '../commons/useColumnDefs';
 import { ContributionForm, ReviewMode } from '../ContributionForm';
 import {
   transformContributionData,
@@ -85,7 +83,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   const [active, setActive] = useState<TransformedContribution | undefined>(
     undefined,
   );
-  const [contributionId, setContributionId] = useState<string>(id || '');
+  const [contributionId, setContributionId] = useState<string>('');
   const [currentStatus, setCurrentStatus] = useState<
     ContributionStatus | undefined
   >(undefined);
@@ -98,6 +96,13 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   const [savedContributionState, setSavedContributionState] = useState<
     TransformedContribution | undefined
   >(undefined);
+
+  // Sync contributionId with URL param
+  useEffect(() => {
+    if (id && id !== contributionId) {
+      setContributionId(id);
+    }
+  }, [id, contributionId]);
   const [contribs, setContribs] = useState<TransformedContribution[]>([]);
   const [page, setPage] = useState(1);
   const [totalResultsCount, setTotalResultsCount] = useState(0);
@@ -130,21 +135,56 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
             throw new Error('Contribution not found');
           }
 
-          const fetchedData = response.data;
+          const dataContribution = response.data;
+
+          // If the API response doesn't have a changeSet, create one from root
+          if (!dataContribution.changeSet && dataContribution.root) {
+            dataContribution.changeSet = {
+              id: dataContribution.id,
+              changes: [],
+            };
+          }
+
+          // Transform the raw API data to match the expected structure
+          // const transformedData = transformContributionData(rawContribution);
 
           setActive((prev) => {
             // If we have previous active data from row click, merge it
             if (prev) {
               return {
                 ...prev,
-                ...fetchedData,
-                changes: fetchedData.changes || prev.changes || [],
+                ...dataContribution,
+                changes: dataContribution.changes || prev.changes || [],
               };
             }
 
-            // If no previous data, use fetchedData directly
-            return fetchedData;
+            // If no previous data, use transformedData directly
+            return dataContribution;
           });
+
+          //Set originalEntity from root or changes
+          if (dataContribution.root) {
+            // Use root from API response
+            const schema = dataContribution.root.schema;
+            const entityId = dataContribution.root.id;
+            const entity = materializeNew(getSchema(schema), entityId);
+            setOriginalEntity(entity);
+          } else if (
+            dataContribution.changes &&
+            dataContribution.changes.length > 0
+          ) {
+            // Fallback to changes if root doesn't exist
+            const schema = dataContribution.changes[0].entityRef.schema;
+            const entityId = dataContribution.changes[0].entityRef.id;
+            const entity = materializeNew(getSchema(schema), entityId);
+            setOriginalEntity(entity);
+          }
+
+          // Set other required state
+          setCurrentStatus(dataContribution.status);
+          setSavedContributionState(dataContribution);
+          setMode(ReviewMode.ReadOnly);
+          setReviews(dataContribution.reviews || []); // Load reviews from backend
         } catch (err) {
           console.error('Error fetching contribution:', err);
           message.error('Failed to load contribution');
@@ -299,113 +339,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     },
     [],
   );
-
-  const columnDefs = useMemo(
-    () =>
-      [
-        {
-          headerName: 'Title',
-          field: 'title' as any,
-          tooltipField: 'title',
-          width: 200,
-          sortable: true,
-        },
-        {
-          headerName: 'Contributor',
-          field: 'author' as any,
-          valueGetter: (params: any) => params.data?.author || 'Unknown',
-          width: 120,
-          tooltipField: 'author',
-        },
-        {
-          headerName: 'Comments',
-          field: 'comments' as any,
-          tooltipField: 'comments',
-          width: 250,
-          sortable: true,
-        },
-        {
-          headerName: 'Batch',
-          field: 'batch' as any,
-          tooltipField: 'batch',
-          valueGetter: (params: any) => {
-            return (
-              params.data?.batch?.title || params.data?.batch || 'Unassigned'
-            );
-          },
-          width: 180,
-          sortable: true,
-        },
-        {
-          headerName: 'Date',
-          field: 'timestamp' as any,
-          valueFormatter: ({ value }: { value: number }) =>
-            dayjs(value).format('MM/DD/YYYY'),
-          width: 100,
-          // sort: 'desc',
-        },
-        {
-          headerName: 'Voyage ID',
-          field: 'voyageId' as any,
-          tooltipValueGetter: (params: any) =>
-            `Voyage ID: ${params.data?.voyageId}`,
-          width: 120,
-          // sort: 'asc',
-          sortable: true,
-        },
-        {
-          headerName: 'Ship',
-          field: 'shipName' as any,
-          width: 150,
-          tooltipField: 'shipName',
-          sortable: true,
-        },
-        {
-          headerName: 'Port of Departure',
-          field: 'portOfDeparture' as any,
-          tooltipField: 'portOfDeparture',
-          width: 200,
-          sortable: true,
-        },
-        {
-          headerName: 'Nationality',
-          field: 'nationality' as any,
-          width: 120,
-          flex: 1,
-          tooltipField: 'nationality',
-          sortable: true,
-        },
-        {
-          headerName: 'Tonnage',
-          field: 'tonnage' as any,
-          width: 100,
-          flex: 1,
-          tooltipField: 'tonnage',
-          sortable: true,
-        },
-        {
-          headerName: 'Reviewer',
-          field: undefined as any,
-          valueGetter: () => 'David Ellis',
-          width: 120,
-          flex: 1,
-          sortable: true,
-        },
-        {
-          headerName: 'Status & Actions',
-          field: 'status' as any,
-          cellRenderer: StatusCellRenderer,
-          cellRendererParams: (params: any) => ({
-            onStatusChange: handleStatusChange,
-            data: params.data,
-          }),
-          width: 180,
-          flex: 1,
-          sortable: true,
-        },
-      ] as any[],
-    [handleStatusChange],
-  );
+  const columnDefs = useColumnDefs(handleStatusChange);
 
   const handlePageChange = useCallback(
     (newPage: number, pageSize?: number) => {
