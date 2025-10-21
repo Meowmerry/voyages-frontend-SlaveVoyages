@@ -4,7 +4,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState, User } from '@/share/InterfaceTypeUser';
 
 const initialState: AuthState = {
-  user: null,
+  user: {
+    username: '',
+    name: '',
+    token:'',
+    email:''
+  },
 };
 
 const getAuthUserSlice = createSlice({

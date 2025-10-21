@@ -37,7 +37,8 @@ const SignInForm: React.FC<SignInFormProps> = ({
 
   const mockUser = {
     email: 'meow@test.com',
-    userName: 'Thasanee',
+    username: 'Thasanee',
+    name: 'Thasanee',
     token: '$12345',
   };
 
@@ -52,8 +53,9 @@ const SignInForm: React.FC<SignInFormProps> = ({
         dispatch(
           login({
             email: mockUser.email,
-            userName: mockUser.userName,
+            username: mockUser.username,
             token: mockUser.token,
+            name: mockUser.name
           }),
         );
         navigate(nextPath);

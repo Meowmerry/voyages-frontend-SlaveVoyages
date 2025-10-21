@@ -1,0 +1,49 @@
+import { ContributionStatus, Contribution, EntityChange } from '@dotproductdev/voyages-contribute';
+import axios from 'axios';
+
+import { BASEURLNODE } from '@/share/AUTH_BASEURL';
+
+// Type for creating a new contribution (before backend adds server-side fields)
+export interface CreateContributionPayload {
+  id: string;
+  root: any;
+  changeSet: {
+    title: string;
+    comments: string;
+    timestamp: number;
+    changes: EntityChange[];
+    id?: string;
+    author?: string
+  };
+  status?: ContributionStatus;
+  batch?: string | null;
+}
+
+// API function for creating/updating contribution
+export const createSaveChangeContribution = async (
+  contribution: CreateContributionPayload
+): Promise<Contribution> => {
+  try {
+    const response = await axios.post(
+      `${BASEURLNODE}/contributions`,
+      contribution,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error('Error creating contribution:', error);
+
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        `Failed to create contribution: ${error.response?.data?.error || error.message}`,
+      );
+    }
+
+    throw error;
+  }
+};
