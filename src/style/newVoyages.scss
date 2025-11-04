@@ -43,3 +43,14 @@
     }
   }
 }
+
+.new-voyage-button {
+  background-color:  rgb(55, 148, 141);
+  color: #fff;
+  margin-right: 0.5rem;
+  height: 32;
+  font-size: 0.85rem;
+  &:hover {
+    background-color: rgba(6, 186, 171, 0.83) !important;
+  }
+}

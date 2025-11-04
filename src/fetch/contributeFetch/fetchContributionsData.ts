@@ -17,22 +17,16 @@ export const fetchContributionsData = async (filterQuery: string) => {
 
 export const fetchContributionsDataByAuthor = async (
   filterQuery: string,
-  _authorEmail?: string,
+  _authorUser?: string,
 ) => {
   const params = new URLSearchParams(filterQuery);
-  if (!params.has('page')) {
-    params.append('page', '1');
-  }
-  if (!params.has('limit')) {
-    params.append('limit', '10000');
-  }
-
   const url = `${BASEURLNODE}/contributions/wip?${params.toString()}`;
 
   try {
     const response = await axios.get(url, {
       headers: {
-        Authorization: AUTHTOKEN,
+        // Todo: Authorization: AUTHTOKEN, ==> will change when we can get Auth from API
+        Authorization: _authorUser,
         'Content-Type': 'application/json',
       },
     });
