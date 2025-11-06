@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { fetchEnumeration } from '@/fetch/contributeFetch/fetchEnumeration';
+
 import { MaterializedEntity } from '@dotproductdev/voyages-contribute';
+
+import { fetchEnumeration } from '@/fetch/contributeFetch/fetchEnumeration';
 
 interface CachedEnumeration {
   timestamp: number;

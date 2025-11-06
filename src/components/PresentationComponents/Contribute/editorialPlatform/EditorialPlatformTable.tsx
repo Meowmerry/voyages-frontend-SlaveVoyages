@@ -399,7 +399,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     }
     setMode(ReviewMode.Review);
   }, [active, contributionId]);
-
   // Handle row click - load contribution
   const handleRowClick = useCallback(
     ({ data, event }: any) => {

@@ -28,7 +28,7 @@ export const transformContributionData = (
     ...changeSetData,
     changeSetId: changeSetData?.id ?? '',
     id: contribution?.id ?? '',
-    voyage_id: changeSetData.changes?.[0]?.entityRef?.id ?? '',
+    voyage_id: contribution.id ?? '',
     status: contribution?.status,
     shipName: extractShipData(changeSetData, 'VoyageShip_ship_name'),
     portOfDeparture: extractItineraryData(changeSetData),

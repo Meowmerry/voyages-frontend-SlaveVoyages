@@ -31,13 +31,12 @@ const initialFilters: ContributionFilters = {
   reviewer: '',
   search: '',
 };
-
 export interface NewVoyagesFilters {
   author?: string;
 }
 
 // Custom hooks
-export const useSearchEditRequestsFilters = (form: any, gridRef?: any) => {
+export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const [newVoyagesFilters, setNewVoyagesFilters] = useState<NewVoyagesFilters>(
     { author: user?.email },
@@ -49,13 +48,25 @@ export const useSearchEditRequestsFilters = (form: any, gridRef?: any) => {
     if (user?.email) params.append('author', user.email);
     return params.toString();
   }, [user?.email]);
-
   const [filters, setFilters] = useState<ContributionFilters>(initialFilters);
 
   const buildFilterQuery = useCallback(
     (filters: ContributionFilters): string => {
       const params = new URLSearchParams();
-      if (filters.author) params.append('author', filters.author);
+
+      // Handle status with special mapping
+      if (filters.status !== 'all') {
+        if (filters.status === 'active') {
+          // Active means status 1 (submitted) OR status 2 (accepted)
+          params.append('status', '1');
+          params.append('status', '2');
+        } else {
+          // Pass through the actual status value
+          params.append('status', String(filters.status));
+        }
+      }
+
+      if (filters.author) params.append('author', String(filters.author));
       if (filters.voyageId) params.append('voyageId', String(filters.voyageId));
       if (filters.shipName) params.append('shipName', String(filters.shipName));
       if (filters.nationality)

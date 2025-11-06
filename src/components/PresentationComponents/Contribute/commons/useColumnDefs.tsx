@@ -48,7 +48,7 @@ export const useColumnDefs = (
           valueFormatter: ({ value }: { value: number }) =>
             dayjs(value).format('MM/DD/YYYY'),
           width: 100,
-          // sort: 'desc',
+          sort: 'desc',
         },
         {
           headerName: 'Voyage ID',
@@ -131,6 +131,14 @@ export const useColumnNewVoyagesDefs = () => {
           cellRenderer: StatusCellRenderer,
           flex: 1,
           sortable: true,
+        },
+        {
+          headerName: 'Date',
+          field: 'timestamp' as any,
+          valueFormatter: ({ value }: { value: number }) =>
+            dayjs(value).format('MM/DD/YYYY'),
+          width: 200,
+          sort: 'desc',
         },
       ] as any[],
     [],

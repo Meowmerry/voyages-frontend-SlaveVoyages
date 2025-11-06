@@ -6,13 +6,17 @@ import { BASEURLNODE } from '@/share/AUTH_BASEURL';
 // API function for creating/updating contribution
 export const createSubmitChangeContribution = async (
   contribution: Contribution,
+  _authorUser?: string,
 ): Promise<Contribution> => {
+  const ID = contribution?.root?.id || contribution?.id;
   try {
-    const response = await axios.post(
-      `${BASEURLNODE}/contributions/${contribution.id}/change_status`,
+    const response = await axios.patch(
+      `${BASEURLNODE}/contributions/${ID}/change_status`,
       contribution,
       {
         headers: {
+          // Todo: Authorization: AUTHTOKEN, ==> will change when we can get Auth from API
+          Authorization: _authorUser,
           'Content-Type': 'application/json',
         },
       },

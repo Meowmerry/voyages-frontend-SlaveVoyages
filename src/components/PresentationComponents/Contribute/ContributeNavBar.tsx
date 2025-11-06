@@ -38,7 +38,7 @@ const ContributeNavBar = ({ handleDrawerOpen }: ContributeNavBarProps) => {
           {user ? (
             <div className="navbar-subtitle-contribuite  flex">
               <div className="navbar-subitem">
-                Welcome, {user.userName}.
+                Welcome, {user.username}.
                 <Link className="navbar-subitem-link" to="/contribute/">
                   {translatedcontribute.contributeContributeHome}
                 </Link>{' '}
