@@ -224,6 +224,16 @@ function BarGraph() {
     [],
   );
 
+  const handleClearAll = useCallback(() => {
+    setChips([]);
+    setYAxes([]);
+    setError(true);
+    setBarOptions((prevOptions) => ({
+      ...prevOptions,
+      y_vars: '',
+    }));
+  }, []);
+
   if (isLoading) {
     return (
       <div className="Skeleton-loading">
@@ -246,6 +256,7 @@ function BarGraph() {
         selectedOptions={barGraphOptions}
         handleChange={handleChangeBarGraphOption}
         handleChangeMultipleYSelected={handleChangeBarGraphChipYSelected}
+        handleClearAll={handleClearAll}
         maxWidth={maxWidth}
         XFieldText={'X Field'}
         YFieldText={'Multi-Selector Y-Field'}

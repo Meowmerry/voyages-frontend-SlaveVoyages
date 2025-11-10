@@ -230,6 +230,16 @@ function Scatter() {
     [],
   );
 
+  const handleClearAll = useCallback(() => {
+    setChips([]);
+    setYAxes([]);
+    setError(true);
+    setScatterOptions((prevOptions) => ({
+      ...prevOptions,
+      y_vars: '',
+    }));
+  }, []);
+
   return (
     <div
       className="mobile-responsive"
@@ -245,6 +255,7 @@ function Scatter() {
         selectedOptions={scatterOptions}
         handleChange={handleChangeScatterOption}
         handleChangeMultipleYSelected={handleChangeScatterChipYSelected}
+        handleClearAll={handleClearAll}
         maxWidth={maxWidth}
         XFieldText="X Field"
         YFieldText="Multi-Selector Y-Field"

@@ -1,5 +1,6 @@
 import { FunctionComponent, ReactNode } from 'react';
 
+import CloseIcon from '@mui/icons-material/Close';
 import {
   Box,
   FormControl,
@@ -9,6 +10,8 @@ import {
   SelectChangeEvent,
   Chip,
   OutlinedInput,
+  IconButton,
+  InputAdornment,
 } from '@mui/material';
 import { useSelector } from 'react-redux';
 
@@ -30,6 +33,7 @@ interface SelectDropdownProps {
     event: SelectChangeEvent<string[]>,
     name: string,
   ) => void;
+  handleClearAll?: () => void;
   maxWidth?: number;
   XFieldText?: string;
   YFieldText?: string;
@@ -49,6 +53,7 @@ export const SelectDropdown: FunctionComponent<SelectDropdownProps> = ({
   selectedOptions,
   handleChange,
   handleChangeMultipleYSelected,
+  handleClearAll,
   maxWidth,
   XFieldText,
   YFieldText,
@@ -183,7 +188,35 @@ export const SelectDropdown: FunctionComponent<SelectDropdownProps> = ({
                 }
               }}
               input={
-                <OutlinedInput id="select-multiple-chip" label={YFieldText} />
+                <OutlinedInput
+                  id="select-multiple-chip"
+                  label={YFieldText}
+                  endAdornment={
+                    chips && chips.length > 0 ? (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (handleClearAll) {
+                              handleClearAll();
+                            }
+                          }}
+                          edge="end"
+                          size="small"
+                          aria-label="clear all selections"
+                          sx={{
+                            marginRight: '8px',
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                            },
+                          }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
+                      </InputAdornment>
+                    ) : null
+                  }
+                />
               }
               renderValue={(value): ReactNode => (
                 <Box
@@ -210,6 +243,24 @@ export const SelectDropdown: FunctionComponent<SelectDropdownProps> = ({
                         }}
                         key={`${chipValue}-${index}`}
                         label={selectedOption ? selectedOption.label[lang] : ''}
+                        onDelete={(e) => {
+                          e.stopPropagation();
+                          if (handleChangeMultipleYSelected) {
+                            const newValue = value.filter(
+                              (v) => v !== chipValue,
+                            );
+                            const syntheticEvent = {
+                              target: { value: newValue },
+                            } as SelectChangeEvent<string[]>;
+                            handleChangeMultipleYSelected(
+                              syntheticEvent,
+                              'y_vars',
+                            );
+                          }
+                        }}
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                        }}
                       />
                     );
                   })}

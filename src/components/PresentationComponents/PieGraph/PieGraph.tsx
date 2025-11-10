@@ -213,11 +213,15 @@ function PieGraph() {
             width: '100%',
             maxWidth: chartWidth,
             height: chartHeight,
-            minHeight: 500,
+            minHeight: maxWidth < 768 ? 400 : chartHeight,
             border: '1px solid #ccc',
             marginTop: 18,
             overflow: 'auto',
             position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: maxWidth < 768 ? '10px' : '0',
           }}
         >
           <Plot
@@ -231,13 +235,17 @@ function PieGraph() {
                 textinfo: 'label+percent',
                 insidetextorientation: 'radial',
                 outsidetextfont: {
-                  size: 14,
+                  size: maxWidth < 768 ? 12 : 14,
                   color: '#333',
                   family: 'Arial, sans-serif',
                 },
                 hole: 0.1,
                 textposition: 'inside',
                 showlegend: showLegend,
+                domain: {
+                  x: [0, 1],
+                  y: [0, 1],
+                },
               },
             ]}
             layout={{
@@ -250,10 +258,17 @@ function PieGraph() {
               },
               font: {
                 family: 'Arial, sans-serif',
-                size: maxWidth < 500 ? 10 : 14,
+                size: maxWidth < 500 ? 9 : maxWidth < 768 ? 11 : 14,
                 color: '#333333',
               },
               autosize: true,
+              margin: {
+                l: maxWidth < 768 ? 10 : 40,
+                r: maxWidth < 768 ? 10 : 40,
+                t: maxWidth < 768 ? 70 : 80,
+                b: maxWidth < 768 ? 20 : 60,
+                pad: 4,
+              },
               legend: {
                 orientation: showLegend ? 'v' : 'h',
                 x: showLegend ? 1.02 : 0.5,
