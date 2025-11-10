@@ -127,7 +127,7 @@ export const batchApi = {
     return response.batches;
   },
 
-  // Update batch
+  // Update batch: WAIT FOR API
   async updateBatch(
     batchId: number,
     data: Partial<PublicationBatch>,
