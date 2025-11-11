@@ -67,13 +67,6 @@ export const useColumnDefs = (
           sortable: true,
         },
         {
-          headerName: 'Port of Departure',
-          field: 'portOfDeparture' as any,
-          tooltipField: 'portOfDeparture',
-          width: 200,
-          sortable: true,
-        },
-        {
           headerName: 'Nationality',
           field: 'nationality' as any,
           width: 120,
@@ -116,8 +109,19 @@ export const useColumnNewVoyagesDefs = (
         {
           headerName: 'Voyage ID(s)',
           field: 'voyage_id' as any,
+          valueGetter: (params: any) => {
+            return params.data?.voyage_id || params.voyage_id || '-';
+          },
           tooltipValueGetter: (params: any) =>
             `Voyage ID: ${params.data?.voyage_id}`,
+          sortable: true,
+          flex: 1,
+        },
+        {
+          headerName: 'Contribute ID(s)',
+          field: 'id' as any,
+          tooltipValueGetter: (params: any) =>
+            `Contribute ID: ${params.data?.id}`,
           sortable: true,
           flex: 1,
         },

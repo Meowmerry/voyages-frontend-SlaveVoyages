@@ -25,14 +25,14 @@ const ActionCellRenderer: React.FC<ActionCellRendererProps> = ({
     e.stopPropagation();
     Modal.confirm({
       title: 'Delete Contribution',
-      content: `Are you sure you want to delete this contribution (Voyage ID: ${data?.voyage_id})?`,
+      content: `Are you sure you want to delete this contribution id:${data?.id})?`,
       okText: 'Delete',
       okType: 'danger',
       cancelText: 'Cancel',
       onOk: async () => {
-        if (onDelete && data?.voyage_id) {
+        if (onDelete && data?.id) {
           try {
-            await onDelete(data.voyage_id);
+            await onDelete(data.id);
           } catch (error) {
             console.error('Failed to delete contribution:', error);
           }

@@ -32,20 +32,19 @@ import {
   Tag,
 } from 'antd';
 import '@/style/table.scss';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const { Text } = Typography;
 import '@/style/contributeContent.scss';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import {
-  fetchContributionsData,
-  fetchContributionsDataByID,
-} from '@/fetch/contributeFetch/fetchContributionsData';
+import { fetchContributionsData } from '@/fetch/contributeFetch/fetchContributionsData';
 import { submitReview } from '@/fetch/contributeFetch/submitReview';
 import { updateContributionStatus } from '@/fetch/contributeFetch/updateContributionStatus';
 import { useBatchManagement } from '@/hooks/useBatchManagement';
 import { useSearchEditRequestsFilters } from '@/hooks/useSearchEditRequestsFilters';
+import { RootState } from '@/redux/store';
 
 import BatchManagement from '../BatchComponent/BatchManagement';
 import BatchAssignmentModal from '../BatchComponent/Modal/BatchAssignmentModal';
@@ -76,7 +75,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
 }) => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-
+  const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const { batches } = useBatchManagement({
     autoFetch: true,
   });
@@ -129,7 +128,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     const fetchData = async () => {
       const filterQuery = buildFilterQuery(filters);
       try {
-        const response = await fetchContributionsData(filterQuery);
+        const response = await fetchContributionsData(filterQuery, user?.email);
         const contributionsArray = response.data;
         const transformedRows = contributionsArray.map(
           transformContributionData,
@@ -142,7 +141,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     };
 
     fetchData();
-  }, [filters, buildFilterQuery]);
+  }, [filters, buildFilterQuery, user]);
 
   // Load contribution when ID in URL changes
   useEffect(() => {
@@ -544,7 +543,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           {empty && active?.changeSet && (
             <ContributionForm
               entity={empty}
-              contribuition={active}
+              contribution={active}
               onChange={(
                 contribuition: Contribution | TransformedContribution,
               ) => {

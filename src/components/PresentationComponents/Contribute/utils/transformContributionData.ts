@@ -23,12 +23,13 @@ export const transformContributionData = (
   contribution: Contribution,
 ): TransformedContribution => {
   const changeSetData = contribution.changeSet || {};
+
   return {
     ...contribution,
     ...changeSetData,
     changeSetId: changeSetData?.id ?? '',
     id: contribution?.id ?? '',
-    voyage_id: contribution.id ?? '',
+    voyage_id: contribution?.root?.id ?? '',
     status: contribution?.status,
     shipName: extractShipData(changeSetData, 'VoyageShip_ship_name'),
     portOfDeparture: extractItineraryData(changeSetData),

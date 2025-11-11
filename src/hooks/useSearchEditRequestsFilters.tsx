@@ -36,7 +36,7 @@ export interface NewVoyagesFilters {
 }
 
 // Custom hooks
-export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
+export const useSearchEditRequestsFilters = (form: any, gridRef?: any) => {
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const [newVoyagesFilters, setNewVoyagesFilters] = useState<NewVoyagesFilters>(
     { author: user?.email },
@@ -49,6 +49,13 @@ export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
     return params.toString();
   }, [user?.email]);
   const [filters, setFilters] = useState<ContributionFilters>(initialFilters);
+
+  const buildExisingVoyagesFilterQuery = useCallback((): string => {
+    const params = new URLSearchParams();
+    params.append('status', '0');
+    if (user?.email) params.append('author', user.email);
+    return params.toString();
+  }, [user?.email]);
 
   const buildFilterQuery = useCallback(
     (filters: ContributionFilters): string => {
@@ -95,11 +102,11 @@ export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
   const handleClearFilters = useCallback(() => {
     setFilters(initialFilters);
     form.resetFields();
-    gridRef.current?.api.refreshInfiniteCache();
+    gridRef?.current?.api.refreshInfiniteCache();
   }, [form, gridRef]);
 
   const handleApplyFilters = useCallback(() => {
-    gridRef.current?.api.refreshInfiniteCache();
+    gridRef?.current?.api.refreshInfiniteCache();
   }, [gridRef]);
 
   const hasActiveFilters = useMemo(() => {
@@ -132,5 +139,6 @@ export const useSearchEditRequestsFilters = (form: any, gridRef: any) => {
     buildNewVoyagesFilterQuery,
     newVoyagesFilters,
     setNewVoyagesFilters,
+    buildExisingVoyagesFilterQuery,
   };
 };

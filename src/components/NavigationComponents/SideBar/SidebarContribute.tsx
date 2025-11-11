@@ -6,7 +6,13 @@ import {
   Home,
   Diversity3,
 } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Tooltip,
+} from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useNavigation } from '@/hooks/useNavigation';
@@ -38,7 +44,7 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
 
   useEffect(() => {
     dispatch(loadUserFromStorage());
-  }, []);
+  }, [dispatch]);
 
   return (
     <StyledDrawer
@@ -49,13 +55,25 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
     >
       <List>
         <ListItem onClick={handleClickGuidelines}>
-          <ListItemIcon>
-            <Home />
-          </ListItemIcon>
+          <Tooltip
+            title={translatedContribute.contributeGuidelines}
+            placement="right"
+            arrow
+          >
+            <ListItemIcon>
+              <Home style={{ cursor: 'pointer' }} />
+            </ListItemIcon>
+          </Tooltip>
           {openSideBar && (
             <ListItemText
-              primaryTypographyProps={{
-                style: { fontSize: '0.90rem', fontWeight: '500' },
+              slotProps={{
+                primary: {
+                  style: {
+                    fontSize: '0.90rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                  },
+                },
               }}
               primary={translatedContribute.contributeGuidelines}
             />
@@ -64,13 +82,25 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
         {user ? (
           <>
             <ListItem onClick={() => handleClickSideBar('')}>
-              <ListItemIcon>
-                <Diversity3 />
-              </ListItemIcon>
+              <Tooltip
+                title={translatedContribute.contributeContributeHome}
+                placement="right"
+                arrow
+              >
+                <ListItemIcon>
+                  <Diversity3 style={{ cursor: 'pointer' }} />
+                </ListItemIcon>
+              </Tooltip>
               {openSideBar && (
                 <ListItemText
-                  primaryTypographyProps={{
-                    style: { fontSize: '0.90rem', fontWeight: '500' },
+                  slotProps={{
+                    primary: {
+                      style: {
+                        fontSize: '0.90rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                      },
+                    },
                   }}
                   primary={translatedContribute.contributeContributeHome}
                 />
@@ -81,11 +111,21 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
                 key={btn.nameBtn}
                 onClick={() => handleClickSideBar(btn.path)}
               >
-                <ListItemIcon>{btn.icon}</ListItemIcon>
+                <Tooltip title={btn.nameBtn} placement="right" arrow>
+                  <ListItemIcon style={{ cursor: 'pointer' }}>
+                    {btn.icon}
+                  </ListItemIcon>
+                </Tooltip>
                 {openSideBar && (
                   <ListItemText
-                    primaryTypographyProps={{
-                      style: { fontSize: '0.90rem', fontWeight: '500' },
+                    slotProps={{
+                      primary: {
+                        style: {
+                          fontSize: '0.90rem',
+                          fontWeight: '500',
+                          cursor: 'pointer',
+                        },
+                      },
                     }}
                     primary={btn.nameBtn}
                   />
@@ -94,13 +134,24 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
             ))}
 
             <ListItem onClick={handleLogout}>
-              <ListItemIcon>
-                <ExitToApp />
-              </ListItemIcon>
+              <Tooltip
+                title={translatedContribute.contributeLogOut}
+                placement="right"
+              >
+                <ListItemIcon>
+                  <ExitToApp style={{ cursor: 'pointer' }} />
+                </ListItemIcon>
+              </Tooltip>
               {openSideBar && (
                 <ListItemText
-                  primaryTypographyProps={{
-                    style: { fontSize: '0.90rem', fontWeight: '500' },
+                  slotProps={{
+                    primary: {
+                      style: {
+                        fontSize: '0.90rem',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                      },
+                    },
                   }}
                   primary={translatedContribute.contributeLogOut}
                 />
@@ -109,13 +160,21 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
           </>
         ) : (
           <ListItem onClick={handleSignInClick}>
-            <ListItemIcon>
-              <AccountCircleRounded />
-            </ListItemIcon>
+            <Tooltip title={translatedContribute.contributeSignInButton}>
+              <ListItemIcon>
+                <AccountCircleRounded style={{ cursor: 'pointer' }} />
+              </ListItemIcon>
+            </Tooltip>
             {openSideBar && (
               <ListItemText
-                primaryTypographyProps={{
-                  style: { fontSize: '0.90rem', fontWeight: '500' },
+                slotProps={{
+                  primary: {
+                    style: {
+                      fontSize: '0.90rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                    },
+                  },
                 }}
                 primary={translatedContribute.contributeSignInButton}
               />

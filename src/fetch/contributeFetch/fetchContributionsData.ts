@@ -2,7 +2,10 @@ import axios, { isAxiosError } from 'axios';
 
 import { AUTHTOKEN, BASEURLNODE } from '@/share/AUTH_BASEURL';
 
-export const fetchContributionsData = async (filterQuery: string) => {
+export const fetchContributionsData = async (
+  filterQuery: string,
+  _authorUser?: string,
+) => {
   const response = await axios.get(
     `${BASEURLNODE}/contributions?page=1&limit=50000&${filterQuery}`,
     {
@@ -12,6 +15,17 @@ export const fetchContributionsData = async (filterQuery: string) => {
       },
     },
   );
+  return response.data;
+};
+
+export const fetchCheckVoyageConflict = async (_authorUser?: string) => {
+  const response = await axios.get(`${BASEURLNODE}/contributions`, {
+    headers: {
+      // Todo: Authorization: AUTHTOKEN, ==> will change when we can get Auth from API
+      Authorization: _authorUser,
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 
