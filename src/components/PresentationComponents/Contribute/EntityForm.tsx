@@ -13,7 +13,6 @@ import { StyledCollapse } from '@/styleMUI/stylesMenu/styleCollapse';
 
 export interface ContributionFormProps {
   entity: MaterializedEntity;
-  // onUpdate: (contribution: Contribution) => void;
 }
 
 export interface EntityFormProps {

@@ -40,6 +40,7 @@ import '@/style/contributeContent.scss';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { fetchContributionsData } from '@/fetch/contributeFetch/fetchContributionsData';
+import { fetchSubmitEditVoaygesForm } from '@/fetch/contributeFetch/fetchSubmitEditVoaygesForm';
 import { submitReview } from '@/fetch/contributeFetch/submitReview';
 import { updateContributionStatus } from '@/fetch/contributeFetch/updateContributionStatus';
 import { useBatchManagement } from '@/hooks/useBatchManagement';
@@ -86,12 +87,12 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   >(undefined);
 
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [originalEntity, setOriginalEntity] = useState<
-    MaterializedEntity | undefined
-  >(undefined);
   const [mode, setMode] = useState(ReviewMode.ReadOnly);
   const [savedContributionState, setSavedContributionState] = useState<
     Contribution | undefined
+  >(undefined);
+  const [fetchedEntity, setFetchedEntity] = useState<
+    MaterializedEntity | undefined
   >(undefined);
 
   // Sync contributionId with URL param
@@ -125,7 +126,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   } = useSearchEditRequestsFilters(form, gridRef);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const loadContribution = async () => {
       const filterQuery = buildFilterQuery(filters);
       try {
         const response = await fetchContributionsData(filterQuery, user?.email);
@@ -140,41 +141,74 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
       }
     };
 
-    fetchData();
+    loadContribution();
   }, [filters, buildFilterQuery, user]);
 
   // Load contribution when ID in URL changes
   useEffect(() => {
-    if (id && contribs.length > 0) {
-      const contribution = contribs.find((c) => c.id === id);
-      if (contribution) {
-        setActive(contribution);
-        setCurrentStatus(contribution.status);
-        setSavedContributionState(contribution);
-        setMode(ReviewMode.ReadOnly);
-        setReviews([]); // TODO: Load reviews from backend
+    const loadContributionEntity = async () => {
+      if (id && user?.email && contribs.length > 0) {
+        const contribution = contribs.find((c) => c.id === id);
+        if (contribution) {
+          setActive(contribution);
+          setCurrentStatus(contribution.status);
+          setSavedContributionState(contribution);
+          setMode(ReviewMode.ReadOnly);
+          setReviews([]); // TODO: Load reviews from backend
 
-        if (
-          contribution?.changeSet?.changes &&
-          contribution?.changeSet?.changes.length > 0
-        ) {
-          const schema = contribution?.changeSet?.changes[0].entityRef.schema;
-          const entityId = contribution?.changeSet?.changes[0].entityRef.id;
-          const entity = materializeNew(getSchema(schema), entityId);
-          setOriginalEntity(entity);
+          const isExistingVoyage = contribution.root.type === 'existing';
+
+          // Fetch the actual entity for existing voyages
+          if (
+            contribution.changeSet?.changes &&
+            contribution.changeSet.changes.length > 0
+          ) {
+            const entityRef = contribution.changeSet.changes[0].entityRef;
+            if (isExistingVoyage) {
+              try {
+                const res = await fetchSubmitEditVoaygesForm(
+                  String(entityRef.id),
+                );
+                if (res.status === 200 && res.data) {
+                  setFetchedEntity(res.data);
+                } else {
+                  // Fallback to blank entity if fetch fails
+                  console.error(
+                    'Failed to fetch existing voyage, using blank entity',
+                  );
+                  setFetchedEntity(
+                    materializeNew(getSchema(entityRef.schema), entityRef.id),
+                  );
+                }
+              } catch (error) {
+                console.error('Error fetching existing voyage:', error);
+                // Fallback to blank entity
+                setFetchedEntity(
+                  materializeNew(getSchema(entityRef.schema), entityRef.id),
+                );
+              }
+            } else {
+              // For new voyages, create blank entity
+              setFetchedEntity(
+                materializeNew(getSchema(entityRef.schema), entityRef.id),
+              );
+            }
+          }
         }
+      } else if (!id) {
+        // Clear state when no ID in URL
+        setActive(undefined);
+        setReviews([]);
+        setCurrentStatus(undefined);
+        setContributionId('');
+        setSavedContributionState(undefined);
+        setMode(ReviewMode.ReadOnly);
+        setFetchedEntity(undefined);
       }
-    } else if (!id) {
-      // Clear state when no ID in URL
-      setActive(undefined);
-      setOriginalEntity(undefined);
-      setReviews([]);
-      setCurrentStatus(undefined);
-      setContributionId('');
-      setSavedContributionState(undefined);
-      setMode(ReviewMode.ReadOnly);
-    }
-  }, [id, contribs]);
+    };
+
+    loadContributionEntity();
+  }, [id, contribs, user?.email]);
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -280,19 +314,19 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   const empty = useMemo(() => {
     if (!active) return undefined;
 
-    // If we have the original entity stored, use it (this handles the review mode case)
-    if (originalEntity) {
-      return originalEntity;
+    // Use the fetched entity if available
+    if (fetchedEntity) {
+      return fetchedEntity;
     }
 
-    // Handle the normal case when active.changes exists
+    // Fallback: create a blank entity if fetch is still in progress or failed
     if (active.changeSet && active.changeSet.changes.length > 0) {
       const schema = active.changeSet.changes[0].entityRef.schema;
       const id = active.changeSet.changes[0].entityRef.id;
       return materializeNew(getSchema(schema), id);
     }
     return undefined;
-  }, [active, originalEntity]);
+  }, [active, fetchedEntity]);
 
   const getRowRowStyle = useCallback(
     () => ({
@@ -425,14 +459,6 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
       // Reset to read-only mode
       setMode(ReviewMode.ReadOnly);
 
-      // Create and store the original entity
-      if (data.changes && data.changes.length > 0) {
-        const schema = data.changes[0].entityRef.schema;
-        const id = data.changes[0].entityRef.id;
-        const entity = materializeNew(getSchema(schema), id);
-        setOriginalEntity(entity);
-      }
-
       navigate(`/contribute/editor_main/requests/${data.id}`);
     },
     [navigate],
@@ -448,12 +474,12 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
 
       // Clear all state before navigation to ensure clean reset
       setActive(undefined);
-      setOriginalEntity(undefined);
       setReviews([]);
       setCurrentStatus(undefined);
       setContributionId('');
       setSavedContributionState(undefined);
       setMode(ReviewMode.ReadOnly);
+      setFetchedEntity(undefined);
 
       // Navigate with replace to update URL without adding history entry
       // The useEffect will ensure state stays cleared when URL changes

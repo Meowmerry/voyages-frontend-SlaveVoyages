@@ -1,8 +1,4 @@
-import {
-  fetchCheckVoyageConflict,
-  fetchContributionsData,
-  fetchContributionsDataByAuthor,
-} from '@/fetch/contributeFetch/fetchContributionsData';
+import { fetchCheckVoyageConflict } from '@/fetch/contributeFetch/fetchContributionsData';
 
 export interface VoyageConflictResult {
   hasConflict: boolean;
