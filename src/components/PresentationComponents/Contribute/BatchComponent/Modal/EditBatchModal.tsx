@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-import { PaperDraggableCreateBatch } from '@/components/SelectorComponents/Cascading/PaperDraggable';
+import { PaperDraggableEditBatch } from '@/components/SelectorComponents/Cascading/PaperDraggable';
 import { useBatchManagement } from '@/hooks/useBatchManagement';
 import { StyleDialog } from '@/styleMUI';
 
@@ -111,7 +111,7 @@ const EditBatchModal: React.FC<EditBatchModalProps> = ({
       }}
       fullWidth
       maxWidth="sm"
-      PaperComponent={PaperDraggableCreateBatch}
+      PaperComponent={PaperDraggableEditBatch}
       aria-labelledby="draggable-dialog-edit-batch"
     >
       <DialogTitle

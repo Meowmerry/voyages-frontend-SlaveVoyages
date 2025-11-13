@@ -94,6 +94,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
   const [fetchedEntity, setFetchedEntity] = useState<
     MaterializedEntity | undefined
   >(undefined);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Sync contributionId with URL param
   useEffect(() => {
@@ -142,7 +143,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
     };
 
     loadContribution();
-  }, [filters, buildFilterQuery, user]);
+  }, [filters, buildFilterQuery, user, refreshTrigger]);
 
   // Load contribution when ID in URL changes
   useEffect(() => {
@@ -803,7 +804,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
         visible={batchManagementVisible}
         onClose={() => setBatchManagementVisible(false)}
         onBatchAssigned={() => {
-          handleApplyFilters();
+          setRefreshTrigger((prev) => prev + 1);
           message.success('Batch updated successfully');
         }}
       />
@@ -816,7 +817,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           setBatchAssignmentVisible(false);
           setSelectedRows([]);
           gridRef.current?.api.deselectAll();
-          handleApplyFilters();
+          setRefreshTrigger((prev) => prev + 1);
         }}
       />
     </div>

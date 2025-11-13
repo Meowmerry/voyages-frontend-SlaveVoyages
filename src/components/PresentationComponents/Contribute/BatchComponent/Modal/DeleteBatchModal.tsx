@@ -15,7 +15,7 @@ import {
   Alert,
 } from '@mui/material';
 
-import { PaperDraggableCreateBatch } from '@/components/SelectorComponents/Cascading/PaperDraggable';
+import { PaperDraggableDeleteBatch } from '@/components/SelectorComponents/Cascading/PaperDraggable';
 import { useBatchManagement } from '@/hooks/useBatchManagement';
 import { StyleDialog } from '@/styleMUI';
 
@@ -81,7 +81,7 @@ const DeleteBatchModal: React.FC<DeleteBatchModalProps> = ({
       }}
       fullWidth
       maxWidth="sm"
-      PaperComponent={PaperDraggableCreateBatch}
+      PaperComponent={PaperDraggableDeleteBatch}
       aria-labelledby="draggable-dialog-delete-batch"
     >
       <DialogTitle
