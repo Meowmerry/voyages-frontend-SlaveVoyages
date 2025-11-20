@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { CheckOutlined, CloseOutlined, DownOutlined } from '@ant-design/icons';
 import { ContributionStatus } from '@dotproductdev/voyages-contribute';
-import { Space, Tag, Popconfirm, message, Dropdown } from 'antd';
+import { Space, Tag } from 'antd';
 
 export const statusConfig: Record<
   ContributionStatus,
@@ -39,30 +38,12 @@ interface StatusCellRendererProps {
   ) => void;
 }
 
-const StatusCellRenderer: React.FC<StatusCellRendererProps> = ({
-  value,
-  data,
-  onStatusChange,
-}) => {
+const StatusCellRenderer: React.FC<StatusCellRendererProps> = ({ value }) => {
   const statusKey =
-    value! in statusConfig
+    value !== undefined && value in statusConfig
       ? (value as ContributionStatus)
-      : ContributionStatus.Submitted;
+      : ContributionStatus.WorkInProgress;
   const config = statusConfig[statusKey];
-
-  const handleAccept = () => {
-    if (onStatusChange && data?.id) {
-      onStatusChange(data.id, ContributionStatus.Accepted);
-      message.success('Contribution accepted successfully');
-    }
-  };
-
-  const handleReject = () => {
-    if (onStatusChange && data?.id) {
-      onStatusChange(data.id, ContributionStatus.Rejected);
-      message.success('Contribution rejected');
-    }
-  };
 
   return (
     <Space direction="vertical" size="small" style={{ width: '100%' }}>

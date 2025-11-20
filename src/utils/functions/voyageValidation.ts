@@ -1,7 +1,10 @@
+import { ContributionStatus } from '@dotproductdev/voyages-contribute';
+
 import { fetchCheckVoyageConflict } from '@/fetch/contributeFetch/fetchContributionsData';
 
 export interface VoyageConflictResult {
   hasConflict: boolean;
+  status?: number;
   contributionId?: string;
   conflictType?: 'new' | 'existing';
 }
@@ -32,6 +35,7 @@ export const checkVoyageConflict = async (
       if (checkType === 'new' && rootType === 'new' && rootId === voyageIdStr) {
         return {
           hasConflict: true,
+          status: contrib.status,
           contributionId: contrib.id,
           conflictType: 'new',
         };
@@ -45,6 +49,7 @@ export const checkVoyageConflict = async (
       ) {
         return {
           hasConflict: true,
+          status: contrib.status,
           contributionId: contrib.id,
           conflictType: 'existing',
         };
@@ -58,21 +63,35 @@ export const checkVoyageConflict = async (
   }
 };
 
+export interface ConflictErrorMessage {
+  status: string;
+  content: string;
+}
+
 /**
  * Get a user-friendly error message for voyage conflicts
- * @param conflictType - Type of conflict detected
- * @returns User-friendly error message
+ * @param conflictStatus - Type of conflict detected
+ * @returns User-friendly error message with status
  */
 export const getConflictErrorMessage = (
-  conflictType: 'new' | 'existing',
-): string => {
-  if (conflictType === 'new') {
-    return 'This voyage has already been submitted for evaluation. Please contact the editor for any further revisions or additional information you wish to contribute.';
+  conflictStatus: number,
+): ConflictErrorMessage => {
+  if (conflictStatus === ContributionStatus.Submitted) {
+    return {
+      status: 'submitted',
+      content: `This voyage has already been submitted for evaluation. Please contact the editor at editors@slavevoyages.org for any further revisions or additional information you wish to contribute.`,
+    };
   }
 
-  if (conflictType === 'existing') {
-    return 'This voyage is already being edited in your work-in-progress contributions. Please complete or delete the existing contribution before creating a new one.';
+  if (conflictStatus === ContributionStatus.WorkInProgress) {
+    return {
+      status: 'work-in-progress',
+      content: `This voyage is already being edited in your work-in-progress contributions.\n Please complete or delete the existing contribution before creating a new one.`,
+    };
   }
 
-  return 'This voyage already exists in your contributions.';
+  return {
+    status: 'conflict',
+    content: 'This voyage already exists in your contributions.',
+  };
 };

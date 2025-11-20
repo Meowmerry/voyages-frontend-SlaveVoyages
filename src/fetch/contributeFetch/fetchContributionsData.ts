@@ -54,6 +54,29 @@ export const fetchContributionsDataByAuthor = async (
   }
 };
 
+export const fetchContributionById = async (
+  contributionId: string,
+  authorUser?: string,
+) => {
+  const url = `${BASEURLNODE}/contributions/wip/${contributionId}`;
+
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: authorUser || AUTHTOKEN,
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching contribution by ID:', error);
+    if (isAxiosError(error)) {
+      console.error('Response data:', error.response?.data);
+    }
+    throw error;
+  }
+};
+
 export const deleteContribution = async (
   contributionId: string,
   authorUser?: string,

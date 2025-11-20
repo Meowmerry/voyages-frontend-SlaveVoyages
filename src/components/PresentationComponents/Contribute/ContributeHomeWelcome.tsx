@@ -67,20 +67,17 @@ const ContributeHomeWelcome: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
   const [totalResultsCount, setTotalResultsCount] = useState(0);
+  const [isLoadingTable, setIsLoadingTable] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState<ReviewMode>(ReviewMode.Create);
   const [contributionId, setContributionId] = useState<string | undefined>('');
-  const [isLoadingTable, setIsLoadingTable] = useState(false);
 
   // Use shared hook for contribution state management
   const {
-    selectedContribution,
-    formEntity,
-    setSelectedContribution,
     setContributions,
-    updateFormEntity,
     contributions,
-    updateContribution,
+    setSelectedContribution,
+    updateFormEntity,
   } = useVoyageContribution();
 
   // Load contribution by ID when id param exists (only for interim path)
@@ -148,12 +145,6 @@ const ContributeHomeWelcome: React.FC = () => {
   useEffect(() => {
     const state = location.state as { reload?: boolean; timestamp?: number };
     if (state?.reload) {
-      // Reset form state
-      setShowForm(false);
-      setSelectedContribution(undefined);
-      updateFormEntity(undefined);
-      setContributionId('');
-
       // Fetch fresh data
       if (user?.email) {
         fetchContributions();
@@ -162,15 +153,7 @@ const ContributeHomeWelcome: React.FC = () => {
       // Clear the state to prevent repeated reloads
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [
-    location,
-    navigate,
-    user?.email,
-    fetchContributions,
-    setContributions,
-    updateFormEntity,
-    setSelectedContribution,
-  ]);
+  }, [location, navigate, user?.email, fetchContributions]);
 
   const handleEditContribution = useCallback(
     async (data: TransformedContribution) => {
@@ -226,19 +209,17 @@ const ContributeHomeWelcome: React.FC = () => {
 
       setSelectedContribution(editableContribution);
       setShowForm(true);
-      // navigate(`/contribute/interim/new/${data?.id}`);
+      // Pass the data through navigation state so NewVoyage can use it
+      navigate(`/contribute/interim/new/${data?.id}`, {
+        state: {
+          formEntity: entityToUse,
+          selectedContribution: editableContribution,
+          formMode: ReviewMode.Edit,
+        },
+      });
     },
     [navigate, setSelectedContribution, updateFormEntity],
   );
-
-  // Handle back button click
-  const handleBackClick = useCallback(() => {
-    setShowForm(false);
-    setSelectedContribution(undefined);
-    updateFormEntity(undefined);
-    fetchContributions();
-    navigate('/contribute', { replace: true });
-  }, [fetchContributions, navigate, setSelectedContribution, updateFormEntity]);
 
   // Handle delete contribution
   const handleDelete = useCallback(
@@ -263,49 +244,26 @@ const ContributeHomeWelcome: React.FC = () => {
 
   // Fetch contributions on mount and when filters change
   useEffect(() => {
-    if (user?.email && !showForm && !contributePath) {
+    if (user?.email && !contributePath) {
       fetchContributions();
     }
   }, [
     newVoyagesFilters,
     buildNewVoyagesFilterQuery,
     user?.email,
-    showForm,
     contributePath,
     fetchContributions,
   ]);
 
-  // If contributePath is 'interim', render NewVoyage component with form props
   if (contributePath === 'interim') {
     return (
       <NewVoyage
         showForm={showForm}
-        formEntity={formEntity}
-        selectedContribution={selectedContribution}
-        formMode={formMode}
         contributionId={contributionId}
-        onBack={handleBackClick}
-        onChange={updateContribution}
+        formMode={formMode}
       />
     );
   }
-
-  // If showing form from home page (via edit button from table), render the form view
-  if (showForm && formEntity && selectedContribution) {
-    return (
-      <NewVoyage
-        showForm={showForm}
-        formEntity={formEntity}
-        selectedContribution={selectedContribution}
-        formMode={formMode}
-        contributionId={contributionId}
-        onBack={handleBackClick}
-        onChange={updateContribution}
-      />
-    );
-  }
-
-  // Default view with buttons and table (home page)
   return (
     !contributePath && (
       <div className="contribute-content">
@@ -351,7 +309,9 @@ const ContributeHomeWelcome: React.FC = () => {
               backgroundColor: '#fafafa',
             }}
           >
-            <Spin size="large" tip="Loading contributions..." />
+            <Spin size="large" tip="Loading contributions...">
+              <div style={{ height: '200px' }} />
+            </Spin>
           </div>
         ) : (
           contributions.length > 0 && (
