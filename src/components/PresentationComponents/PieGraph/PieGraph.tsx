@@ -273,7 +273,7 @@ function PieGraph() {
               width: chartWidth,
               height: chartHeight,
               title: {
-                text: `The ${xAxes || ''} vs <br>${yAxes || ''} Pie Chart`,
+                text: `${xAxes || ''} vs <br>${yAxes || ''} Pie Chart`,
                 x: 0.5,
                 xanchor: 'center',
                 font: {
