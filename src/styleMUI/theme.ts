@@ -13,7 +13,7 @@ export const generateThemeGB = (state: any) => {
   } else if (state === 'texas') {
     MAINColorBG = 'rgba(187, 105, 46)';
   } else if (state === 'indian-ocean-and-asia-slave-trades') {
-    MAINColorBG = 'rgba(255, 170, 110)';
+    MAINColorBG = 'rgb(255, 160, 90)';
   }
   return MAINColorBG;
 };

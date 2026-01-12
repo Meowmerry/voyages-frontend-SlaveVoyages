@@ -53,7 +53,7 @@ export const getColorBackground = (item: string) => {
   } else if (item === TYPESOFDATASETPEOPLE.texas) {
     background = 'rgb(167 70 0)';
   } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
-    background = 'rgb(213, 88, 0)';
+    background = 'rgb(245, 116, 20)';
   }
   return background;
 };
@@ -80,7 +80,7 @@ export const getColorBTNVoyageDatasetBackground = (item: string) => {
   } else if (item === INTRAAMERICANTRADS) {
     background = '#ab47bc';
   } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
-    background = 'rgb(213 88 0)';
+    background = 'rgb(245, 116, 20)';
   }
   return background;
 };
@@ -141,7 +141,7 @@ export const getColorNavbarBackground = (item: string) => {
   } else if (item === TRANSATLANTICTRADS) {
     background = '#1976d2';
   } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
-    background = 'rgb(246 123 36)';
+    background = 'rgb(255, 160, 90)';
   }
   return background;
 };
@@ -207,7 +207,7 @@ export const getColorHoverBackground = (item: string) => {
   } else if (item === INTRAAMERICANTRADS) {
     background = 'rgb(127, 118, 191)';
   } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
-    background = 'rgb(213 88 0)';
+    background = 'rgb(255, 160, 90)';
   }
 
   return background;
@@ -259,6 +259,8 @@ export const getColorHoverBackgroundCollection = (item: string) => {
     boxShadow = '#3ec59e';
   } else if (item === 'blog') {
     boxShadow = 'rgb(96 40 0)';
+  } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
+    boxShadow = 'rgb(255, 160, 90)';
   }
   return boxShadow;
 };
@@ -434,7 +436,7 @@ export const getHeaderColomnColor = (item: string) => {
   } else if (item === TRANSATLANTICTRADS) {
     color = 'rgb(2 83 204)';
   } else if (item === INDIANOCEANANDASIANSLAVETRADEDATABASE) {
-    color = 'rgb(213, 88, 0)';
+    color = 'rgb(255, 109, 0)';
   }
   return color;
 };
