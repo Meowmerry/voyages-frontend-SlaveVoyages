@@ -16,6 +16,7 @@ import { setVisibleColumn } from '@/redux/getColumnSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import {
   ENSALVERSTYLE,
+  INDIANOCEANANDASIANTRANDS,
   INTRAAMERICANTRADS,
   TRANSATLANTICTRADS,
 } from '@/share/CONST_DATA';
@@ -33,6 +34,7 @@ import ENSLAVED_TABLE from '@/utils/flatfiles/enslaved/enslaved_all_table.json';
 import TEXAS_TABLE from '@/utils/flatfiles/enslaved/enslaved_texas_table.json';
 import ENSLAVERS_TABLE from '@/utils/flatfiles/enslavers/enslavers_table.json';
 import AllVoyages_TABLE_FLAT from '@/utils/flatfiles/voyages/voyages_all_table.json';
+import INDIANOCEANANDASIANFILE_TABLE_FLAT from '@/utils/flatfiles/voyages/voyages_indian_ocean_and_asia_slave_trade_database_table.json';
 import Intraamerican_TABLE_FLAT from '@/utils/flatfiles/voyages/voyages_intraamerican_table.json';
 import Transatlantic_TABLE_FLAT from '@/utils/flatfiles/voyages/voyages_transatlantic_table.json';
 import { checkRouteForVoyages } from '@/utils/functions/checkPagesRoute';
@@ -54,7 +56,7 @@ const allVoyageColumnSelector: ColumnSelectorTree[] = JSON.parse(
   JSON.stringify(AllVoyages_TABLE_FLAT.column_selector_tree),
 );
 const indianOceanAsiaSlaveTrades: ColumnSelectorTree[] = JSON.parse(
-  JSON.stringify(AllVoyages_TABLE_FLAT.column_selector_tree), // TODO: Change to new flatfile when available
+  JSON.stringify(INDIANOCEANANDASIANFILE_TABLE_FLAT.column_selector_tree),
 );
 const enslavedColumnSelector: ColumnSelectorTree[] = JSON.parse(
   JSON.stringify(ENSLAVED_TABLE.column_selector_tree),
@@ -198,7 +200,8 @@ const ButtonDropdownColumnSelector = () => {
         } else if (
           styleNameRoute === ENSALVERSTYLE ||
           styleNameRoute === TRANSATLANTICTRADS ||
-          styleNameRoute === INTRAAMERICANTRADS
+          styleNameRoute === INTRAAMERICANTRADS ||
+          styleNameRoute === INDIANOCEANANDASIANTRANDS
         ) {
           setMenuValueCells(enslaversColumnSelector);
         }

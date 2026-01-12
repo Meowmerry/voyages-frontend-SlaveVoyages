@@ -5,8 +5,12 @@ export const EnslaversTitle = 'Enslavers';
 export const TRANSATLANTICTABLEFILE = 'voyages_transatlantic_table.json';
 export const INTRAAMERICANTABLEFILE = 'voyages_intraamerican_table.json';
 export const ALLVOYAGESTABLEFILE = 'voyages_all_table.json';
+export const INDIANOCEANANDASIANFILE =
+  'voyages_indian_ocean_and_asia_slave_trade_database_table.json';
 export const TRANSATLANTICFILECARD = 'voyages_transatlantic_card.json';
 export const INTRAAMERICANFILECARD = 'voyages_intraamerican_card.json';
+export const INDIANOCEANANDASIANFILECARD =
+  'voyages_indian_ocean_and_asia_slave_trade_database_card.json';
 export const ALLVOYAGESFILECARD = 'voyages_all_card.json';
 export const ENSLAVED_african_origins_CARDFILE =
   'enslaved_african_origins_card.json';
@@ -62,6 +66,7 @@ export const TRANSATLANTICENSLAVERS = '/trans-atlantic-trades';
 export const allEnslavers = 'enslaver';
 export const INTRAAMERICANTRADS = 'intra-american-trades';
 export const TRANSATLANTICTRADS = 'trans-atlantic-trades';
+export const INDIANOCEANANDASIANTRANDS = 'indian-ocean-and-asia-slave-trads';
 
 export const mbaccesstoken = `pk.eyJ1IjoiamNtMTAiLCJhIjoiY2xid2VpZmF3MDhsaTN1bGhqMXZ5YmxjZCJ9.eP7ZuC68Q5iBZQa8I13AGw`;
 

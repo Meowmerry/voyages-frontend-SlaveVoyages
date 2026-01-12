@@ -125,7 +125,6 @@ const VoyagesPage = () => {
   const { title: pageTitle, description: pageDescription } = getPageMetadata();
 
   useEffect(() => {
-    console.log('styleVoyagesName', styleVoyagesName);
     if (styleVoyagesName) {
       dispatch(setStyleName(styleVoyagesName));
     }

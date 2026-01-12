@@ -11,10 +11,10 @@ export const getColorVoyagePageBackground = (
   currentPage: number,
 ) => {
   let background = 'rgb(55 148 141)';
-  if (item === TYPESOFDATASET.allVoyages) {
-    background = 'rgb(55 148 141)';
-  } else if (item === TYPESOFDATASET.allVoyages && currentPage === 1) {
+  if (item === TYPESOFDATASET.allVoyages && currentPage === 1) {
     background = 'transparent';
+  } else if (item === TYPESOFDATASET.allVoyages) {
+    background = 'rgb(55 148 141)';
   } else if (item === TYPESOFDATASET.intraAmerican) {
     background = 'rgba(127, 118, 191)';
   } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
@@ -170,6 +170,8 @@ export const getColorBackgroundHeader = (item: string) => {
     background = '#1976d2';
   } else if (item === TYPESOFDATASETPEOPLE.allEnslaved) {
     background = 'rgb(178, 148, 147)';
+  } else if (item === TYPESOFDATASET.indianOceanAndAsiaSlaveTrades) {
+    background = 'rgb(255, 160, 90)';
   }
   return background;
 };

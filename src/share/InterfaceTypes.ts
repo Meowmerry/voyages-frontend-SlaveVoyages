@@ -670,6 +670,7 @@ export interface ValueFilterList {
   valueAfricanOrigin: FilterMenuList[];
   valueEnslavedTexas: FilterMenuList[];
   valueEnslavers: FilterMenuList[];
+  valueIndianOceanAndAsiaSlaveTradeDatabase: FilterMenuList[];
 }
 
 export interface FilterMenuList {
