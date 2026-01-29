@@ -255,17 +255,13 @@ const ContributeHomeWelcome: React.FC = () => {
     fetchContributions,
   ]);
 
-  if (contributePath === 'interim') {
-    return (
-      <NewVoyage
-        showForm={showForm}
-        contributionId={contributionId}
-        formMode={formMode}
-      />
-    );
+  // Only render when we're at the contribute home page (no specific path)
+  // When contributePath === 'interim', ContributeContent will render NewVoyage directly
+  if (contributePath) {
+    return null;
   }
+
   return (
-    !contributePath && (
       <div className="contribute-content">
         <h1 className="page-title-1">
           {translatedContribute.contributeContributeHomeWelcome}
@@ -369,7 +365,6 @@ const ContributeHomeWelcome: React.FC = () => {
           )
         )}
       </div>
-    )
   );
 };
 export default ContributeHomeWelcome;

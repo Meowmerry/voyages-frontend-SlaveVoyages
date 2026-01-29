@@ -31,10 +31,28 @@ const PropertyChangeCard = ({
   let display: ReactNode;
 
   function getDisplayName(
+    change?: PropertyChange,
     changed?: MaterializedEntity | string | number | boolean | null,
     linkedChanges?: LinkedEntitySelectionChange['linkedChanges'],
-  ): string {
-    if (!changed) return '<null>';
+  ): ReactNode {
+    if (!changed) {
+      if(change?.property === "Voyage_voyage_groupings") return null
+      return (
+        <span
+          style={{
+            backgroundColor: '#8c8c8c',
+            color: '#fff',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            fontStyle: 'italic',
+            fontWeight: 'bold'
+          }}
+        >
+          NULL
+        </span>
+      );
+    } 
     if (
       typeof changed === 'string' ||
       typeof changed === 'number' ||
@@ -55,7 +73,30 @@ const PropertyChangeCard = ({
   }
 
   if (change.kind === 'direct') {
-    display = <span className="details-changes">{String(change.changed)}</span>;
+    // Handle null/undefined values with styled NULL tag
+    if (change.changed === null || change.changed === undefined) {
+      display = (
+        <span
+          style={{
+            backgroundColor: '#8c8c8c',
+            color: '#fff',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            fontSize: '12px',
+            fontStyle: 'italic',
+            fontWeight: 'bold',
+          }}
+        >
+          NULL
+        </span>
+      );
+    } else {
+      if((change.property === 'Voyage_voyage_id') || (change.property === 'Voyage_dataset') ){
+        return null
+      }else{
+         display = <span className="details-changes">{String(change.changed)}</span>;
+      }
+    }
   } else if (change.kind === 'linked' && change.linkedChanges) {
     display = (
       <div className="linked-change-wrapper">
@@ -70,7 +111,7 @@ const PropertyChangeCard = ({
     );
   } else if (change.kind === 'linked') {
     display = (
-      <span className="details-changes">{getDisplayName(change.changed)}</span>
+      <span className="details-changes">{getDisplayName(change,change.changed)}</span>
     );
   } else if (change.kind === 'ownedList') {
     const combinedChanges = change.modified.flatMap((mod) => mod.changes);
