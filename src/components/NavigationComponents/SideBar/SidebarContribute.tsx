@@ -1,7 +1,6 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-import { loadUserFromStorage } from '@/redux/getAuthUserSlice';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 import { getDisplayButtons } from '@/utils/functions/contribuitePath';
 import StyledDrawer from '@/styleMUI/StyledDrawer';
@@ -13,7 +12,6 @@ interface SidebarContributeProps {
 }
 
 const SidebarContribute: React.FC<SidebarContributeProps> = ({ openSideBar }) => {
-  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const {
     handleClickGuidelines,
@@ -24,11 +22,6 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({ openSideBar }) =>
   const { languageValue } = useSelector((state: RootState) => state.getLanguages);
   const translatedContribute = translationLanguagesContribute(languageValue);
   const buttons = getDisplayButtons(translatedContribute);
-
-
-  useEffect(() => {
-    dispatch(loadUserFromStorage());
-  }, []);
 
   return (
 
