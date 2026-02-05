@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import './style/index.css';
 import { Provider } from 'react-redux';
 import { StyleSheetManager } from 'styled-components';
+import { HelmetProvider } from 'react-helmet-async';
 
 import AppWithRouter from './App.js';
 import store from './redux/store';
@@ -16,12 +17,14 @@ const insertionPoint =
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <StyledEngineProvider injectFirst>
-      <StyleSheetManager target={insertionPoint}>
-        <Provider store={store}>
-          <AppWithRouter />
-        </Provider>
-      </StyleSheetManager>
-    </StyledEngineProvider>
+    <HelmetProvider>
+      <StyledEngineProvider injectFirst>
+        <StyleSheetManager target={insertionPoint}>
+          <Provider store={store}>
+            <AppWithRouter />
+          </Provider>
+        </StyleSheetManager>
+      </StyledEngineProvider>
+    </HelmetProvider>
   </React.StrictMode>,
 );

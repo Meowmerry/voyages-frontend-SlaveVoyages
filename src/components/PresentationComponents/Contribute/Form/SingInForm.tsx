@@ -1,73 +1,78 @@
 // SignInForm.tsx
-import React from 'react';
-
+import React, { useState } from 'react';
 import '@/style/contributeContent.scss';
 import { useDispatch, useSelector } from 'react-redux';
+import { signInWithEmail, signInWithOAuth } from '@/redux/getAuthUserSlice';
 import { useNavigate } from 'react-router-dom';
-
 import { useNavigation } from '@/hooks/useNavigation';
-import { useSignInForm, SignInFormData } from '@/hooks/useSignInForm';
-import { login } from '@/redux/getAuthUserSlice';
 import { RootState } from '@/redux/store';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
+import { AppDispatch } from '@/redux/store';
 
 // Define types for form values
 interface SignInFormProps {
   nextPath?: string;
-  onSubmit?: (data: SignInFormData) => Promise<void> | void;
 }
 const SignInForm: React.FC<SignInFormProps> = ({
   nextPath = '/contribute/legal',
-  onSubmit,
 }) => {
   const { handleSignUpClick, handleResetPasswordClick } = useNavigation();
   const { languageValue } = useSelector(
-    (state: RootState) => state.getLanguages,
+    (state: RootState) => state.getLanguages
   );
   const translatedContribute = translationLanguagesContribute(languageValue);
 
-  const {
-    formData,
-    errors,
-    isSubmitting,
-    handleInputChange,
-    handleSubmit,
-    setAuthError,
-  } = useSignInForm();
+  const [formValues, setFormValues] = useState({
+    email: '',
+    password: '',
+    remember: false,
+  });
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  const mockUser = {
-    email: 'meow@test.com',
-    username: 'Thasanee',
-    name: 'Thasanee',
-    token: '$12345',
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state: RootState) => state.getAuthUserSlice);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const { name, value, type, checked } = e.target;
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const handleFormSubmit = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault();
+    setAuthError(null);
 
-  const handleFormSubmit = async (data: SignInFormData) => {
-    if (onSubmit) {
-      await onSubmit(data);
-    } else {
-      if (data.email === mockUser.email && data.password === mockUser.token) {
-        dispatch(
-          login({
-            email: mockUser.email,
-            username: mockUser.username,
-            token: mockUser.token,
-            name: mockUser.name,
-          }),
-        );
-        navigate(nextPath);
-      } else {
-        setAuthError('Invalid email or password');
-      }
+    try {
+      await dispatch(
+        signInWithEmail({
+          email: formValues.email,
+          password: formValues.password,
+        })
+      ).unwrap();
+      navigate(nextPath);
+    } catch (error: any) {
+      setAuthError(error || 'Invalid email or password');
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Simulate Google Sign-In
-    alert('Signing in with Google...');
+  const handleGoogleSignIn = async () => {
+    setAuthError(null);
+    try {
+      await dispatch(signInWithOAuth('google')).unwrap();
+    } catch (error: any) {
+      setAuthError(error || 'Google sign in failed');
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setAuthError(null);
+    try {
+      await dispatch(signInWithOAuth('github')).unwrap();
+    } catch (error: any) {
+      setAuthError(error || 'GitHub sign in failed');
+    }
   };
 
   return (
@@ -76,19 +81,16 @@ const SignInForm: React.FC<SignInFormProps> = ({
       <div className="form-inorder">
         {translatedContribute.contributeInOrderToAccess}
       </div>
+      {authError && (
+        <div style={{ color: 'red', marginBottom: '10px' }}>
+          {authError}
+        </div>
+      )}
       <div className="sign-in-form-submit">
         <form
-          method="post"
-          action="/accounts/login/"
-          onSubmit={(e) => handleSubmit(e, handleFormSubmit)}
+          onSubmit={handleFormSubmit}
           className="sign-in-form"
         >
-          {/* CSRF Token */}
-          <input
-            type="hidden"
-            name="csrfmiddlewaretoken"
-            value="0vije7yXjc0TqC3CqWZ4qHPfMiCd2MSbCdZgAlJHuwnmaeKIz9Ix8iDzfdQ7Ugvn"
-          />
 
           <table>
             <tbody>
@@ -105,7 +107,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     name="email"
                     id="id_email"
                     placeholder="E-mail address"
-                    value={formData.email}
+                    value={formValues.email}
                     onChange={handleInputChange}
                     required
                     autoFocus
@@ -126,7 +128,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     name="password"
                     id="id_password"
                     placeholder="Password"
-                    value={formData.password}
+                    value={formValues.password}
                     onChange={handleInputChange}
                     required
                   />
@@ -146,37 +148,33 @@ const SignInForm: React.FC<SignInFormProps> = ({
                     type="checkbox"
                     name="remember"
                     id="id_remember"
-                    checked={formData.remember}
+                    checked={formValues.remember}
                     onChange={handleInputChange}
                   />
                 </td>
               </tr>
             </tbody>
           </table>
-          <input type="hidden" name="next" value={nextPath} />
-
-          {errors.general && (
-            <div style={{ color: 'red', marginBottom: '1rem' }}>
-              {errors.general}
-            </div>
-          )}
-          <button
-            type="submit"
-            className="local_account_login_btn"
-            disabled={isSubmitting}
-          >
-            {isSubmitting
-              ? 'Signing in...'
-              : translatedContribute.contributeSignInButton}
+          <button type="submit" className="local_account_login_btn" disabled={loading}>
+            {loading ? 'Signing in...' : translatedContribute.contributeSignInButton}
           </button>
         </form>
-        <button onClick={handleGoogleSignIn}>
+        <button onClick={handleGoogleSignIn} disabled={loading}>
           <img
             src="https://www.slavevoyages.org/static/images/site/google_logo.png"
             width="16px"
             height="16px"
           />
           {translatedContribute.contributeSignInWithGoogle}
+        </button>
+        <button onClick={handleGitHubSignIn} disabled={loading}>
+          <img
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+            width="16px"
+            height="16px"
+            alt="GitHub"
+          />
+          Sign in with GitHub
         </button>
         <span>
           <span>

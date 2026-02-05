@@ -1,11 +1,8 @@
 // Sidebar.tsx
-import React, { useEffect } from 'react';
-
+import React from 'react';
 import '@/style/contributeContent.scss';
-import { useDispatch, useSelector } from 'react-redux';
-
 import { useNavigation } from '@/hooks/useNavigation';
-import { loadUserFromStorage } from '@/redux/getAuthUserSlice';
+import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { getDisplayButtons } from '@/utils/functions/contribuitePath';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
@@ -17,16 +14,12 @@ const SidebarContribute: React.FC = () => {
     handleLogout,
     handleClickSideBar,
   } = useNavigation();
-  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const { languageValue } = useSelector(
     (state: RootState) => state.getLanguages,
   );
   const translatedContribute = translationLanguagesContribute(languageValue);
   const buttons = getDisplayButtons(translatedContribute);
-  useEffect(() => {
-    dispatch(loadUserFromStorage());
-  }, []);
 
   const buttonStyle: React.CSSProperties = {
     cursor: 'pointer',

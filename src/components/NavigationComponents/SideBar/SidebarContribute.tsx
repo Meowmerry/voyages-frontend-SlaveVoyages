@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react';
-
-import {
-  ExitToApp,
-  AccountCircleRounded,
-  Home,
-  BookOutlined,
-} from '@mui/icons-material';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
+import { getDisplayButtons } from '@/utils/functions/contribuitePath';
+import StyledDrawer from '@/styleMUI/StyledDrawer';
 import {
   List,
   ListItem,
@@ -13,22 +11,19 @@ import {
   ListItemText,
   Tooltip,
 } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-
+import {
+  ExitToApp,
+  AccountCircleRounded,
+  Home,
+  BookOutlined,
+} from '@mui/icons-material';
 import { useNavigation } from '@/hooks/useNavigation';
-import { loadUserFromStorage } from '@/redux/getAuthUserSlice';
-import { RootState } from '@/redux/store';
-import StyledDrawer from '@/styleMUI/StyledDrawer';
-import { getDisplayButtons } from '@/utils/functions/contribuitePath';
-import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
+
 interface SidebarContributeProps {
   openSideBar: boolean;
 }
 
-const SidebarContribute: React.FC<SidebarContributeProps> = ({
-  openSideBar,
-}) => {
-  const dispatch = useDispatch();
+const SidebarContribute: React.FC<SidebarContributeProps> = ({ openSideBar }) => {
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const {
     handleClickGuidelines,
@@ -41,10 +36,6 @@ const SidebarContribute: React.FC<SidebarContributeProps> = ({
   );
   const translatedContribute = translationLanguagesContribute(languageValue);
   const buttons = getDisplayButtons(translatedContribute);
-
-  useEffect(() => {
-    dispatch(loadUserFromStorage());
-  }, [dispatch]);
 
   return (
     <StyledDrawer
