@@ -6,7 +6,6 @@ import {
   MaterializedEntity,
   TableProperty,
 } from '@dotproductdev/voyages-contribute';
-
 import '@/style/numberTable.scss';
 import { Close } from '@mui/icons-material';
 import { Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';

@@ -1,3 +1,6 @@
+import { useCallback, useMemo } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   applyUpdate,
   isMaterializedEntityArray,
@@ -7,7 +10,9 @@ import {
   areMatch,
   OwnedEntityListChange,
   OwnedEntityListProperty,
+  cloneEntity,
 } from '@dotproductdev/voyages-contribute';
+import { Add } from '@mui/icons-material';
 import {
   IconButton,
   Paper,
@@ -19,8 +24,7 @@ import {
   TableRow,
 } from '@mui/material';
 import { Typography } from 'antd';
-import { useCallback, useMemo } from 'react';
-import { Add } from '@mui/icons-material';
+
 import { EntityFormProps } from './EntityForm';
 import { EntityTableRow } from './EntityTableRow';
 
@@ -59,12 +63,12 @@ export const EntityTableView = ({
     if (lastChange) {
       const added = lastChange.modified.filter(
         (m) =>
-          m.ownedEntityId.type === 'new' &&
-          !res.find((e) => areMatch(m.ownedEntityId, e.entityRef)),
+          m.ownedEntity.entityRef.type === 'new' &&
+          !res.find((e) => areMatch(m.ownedEntity.entityRef, e.entityRef)),
       );
       for (const m of added) {
-        const item = materializeNew(childSchema, m.ownedEntityId.id);
-        applyUpdate(item, {}, m.changes);
+        const item = cloneEntity(m.ownedEntity);
+        applyUpdate(item, m.changes);
         res.push(item);
       }
     }
@@ -87,54 +91,63 @@ export const EntityTableView = ({
   }, [entity, lastChange, childSchema, fieldValue]);
   const onChange = other.onChange;
   const handleAdd = useCallback(() => {
-    const change = lastChange ?? createEmptyChange(property.uid);
-    const childProp = childSchema.properties.find(
-      (p) => p.label === property.childBackingProp,
-    );
-    if (childProp === undefined) {
-      throw new Error(
-        `Invalid schema: the child property "${property.childBackingProp}" was not found in ${linkedEntitySchema}`,
+    try {
+      const change = lastChange ?? createEmptyChange(property.uid);
+      const childProp = childSchema.properties.find(
+        (p) => p.label === property.childBackingProp,
       );
-    }
-    onChange({
-      type: 'update',
-      entityRef: entity.entityRef,
-      changes: [
-        {
-          ...change,
-          modified: [
-            ...change.modified,
-            {
-              kind: 'owned',
-              ownedEntityId: {
-                type: 'new',
-                id: `${new Date().getTime()}${crypto.randomUUID()}`,
-                schema: linkedEntitySchema,
+      if (childProp === undefined) {
+        throw new Error(
+          `Invalid schema: the child property "${property.childBackingProp}" was not found in ${linkedEntitySchema}`,
+        );
+      }
+      onChange({
+        type: 'update',
+        entityRef: entity.entityRef,
+        changes: [
+          {
+            ...change,
+            modified: [
+              ...change.modified,
+              {
+                kind: 'owned',
+                ownedEntity: materializeNew(
+                  childSchema,
+                  `${new Date().getTime()}${uuidv4()}`,
+                ),
+                property: property.uid,
+                changes: [
+                  {
+                    kind: 'direct',
+                    property: childProp.uid,
+                    changed: entity.entityRef.id,
+                  },
+                ],
               },
-              property: property.uid,
-              changes: [
-                {
-                  kind: 'direct',
-                  property: childProp.uid,
-                  changed: entity.entityRef.id,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    });
-  }, [entity, lastChange, property, linkedEntitySchema, onChange]);
+            ],
+          },
+        ],
+      });
+    } catch (e) {
+      console.error(e);
+      alert(e);
+    }
+  }, [entity, lastChange, property, linkedEntitySchema, onChange, childSchema]);
 
   return (
-    <div style={{ marginBottom: '10px'}}>
+    <div style={{ marginBottom: '10px' }}>
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableHead>
-            <TableRow >
+            <TableRow>
               <TableCell />
               <TableCell>
-                <Typography.Title level={5}  style={{ color: 'rgb(55, 148, 141)' }}>{property.label}</Typography.Title>
+                <Typography.Title
+                  level={5}
+                  style={{ color: 'rgb(55, 148, 141)' }}
+                >
+                  {property.label}
+                </Typography.Title>
               </TableCell>
               <TableCell align="right">
                 <IconButton size="small" color="success" onClick={handleAdd}>
