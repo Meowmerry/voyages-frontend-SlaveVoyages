@@ -49,16 +49,12 @@ export const EntityTableView = ({
 }: EntityTableViewProps & EntityFormProps) => {
   const { label, linkedEntitySchema } = property;
   const fieldValue = entity.data[label];
-  if (!isMaterializedEntityArray(fieldValue)) {
-    return (
-      <span>
-        BUG: The entity data does not match the expectation of being an array of
-        materialized entities (children)
-      </span>
-    );
-  }
+  const isValidFieldValue = isMaterializedEntityArray(fieldValue);
   const childSchema = getSchema(linkedEntitySchema);
+  const onChange = other.onChange;
+
   const children = useMemo(() => {
+    if (!isValidFieldValue) return [];
     const res: MaterializedEntity[] = [...fieldValue];
     if (lastChange) {
       const added = lastChange.modified.filter(
@@ -88,8 +84,8 @@ export const EntityTableView = ({
       return a.localeCompare(b);
     });
     return res;
-  }, [entity, lastChange, childSchema, fieldValue]);
-  const onChange = other.onChange;
+  }, [isValidFieldValue, lastChange, fieldValue]);
+
   const handleAdd = useCallback(() => {
     try {
       const change = lastChange ?? createEmptyChange(property.uid);
@@ -115,7 +111,6 @@ export const EntityTableView = ({
                   childSchema,
                   `${new Date().getTime()}${uuidv4()}`,
                 ),
-                property: property.uid,
                 changes: [
                   {
                     kind: 'direct',
@@ -133,6 +128,15 @@ export const EntityTableView = ({
       alert(e);
     }
   }, [entity, lastChange, property, linkedEntitySchema, onChange, childSchema]);
+
+  if (!isValidFieldValue) {
+    return (
+      <span>
+        BUG: The entity data does not match the expectation of being an array of
+        materialized entities (children)
+      </span>
+    );
+  }
 
   return (
     <div style={{ marginBottom: '10px' }}>
@@ -157,7 +161,7 @@ export const EntityTableView = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {children.map((c, i) => (
+            {children.map((c) => (
               <EntityTableRow
                 key={c.entityRef.id}
                 {...other}

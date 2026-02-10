@@ -364,7 +364,7 @@ export const ContributionForm = ({
 
     const review: Review = {
       changeSet: {
-        id: -1,
+        id: '-1',
         author: user?.email || 'current-user',
         title: changeSet?.title || '',
         comments: comments,
@@ -512,7 +512,7 @@ export const ContributionForm = ({
           timestamp: new Date().getTime(),
           changes: changesToSubmit,
           author: changeSet.author!,
-          id: changeSetId ? Number(changeSetId) : Number(changeSet.id),
+          id: changeSetId,
         },
         status: ContributionStatus.WorkInProgress,
         reviews: contribution?.reviews || [],
@@ -574,7 +574,7 @@ export const ContributionForm = ({
               timestamp: new Date().getTime(),
               changes: changesToSubmit,
               author: changeSet.author || user?.email || '',
-              id: changeSetId ? Number(changeSetId) : Number(changeSet.id),
+              id: changeSetId,
             },
             status: ContributionStatus.Submitted,
             reviews: contribution?.reviews || [],
@@ -636,6 +636,7 @@ export const ContributionForm = ({
             ...contribution,
             changeSet: {
               ...changeSet,
+              id: String(changeSet.id),
               changes: [],
             },
           } as Contribution);
