@@ -155,7 +155,7 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
           setCurrentStatus(contribution.status);
           setSavedContributionState(contribution);
           setMode(ReviewMode.ReadOnly);
-          setReviews([]); // TODO: Load reviews from backend
+          setReviews(contribution.reviews || []);
 
           const isExistingVoyage = contribution.root.type === 'existing';
 
@@ -389,17 +389,15 @@ const EditorialPlatformTable: React.FC<EditorialPlatformPlatProps> = ({
         setReviews(updatedReviews);
 
         if (active?.changeSet) {
-          // Merge backend response with current contribution state
+          // Update contribution state with the new review
+          // NOTE: Do NOT merge review changes into changeSet.changes -
+          // they should only be in the reviews array to avoid double-application
           const updatedContributionState: Contribution = {
             ...active,
-            // Merge the new review changes with existing changes
-            changeSet: {
-              ...active.changeSet,
-              changes: [
-                ...(active.changeSet?.changes || []),
-                ...(review.changeSet?.changes || []),
-              ],
-            },
+            // Include the updated reviews so they stack properly
+            reviews: updatedReviews,
+            // Keep original changeSet unchanged - reviews are tracked separately
+            changeSet: active.changeSet,
           };
 
           // Save this as the new baseline state

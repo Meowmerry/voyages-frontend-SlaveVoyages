@@ -1,21 +1,24 @@
 import '@/style/contributeContent.scss';
 import '@/style/newVoyages.scss';
-import { Form, Input, Button, Divider } from 'antd';
-import { useState } from 'react';
-import { ContributionForm } from '../ContributionForm';
-import { MaterializedEntity } from '@slavevoyages/voyages-contribute';
-import { fetchSubmitEditVoaygesForm } from '@/fetch/contributeFetch/fetchSubmitEditVoaygesForm';
-import LOADINGLOGO from '@/assets/sv-logo_v2_notext.svg';
+import { useCallback, useState } from 'react';
 
-const initialExistingVoyageEntity: MaterializedEntity = {
-  entityRef: {
-    type: 'existing',
-    schema: 'Voyage',
-    id: 0,
-  },
-  data: {},
-  state: 'original',
-};
+import {
+  MaterializedEntity,
+  Contribution,
+  ContributionStatus,
+} from '@slavevoyages/voyages-contribute';
+import { Form, Input, Button, Divider, Modal, message } from 'antd';
+import { useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
+
+import LOADINGLOGO from '@/assets/sv-logo_v2_notext.svg';
+import { fetchContributionsDataByAuthor } from '@/fetch/contributeFetch/fetchContributionsData';
+import { fetchSubmitEditVoaygesForm } from '@/fetch/contributeFetch/fetchSubmitEditVoaygesForm';
+import { RootState } from '@/redux/store';
+
+import { ContributionFormWrapper } from '../commons/ContributionFormWrapper';
+import { ReviewMode } from '../ContributionForm';
+import { TransformedContribution } from '../utils/transformContributionData';
 
 interface EditExistingVoyageProps {
   openSideBar: boolean;
@@ -24,27 +27,89 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
   openSideBar,
 }) => {
   const [formId] = Form.useForm();
-  const [entity, setEntity] = useState<MaterializedEntity | undefined>(initialExistingVoyageEntity as MaterializedEntity);
+  const [entity, setEntity] = useState<MaterializedEntity | undefined>(
+    undefined,
+  );
+  const [contribution, setContribution] = useState<
+    Contribution | TransformedContribution | undefined
+  >(undefined);
   const [loading, setLoading] = useState(false);
+  const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
 
   const handleSubmit = async (values: any): Promise<void> => {
-    const voyageId = values.voyageId
+    const voyageId = values.voyageId;
 
     if (voyageId) {
       setLoading(true);
-      const res = await fetchSubmitEditVoaygesForm(voyageId)
-      if (res.status === 200) {
-        setEntity(res.data);
-        setLoading(false);
-      } else {
-        alert(`Voyage not found/error on api`);
+
+      try {
+        // Check if this voyage already has a pending contribution
+        const contributionsResponse = await fetchContributionsDataByAuthor('');
+        const existingContributions = contributionsResponse?.data || [];
+
+        const existingContribution = existingContributions.find(
+          (c: Contribution) =>
+            c.root.type === 'existing' &&
+            String(c.root.id) === String(voyageId),
+        );
+
+        if (existingContribution) {
+          // Voyage already has pending changes
+
+          Modal.warning({
+            title: `This Voyage ID ${voyageId}  has already been submitted for evaluation.`,
+            content: `Please contact the editor for any further revisions or additional information you wish to contribute.`,
+            okText: 'OK',
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Fetch the voyage entity
+        const res = await fetchSubmitEditVoaygesForm(voyageId);
+        if (res.status === 200) {
+          const fetchedEntity = res.data;
+          setEntity(fetchedEntity);
+
+          // Create a new contribution for editing this existing voyage
+          const newContribution: Contribution = {
+            id: uuidv4(),
+            root: fetchedEntity.entityRef,
+            changeSet: {
+              id: uuidv4(),
+              author: user?.email || '',
+              title: '',
+              comments: '',
+              timestamp: new Date().getTime(),
+              changes: [],
+            },
+            status: ContributionStatus.WorkInProgress,
+            reviews: [],
+            media: [],
+          };
+          setContribution(newContribution);
+          setLoading(false);
+        } else {
+          message.error('Voyage not found or error on API');
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error checking for existing contributions:', error);
+        message.error('Error checking for existing contributions');
         setLoading(false);
       }
     } else {
-      alert(`Please enter a voyage ID`);
+      message.warning('Please enter a voyage ID');
       setLoading(false);
     }
   };
+
+  const handleContributionChange = useCallback(
+    (updatedContribution: Contribution | TransformedContribution) => {
+      setContribution(updatedContribution);
+    },
+    [],
+  );
 
   return (
     <div
@@ -88,9 +153,13 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
           </div>
         </Form>
         <Divider />
-        {entity && entity.entityRef.id !== 0 ? (
-          <ContributionForm
+        {entity && contribution ? (
+          <ContributionFormWrapper
             entity={entity}
+            contribution={contribution}
+            onChange={handleContributionChange}
+            mode={ReviewMode.Edit}
+            currentStatus={ContributionStatus.WorkInProgress}
           />
         ) : (
           <div
@@ -106,21 +175,27 @@ const EditExistingVoyage: React.FC<EditExistingVoyageProps> = ({
               backgroundColor: '#f9f9f9',
             }}
           >
-            {loading ?
-              (
-                <div className="loading-logo">
-                  <img src={LOADINGLOGO} alt="loading" style={{ width: '50%' }} />
+            {loading ? (
+              <div className="loading-logo">
+                <img src={LOADINGLOGO} alt="loading" style={{ width: '50%' }} />
+              </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    fontSize: '24px',
+                    color: '#999',
+                    marginBottom: '10px',
+                  }}
+                >
+                  ✏️
                 </div>
-              ) : (
-                <>
-                  <div style={{ fontSize: '24px', color: '#999', marginBottom: '10px' }}>
-                    ✏️
-                  </div>
-                  <div style={{ fontSize: '16px', color: '#666' }}>
-                    Please enter a Voyage ID and click <strong>Search</strong> to start editing.
-                  </div>
-                </>
-              )}
+                <div style={{ fontSize: '16px', color: '#666' }}>
+                  Please enter a Voyage ID and click <strong>Search</strong> to
+                  start editing.
+                </div>
+              </>
+            )}
           </div>
         )}
         <Divider />
