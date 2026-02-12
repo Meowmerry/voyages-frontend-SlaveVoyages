@@ -296,7 +296,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
           className="btn-sigin"
           sx={{
             textTransform: 'none',
-            py: 1.2,
+            py: 1,
             mb: 3,
             fontWeight: 500,
           }}

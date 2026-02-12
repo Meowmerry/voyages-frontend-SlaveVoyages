@@ -5,7 +5,7 @@ import { PaperProps } from '@mui/material/Paper';
 import Draggable from 'react-draggable';
 import '@/style/dialog.scss';
 
-import {  PaperDraggableTimeLapseStyle } from '@/styleMUI';
+import { PaperDraggableTimeLapseStyle } from '@/styleMUI';
 
 export function PaperDraggable(props: PaperProps) {
   const paperRef = useRef<HTMLDivElement>(null);
@@ -132,7 +132,11 @@ export function PaperDraggableBatchManagement(props: PaperProps) {
       cancel={'[class*="MuiDialogContent-root"]'}
       nodeRef={paperRef}
     >
-      <Paper {...props} ref={paperRef} className="paper-draggable-dialog" />
+      <Paper
+        {...props}
+        ref={paperRef}
+        className="paper-draggable-batch-dialog "
+      />
     </Draggable>
   );
 }

@@ -127,26 +127,30 @@ export const batchApi = {
     return response.batches;
   },
 
-  // Update batch: WAIT FOR API
+  // Update batch (rename and/or update comments)
   async updateBatch(
     batchId: number,
     data: Partial<PublicationBatch>,
   ): Promise<PublicationBatch> {
-    const response = await fetch(`${BASEURLNODE}/batches/${batchId}`, {
-      method: 'PUT',
+    const response = await fetch(`${BASEURLNODE}/edit_batch`, {
+      method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        id: batchId,
+        title: data.title,
+        comments: data.comments,
+      }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to update batch');
+      throw new Error(error.error || error.details || 'Failed to update batch');
     }
 
     return response.json();
   },
 
-  // Delete batch
+  // Delete batch (only if no contributions are assigned)
   async deleteBatch(batchId: number): Promise<void> {
     const response = await fetch(`${BASEURLNODE}/batches/${batchId}`, {
       method: 'DELETE',
@@ -157,7 +161,8 @@ export const batchApi = {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Failed to delete batch');
+      throw new Error(error.error || error.details || 'Failed to delete batch');
     }
+    // Success returns 204 No Content
   },
 };

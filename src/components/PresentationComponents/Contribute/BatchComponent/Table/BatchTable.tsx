@@ -189,14 +189,14 @@ const BatchTable: React.FC<BatchTableProps> = ({
         headerName: 'Contributions',
         field: 'contribution_count',
         cellRenderer: ContributionsCellRenderer,
-        width: 130,
+        width: 120,
         sortable: true,
       },
       {
         headerName: 'Comments',
         field: 'comments',
         cellRenderer: CommentsCellRenderer,
-        width: 200,
+        width: 150,
         flex: 1,
         sortable: true,
       },
@@ -205,7 +205,7 @@ const BatchTable: React.FC<BatchTableProps> = ({
         field: 'actions',
         cellRenderer: (params: any) =>
           ActionsCellRenderer(params, onEditBatch, onDeleteBatch),
-        width: 80,
+        width: 110,
         sortable: false,
         filter: false,
         resizable: false,
@@ -254,6 +254,7 @@ const BatchTable: React.FC<BatchTableProps> = ({
       sx={{
         height: '400px',
         width: '100%',
+        overflowY: 'auto',
         '& .ag-header-cell': {
           fontWeight: 600,
         },

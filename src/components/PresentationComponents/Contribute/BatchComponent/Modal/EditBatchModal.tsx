@@ -150,7 +150,6 @@ const EditBatchModal: React.FC<EditBatchModalProps> = ({
               helperText={errors.title}
               required
               slotProps={{ input: { inputProps: { maxLength: 100 } } }}
-              sx={{ mb: 4, mt: 3 }}
               size="small"
               label={
                 <Typography

@@ -80,7 +80,6 @@ export const ResetPassword = () => {
           label="Email Address"
           name="email"
           autoComplete="email"
-          autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           sx={{ mb: 2 }}
@@ -91,7 +90,7 @@ export const ResetPassword = () => {
           fullWidth
           variant="contained"
           disabled={loading}
-          sx={{ mb: 2 }}
+          sx={{ mb: 2, backgroundColor: 'rgb(55, 148, 141)' }}
         >
           {loading ? 'Sending...' : 'Send Reset Instructions'}
         </Button>

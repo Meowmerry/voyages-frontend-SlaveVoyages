@@ -39,22 +39,24 @@ const PasswordChangeForm = () => {
         <Box sx={{ mb: 3 }}>
           <TextField
             sx={{ width: 300 }}
-            InputProps={{
-              sx: {
-                height: 42,
-                padding: '0 8px',
+            slotProps={{
+              input: {
+                sx: {
+                  height: 42,
+                  padding: '0 8px',
+                },
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
               },
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                    size="small"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
             }}
             label="Password"
             variant="outlined"
@@ -67,24 +69,36 @@ const PasswordChangeForm = () => {
         <Box sx={{ mb: 3 }}>
           <TextField
             sx={{ width: 300 }}
-            InputProps={{
-              sx: {
-                height: 42,
-                padding: '0 8px',
+            slotProps={{
+              input: {
+                sx: {
+                  height: 32,
+                  padding: '0 8px',
+                },
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPasswordAgain(!showPasswordAgain)}
+                      edge="end"
+                      size="small"
+                    >
+                      {showPasswordAgain ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
               },
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPasswordAgain(!showPasswordAgain)}
-                    edge="end"
-                    size="small"
-                  >
-                    {showPasswordAgain ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
             }}
-            label="Password (again)"
+            label={
+              <Typography
+                variant="body1"
+                style={{
+                  fontSize: 16,
+                  color: '#4e4e4e',
+                }}
+              >
+                Password (again)
+              </Typography>
+            }
             variant="outlined"
             type={showPasswordAgain ? 'text' : 'password'}
             value={passwordAgain}

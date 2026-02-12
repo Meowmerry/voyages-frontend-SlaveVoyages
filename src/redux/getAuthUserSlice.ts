@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Session } from '@supabase/supabase-js';
-import { supabase } from '@/utils/supabase/supabaseClient';
+
 import { AuthState, User } from '@/share/InterfaceTypeUser';
+import { supabase } from '@/utils/supabase/supabaseClient';
 
 const initialState: AuthState = {
   user: null,
@@ -29,7 +30,10 @@ const mapSupabaseUserToUser = (session: Session): User => {
 // Async thunks
 export const signInWithEmail = createAsyncThunk(
   'auth/signInWithEmail',
-  async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue },
+  ) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -43,7 +47,7 @@ export const signInWithEmail = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message || 'Invalid email or password');
     }
-  }
+  },
 );
 
 export const signUpWithEmail = createAsyncThunk(
@@ -64,7 +68,7 @@ export const signUpWithEmail = createAsyncThunk(
       institution?: string;
       description?: string;
     },
-    { rejectWithValue }
+    { rejectWithValue },
   ) => {
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -86,7 +90,7 @@ export const signUpWithEmail = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message || 'Sign up failed');
     }
-  }
+  },
 );
 
 export const signInWithOAuth = createAsyncThunk(
@@ -106,7 +110,7 @@ export const signInWithOAuth = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message || 'OAuth sign in failed');
     }
-  }
+  },
 );
 
 export const signOut = createAsyncThunk(
@@ -119,7 +123,7 @@ export const signOut = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message || 'Sign out failed');
     }
-  }
+  },
 );
 
 export const resetPassword = createAsyncThunk(
@@ -135,7 +139,7 @@ export const resetPassword = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message || 'Password reset failed');
     }
-  }
+  },
 );
 
 export const refreshSession = createAsyncThunk(
@@ -148,7 +152,7 @@ export const refreshSession = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message || 'Session refresh failed');
     }
-  }
+  },
 );
 
 const getAuthUserSlice = createSlice({
