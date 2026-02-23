@@ -25,6 +25,7 @@ import EditorialPlatformTable from './editorialPlatform/EditorialPlatformTable';
 import EditSourceCodes from './editorialPlatform/EditSourceCodes';
 import EditUser from './editorialPlatform/EditUser';
 import EditVoyages from './editorialPlatform/EditVoyages';
+import EnslaverContributionReview from './editorialPlatform/editEnslavers/EnslaverContributionReview';
 import PublishNewDBVersion from './editorialPlatform/PublishNewDBVersion';
 import PasswordResetForm from './Form/PasswordResetForm';
 import SignOut from './Form/SignOut';
@@ -135,6 +136,21 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
       if (!user) {
         return <SignUpForm />;
       }
+    }
+
+    // Enslaver contribution review — /contribute/enslaver_contribution_review/:id
+    if (
+      location.pathname.includes('/contribute/enslaver_contribution_review/')
+    ) {
+      if (!user) {
+        return (
+          <SignInPage
+            translatedContribute={translatedContribute}
+            handleClickGuidelines={handleClickGuidelines}
+          />
+        );
+      }
+      return <EnslaverContributionReview />;
     }
 
     // FIXED: Check actual URL pathname for requests routes

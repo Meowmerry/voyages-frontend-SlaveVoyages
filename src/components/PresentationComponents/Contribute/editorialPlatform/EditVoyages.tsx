@@ -5,17 +5,7 @@ import { EditOutlined, FileAddOutlined } from '@ant-design/icons';
 import { Box } from '@mui/material';
 import { ContributionStatus } from '@slavevoyages/voyages-contribute';
 import { AgGridReact } from 'ag-grid-react';
-import {
-  Alert,
-  Button,
-  Drawer,
-  Input,
-  Pagination,
-  Space,
-  Tag,
-  Tooltip,
-  Typography,
-} from 'antd';
+import { Alert, Input, Pagination, Tooltip, Typography } from 'antd';
 import dayjs from 'dayjs';
 
 import 'ag-grid-community/styles/ag-grid.css';
@@ -23,130 +13,14 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import '@/style/table.scss';
 
 import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
-import StatusCellRenderer from '../commons/StatusCellRenderer';
 import {
-  getMockVoyageSections,
   MOCK_PENDING_CONTRIBUTIONS,
   PendingContribution,
-  VoyageSection,
 } from '../mockData/pendingContributions';
+import DrawerVoyageById from './editVoyages/DrawerVoyageById';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 const { Search } = Input;
-
-// ── Voyage comparison table (mirrors legacy editor page) ────────────────────
-const VoyageComparisonTable: React.FC<{
-  contrib: PendingContribution;
-  sections: VoyageSection[];
-}> = ({ contrib, sections }) => (
-  <div style={{ fontSize: 13, overflowX: 'auto' }}>
-    <table
-      style={{
-        width: '100%',
-        borderCollapse: 'collapse',
-        tableLayout: 'fixed',
-      }}
-    >
-      <thead>
-        <tr style={{ background: '#555', color: '#fff' }}>
-          {[
-            `Variable`,
-            `Voyage #${contrib.voyage_id}`,
-            'Contributed value',
-            'Editor',
-          ].map((h) => (
-            <th
-              key={h}
-              style={{
-                padding: '7px 10px',
-                textAlign: 'left',
-                fontWeight: 600,
-                fontSize: 12,
-                width: '25%',
-              }}
-            >
-              {h}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {sections.map((section) => (
-          <>
-            {/* Section header row */}
-            <tr key={section.title}>
-              <td
-                colSpan={4}
-                style={{
-                  padding: '10px 10px 4px',
-                  fontWeight: 700,
-                  fontSize: 14,
-                  color: '#333',
-                  borderTop: '2px solid #ddd',
-                  background: '#fff',
-                }}
-              >
-                {section.title}
-              </td>
-            </tr>
-
-            {/* Field rows */}
-            {section.fields.map((f, idx) => {
-              const changed = f.original !== f.contributed;
-              return (
-                <tr
-                  key={f.variable}
-                  style={{
-                    background: idx % 2 === 0 ? '#f5f5f5' : '#fff',
-                  }}
-                >
-                  <td
-                    style={{
-                      padding: '5px 10px',
-                      color: '#444',
-                      verticalAlign: 'top',
-                    }}
-                  >
-                    {f.variable}:
-                  </td>
-                  <td
-                    style={{
-                      padding: '5px 10px',
-                      verticalAlign: 'top',
-                      color: '#555',
-                    }}
-                  >
-                    {f.original || '—'}
-                  </td>
-                  <td
-                    style={{
-                      padding: '5px 10px',
-                      verticalAlign: 'top',
-                      background: changed ? '#fffde7' : undefined,
-                      fontWeight: changed ? 600 : 400,
-                      color: changed ? '#b45309' : '#555',
-                    }}
-                  >
-                    {f.contributed || '—'}
-                  </td>
-                  <td
-                    style={{
-                      padding: '5px 10px',
-                      verticalAlign: 'top',
-                      color: '#555',
-                    }}
-                  >
-                    {f.editor || '—'}
-                  </td>
-                </tr>
-              );
-            })}
-          </>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
 
 // ── Main component ───────────────────────────────────────────────────────────
 const EditVoyages: React.FC = () => {
@@ -349,7 +223,7 @@ const EditVoyages: React.FC = () => {
     const target = event.target as HTMLElement;
     const colId = target.closest('.ag-cell')?.getAttribute('col-id') ?? '';
 
-    // Do NOT open the drawer when clicking the Type icon column
+    // Skip the Type icon column — all other columns open the drawer
     if (colId !== 'type') return;
 
     setSelected(data);
@@ -374,12 +248,6 @@ const EditVoyages: React.FC = () => {
       setPage(1);
     },
     [],
-  );
-
-  // ── Comparison sections for the selected row ─────────────────────────────
-  const comparisonSections = useMemo(
-    () => (selected ? getMockVoyageSections(selected) : []),
-    [selected],
   );
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -484,119 +352,14 @@ const EditVoyages: React.FC = () => {
         />
       </div>
 
-      {/* Detail Drawer — voyage comparison table */}
-      <Drawer
-        title={
-          <Space>
-            <span style={{ fontWeight: 600 }}>
-              {selected?.changeSet?.title ||
-                `Contribution #${selected?.voyage_id}`}
-            </span>
-            <Tag color={selected?.type === 'new' ? 'blue' : 'default'}>
-              {selected?.type === 'new' ? 'New Voyage' : 'Edit Existing'}
-            </Tag>
-          </Space>
-        }
+      {/* Detail drawer — voyage comparison */}
+      <DrawerVoyageById
+        selected={selected}
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        width={750}
-        styles={{ body: { padding: '12px 16px' } }}
-        extra={
-          selected?.status === ContributionStatus.Submitted ? (
-            <Space>
-              <Button
-                type="primary"
-                style={{ background: '#52c41a', border: 'none' }}
-                onClick={() => {
-                  handleAccept(selected.id);
-                  setDrawerOpen(false);
-                }}
-              >
-                Accept
-              </Button>
-              <Button
-                danger
-                onClick={() => {
-                  handleReject(selected.id);
-                  setDrawerOpen(false);
-                }}
-              >
-                Reject
-              </Button>
-            </Space>
-          ) : undefined
-        }
-      >
-        {selected && (
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            {/* Meta info */}
-            <div
-              style={{
-                display: 'flex',
-                gap: 24,
-                background: '#f9fafb',
-                borderRadius: 8,
-                padding: '10px 16px',
-                border: '1px solid #e5e7eb',
-                fontSize: 13,
-              }}
-            >
-              <div>
-                <Text type="secondary">Contributor</Text>
-                <div style={{ fontWeight: 500 }}>
-                  {selected.changeSet?.author || '—'}
-                </div>
-              </div>
-              <div>
-                <Text type="secondary">Submitted</Text>
-                <div style={{ fontWeight: 500 }}>
-                  {selected.changeSet?.timestamp
-                    ? dayjs(selected.changeSet.timestamp).format('YYYY-MM-DD')
-                    : '—'}
-                </div>
-              </div>
-              <div>
-                <Text type="secondary">Status</Text>
-                <div style={{ marginTop: 2 }}>
-                  <StatusCellRenderer value={selected.status} />
-                </div>
-              </div>
-              {selected.batch && (
-                <div>
-                  <Text type="secondary">Batch</Text>
-                  <div style={{ fontWeight: 500 }}>{selected.batch.title}</div>
-                </div>
-              )}
-            </div>
-
-            {/* Researcher comments */}
-            {selected.changeSet?.comments && (
-              <div
-                style={{
-                  background: '#fffbe6',
-                  borderRadius: 8,
-                  padding: '10px 16px',
-                  border: '1px solid #ffe58f',
-                  fontSize: 13,
-                }}
-              >
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  Researcher Notes
-                </Text>
-                <div style={{ marginTop: 4, lineHeight: 1.6 }}>
-                  {selected.changeSet.comments}
-                </div>
-              </div>
-            )}
-
-            {/* Comparison table */}
-            <VoyageComparisonTable
-              contrib={selected}
-              sections={comparisonSections}
-            />
-          </Space>
-        )}
-      </Drawer>
+        onAccept={handleAccept}
+        onReject={handleReject}
+      />
     </Box>
   );
 };

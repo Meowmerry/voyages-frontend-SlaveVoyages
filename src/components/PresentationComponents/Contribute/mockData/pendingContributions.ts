@@ -22,7 +22,8 @@ export interface PendingDisplayFields {
   majorPlaceOfLanding?: string;
 }
 
-export type PendingContribution = TransformedContribution & PendingDisplayFields;
+export type PendingContribution = TransformedContribution &
+  PendingDisplayFields;
 
 const now = Date.now();
 const daysAgo = (days: number) => now - days * 24 * 60 * 60 * 1000;
@@ -64,12 +65,22 @@ export const getMockVoyageSections = (
   const title = (contrib.changeSet?.title ?? '').toLowerCase();
 
   // Derive contextual "changed" fields from the contribution title
-  const shipChanged = title.includes('ship name') || title.includes('name of vessel');
+  const shipChanged =
+    title.includes('ship name') || title.includes('name of vessel');
   const ownerChanged = title.includes('owner');
   const tonnageChanged = title.includes('tonnage') || title.includes('rig');
-  const disembChanged = title.includes('disembarkation') || title.includes('landing') || title.includes('arrival');
-  const embarked = title.includes('embarkation') || title.includes('enslaved') || title.includes('number');
-  const dateChanged = title.includes('year') || title.includes('departure') || title.includes('date');
+  const disembChanged =
+    title.includes('disembarkation') ||
+    title.includes('landing') ||
+    title.includes('arrival');
+  const embarked =
+    title.includes('embarkation') ||
+    title.includes('enslaved') ||
+    title.includes('number');
+  const dateChanged =
+    title.includes('year') ||
+    title.includes('departure') ||
+    title.includes('date');
 
   return [
     {
@@ -91,7 +102,12 @@ export const getMockVoyageSections = (
           : same('Tonnage of vessel', '180'),
         same('Guns mounted', '4'),
         ownerChanged
-          ? field('First or managing owner of venture', 'Unknown', 'Robert Traill', 'Robert Traill')
+          ? field(
+            'First or managing owner of venture',
+            'Unknown',
+            'Robert Traill',
+            'Robert Traill',
+          )
           : same('First or managing owner of venture', 'Various merchants'),
       ],
     },
@@ -99,28 +115,43 @@ export const getMockVoyageSections = (
       title: 'Slave (captive) numbers',
       fields: [
         embarked
-          ? field('Total embarked', String(Number(exported_) - 32), exported_, exported_)
+          ? field(
+            'Total embarked',
+            String(Number(exported_) - 32),
+            exported_,
+            exported_,
+          )
           : same('Total embarked', exported_),
         embarked
-          ? field('Total disembarked', String(Number(imported_) - 25), imported_, imported_)
+          ? field(
+            'Total disembarked',
+            String(Number(imported_) - 25),
+            imported_,
+            imported_,
+          )
           : same('Total disembarked', imported_),
-        same('Deaths in Middle Passage', String(Number(exported_) - Number(imported_))),
+        same(
+          'Deaths in Middle Passage',
+          String(Number(exported_) - Number(imported_)),
+        ),
       ],
     },
     {
       title: 'Voyage outcome',
       fields: [
-        same(
-          'Outcome of voyage',
-          'Arrived with captives, homeward bound',
-        ),
+        same('Outcome of voyage', 'Arrived with captives, homeward bound'),
       ],
     },
     {
       title: 'Voyage itinerary',
       fields: [
         disembChanged
-          ? field('First port of intended disembarkation', 'Martinique', landing, landing)
+          ? field(
+            'First port of intended disembarkation',
+            'Martinique',
+            landing,
+            landing,
+          )
           : same('First port of intended disembarkation', landing),
         same('First place of slave purchase', purchase),
         same('Principal place of slave purchase', purchase),

@@ -304,6 +304,10 @@ const App: React.FC = () => {
         element={<ContributePage />}
       />
       <Route
+        path={`${CONTRIBUTE}enslaver_contribution_review/:id`}
+        element={<ContributePage />}
+      />
+      <Route
         path={`${CONTRIBUTE}editor_main/enslaved_contrib`}
         element={<ContributePage />}
       />
