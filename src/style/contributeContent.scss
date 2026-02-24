@@ -771,11 +771,11 @@
   }
 }
 // Admin routes rendered inside ContributePage shell
-// Need top margin for the navbar but NO side margins and NO flex
+// Same flex layout as .contribuite-main-content but NO side margins
 .admin-main-content {
   margin-top: 7rem;
-  padding: 0;
-  display: block;
+  padding-bottom: 1.5rem;
+  display: flex;
   box-sizing: border-box;
   width: 100%;
 }

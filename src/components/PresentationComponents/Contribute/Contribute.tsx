@@ -18,6 +18,7 @@ const Contribute: React.FC = () => {
       <ContributeNavBar handleDrawerOpen={handleDrawerOpen} />
       {isAdminRoute ? (
         <div className="admin-main-content">
+          <SidebarContribute openSideBar={openSideBar} />
           <ContributeContent openSideBar={openSideBar} />
         </div>
       ) : (
