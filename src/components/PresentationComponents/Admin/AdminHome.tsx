@@ -2,179 +2,96 @@ import { Fragment } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 interface ModelEntry {
   name: string;
   addUrl?: string;
   changeUrl: string;
 }
-
 interface AppSection {
+  appLabel: string;
   appName: string;
   models: ModelEntry[];
 }
 
-// ── Data ──────────────────────────────────────────────────────────────────────
-const adminSections: AppSection[] = [
+// ── Admin sections (matching the real voyages Django admin) ──────────────────
+const ADMIN_SECTIONS: AppSection[] = [
   {
+    appLabel: 'auth',
     appName: 'Authentication and Authorization',
     models: [
       { name: 'Groups', changeUrl: '/admin/auth/group/' },
-      { name: 'Users', addUrl: '/admin/auth/user/add/', changeUrl: '/admin/auth/user/' },
+      {
+        name: 'Users',
+        addUrl: '/admin/auth/user/add/',
+        changeUrl: '/admin/auth/user/',
+      },
     ],
   },
   {
+    appLabel: 'blog',
     appName: 'Blog',
     models: [
-      { name: 'Authors', changeUrl: '/admin/blog/author/' },
-      { name: 'Institutions', changeUrl: '/admin/blog/institution/' },
-      { name: 'Posts', changeUrl: '/admin/blog/post/' },
-      { name: 'Short references', changeUrl: '/admin/blog/shortref/' },
-      { name: 'Tags', changeUrl: '/admin/blog/tag/' },
+      { name: 'Authors', addUrl: '/admin/blog/author/add/', changeUrl: '/admin/blog/author/' },
+      { name: 'Institutions', addUrl: '/admin/blog/institution/add/', changeUrl: '/admin/blog/institution/' },
+      { name: 'Posts', addUrl: '/admin/blog/post/add/', changeUrl: '/admin/blog/post/' },
+      { name: 'Short references', addUrl: '/admin/blog/shortref/add/', changeUrl: '/admin/blog/shortref/' },
+      { name: 'Tags', addUrl: '/admin/blog/tag/add/', changeUrl: '/admin/blog/tag/' },
     ],
   },
   {
-    appName: 'Common',
-    models: [
-      { name: 'Locations', changeUrl: '/admin/common/location/' },
-      { name: 'Sources', changeUrl: '/admin/common/source/' },
-      { name: 'Sparse dates', changeUrl: '/admin/common/sparsedate/' },
-    ],
-  },
-  {
+    appLabel: 'document',
     appName: 'Document',
     models: [
-      { name: 'Doc sparse dates', changeUrl: '/admin/document/docsparsedate/' },
-      { name: 'Doc tags', changeUrl: '/admin/document/doctag/' },
-      { name: 'Docs', changeUrl: '/admin/document/doc/' },
-      { name: 'Pages', changeUrl: '/admin/document/page/' },
+      { name: 'Doc sparse dates', addUrl: '/admin/document/docsparsedate/add/', changeUrl: '/admin/document/docsparsedate/' },
+      { name: 'Doc tags', addUrl: '/admin/document/doctag/add/', changeUrl: '/admin/document/doctag/' },
+      { name: 'Docs', addUrl: '/admin/document/doc/add/', changeUrl: '/admin/document/doc/' },
+      { name: 'Pages', addUrl: '/admin/document/page/add/', changeUrl: '/admin/document/page/' },
     ],
   },
   {
+    appLabel: 'common',
+    appName: 'Common',
+    models: [
+      { name: 'Locations', addUrl: '/admin/common/location/add/', changeUrl: '/admin/common/location/' },
+      { name: 'Sources', addUrl: '/admin/common/source/add/', changeUrl: '/admin/common/source/' },
+      { name: 'Sparse dates', addUrl: '/admin/common/sparsedate/add/', changeUrl: '/admin/common/sparsedate/' },
+    ],
+  },
+  {
+    appLabel: 'past',
     appName: 'Past',
     models: [
-      { name: 'African infos', changeUrl: '/admin/past/africaninfo/' },
-      { name: 'Enslaved', changeUrl: '/admin/past/enslaved/' },
-      { name: 'Enslavement relations', changeUrl: '/admin/past/enslavementrelation/' },
-      { name: 'Enslaver aliases', changeUrl: '/admin/past/enslaveralias/' },
-      { name: 'Enslaver identities', changeUrl: '/admin/past/enslaveridentity/' },
+      { name: 'Enslaved', addUrl: '/admin/past/enslaved/add/', changeUrl: '/admin/past/enslaved/' },
+      { name: 'Enslavement relations', addUrl: '/admin/past/enslavementrelation/add/', changeUrl: '/admin/past/enslavementrelation/' },
+      { name: 'Enslaver aliases', addUrl: '/admin/past/enslaveralias/add/', changeUrl: '/admin/past/enslaveralias/' },
+      { name: 'Enslaver identities', addUrl: '/admin/past/enslaveridentity/add/', changeUrl: '/admin/past/enslaveridentity/' },
       { name: 'Enslaver roles', changeUrl: '/admin/past/enslaverrole/' },
-      { name: 'Owner outcomes', changeUrl: '/admin/past/owneroutcome/' },
-      { name: 'Particular outcomes', changeUrl: '/admin/past/particularoutcome/' },
-      { name: 'Slaves outcomes', changeUrl: '/admin/past/slavesoutcome/' },
-      { name: 'Vessel captured outcomes', changeUrl: '/admin/past/vesselcapturedoutcome/' },
+      { name: 'Owner outcomes', addUrl: '/admin/past/owneroutcome/add/', changeUrl: '/admin/past/owneroutcome/' },
+      { name: 'Particular outcomes', addUrl: '/admin/past/particularoutcome/add/', changeUrl: '/admin/past/particularoutcome/' },
+      { name: 'Slaves outcomes', addUrl: '/admin/past/slavesoutcome/add/', changeUrl: '/admin/past/slavesoutcome/' },
+      { name: 'Vessel captured outcomes', addUrl: '/admin/past/vesselcapturedoutcome/add/', changeUrl: '/admin/past/vesselcapturedoutcome/' },
     ],
   },
   {
+    appLabel: 'voyage',
     appName: 'Voyage',
     models: [
-      { name: 'Cargo types', changeUrl: '/admin/voyage/cargotype/' },
-      { name: 'Cargo units', changeUrl: '/admin/voyage/cargounit/' },
-      { name: 'Nationalities', changeUrl: '/admin/voyage/nationality/' },
-      { name: 'Resistances', changeUrl: '/admin/voyage/resistance/' },
-      { name: 'Voyage sparse dates', changeUrl: '/admin/voyage/voyagesparsedate/' },
-      { name: 'Voyages', changeUrl: '/admin/voyage/voyage/' },
-    ],
-  },
-  {
-    appName: 'Geo',
-    models: [
-      { name: 'Locations', changeUrl: '/admin/geo/location/' },
+      { name: 'Cargo types', addUrl: '/admin/voyage/cargotype/add/', changeUrl: '/admin/voyage/cargotype/' },
+      { name: 'Cargo units', addUrl: '/admin/voyage/cargounit/add/', changeUrl: '/admin/voyage/cargounit/' },
+      { name: 'Nationalities', addUrl: '/admin/voyage/nationality/add/', changeUrl: '/admin/voyage/nationality/' },
+      { name: 'Resistances', addUrl: '/admin/voyage/resistance/add/', changeUrl: '/admin/voyage/resistance/' },
+      { name: 'Voyage sparse dates', addUrl: '/admin/voyage/voyagesparsedate/add/', changeUrl: '/admin/voyage/voyagesparsedate/' },
+      { name: 'Voyages', addUrl: '/admin/voyage/voyage/add/', changeUrl: '/admin/voyage/voyage/' },
     ],
   },
 ];
 
-// ── Styles (inline, no extra deps) ────────────────────────────────────────────
-const headerStyle: React.CSSProperties = {
-  background: '#417690',
-  color: '#fff',
-  padding: '10px 40px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-};
-
-const headerTitleStyle: React.CSSProperties = {
-  fontSize: 18,
-  fontWeight: 700,
-  letterSpacing: '0.5px',
-};
-
-const headerSubStyle: React.CSSProperties = {
-  fontSize: 12,
-  opacity: 0.75,
-  marginTop: 2,
-};
-
-const headerNavStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: 16,
-  fontSize: 13,
-  alignItems: 'center',
-};
-
-const contentStyle: React.CSSProperties = {
-  maxWidth: 900,
-  margin: '32px auto',
-  padding: '0 24px',
-  fontFamily:
-    '"Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif',
-};
-
-const sectionStyle: React.CSSProperties = {
-  marginBottom: 28,
-  border: '1px solid #ddd',
-  borderRadius: 4,
-  overflow: 'hidden',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-};
-
-const sectionHeaderStyle: React.CSSProperties = {
-  background: '#79aec8',
-  color: '#fff',
-  padding: '10px 16px',
-  fontSize: 14,
-  fontWeight: 700,
-  letterSpacing: '0.3px',
-  textTransform: 'uppercase',
-};
-
-const modelRowStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '9px 16px',
-  borderTop: '1px solid #eee',
-  background: '#fff',
-};
-
-const linkStyle: React.CSSProperties = {
-  color: '#417690',
-  textDecoration: 'none',
-  fontSize: 13,
-  fontWeight: 500,
-};
-
-const actionBtnStyle: React.CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  padding: '3px 10px',
-  borderRadius: 3,
-  fontSize: 12,
-  fontWeight: 600,
-  textDecoration: 'none',
-  marginLeft: 6,
-  cursor: 'pointer',
-  border: 'none',
-  background: 'transparent',
-};
-
-// ── Component ─────────────────────────────────────────────────────────────────
+// ── Component ────────────────────────────────────────────────────────────────
 const AdminHome: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleNav = (url: string) => (e: React.MouseEvent) => {
+  const go = (url: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(url);
   };
@@ -185,122 +102,273 @@ const AdminHome: React.FC = () => {
         minHeight: '100vh',
         background: '#f8f8f8',
         fontFamily:
-          '"Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif',
+          '"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif',
+        fontSize: 13,
+        color: '#333',
       }}
     >
-      {/* ── Top header ───────────────────────────────────────────────── */}
-      <div style={headerStyle}>
-        <div>
-          <div style={headerTitleStyle}>Voyage Admin Live</div>
-          <div style={headerSubStyle}>Any changes will take effect immediately</div>
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div
+        id="header"
+        style={{
+          background: '#05768A',
+          color: '#fff',
+          overflow: 'hidden',
+          padding: '0 10px',
+          position: 'relative',
+        }}
+      >
+        {/* Branding */}
+        <div id="branding" style={{ float: 'left', paddingTop: 6 }}>
+          <h1
+            style={{
+              padding: '0px 10px 5px 0px',
+              margin: 0,
+              fontWeight: 'normal',
+              color: '#fff',
+              fontSize: 18,
+            }}
+          >
+            Voyage Admin Live
+          </h1>
+          <h2
+            style={{
+              padding: 0,
+              fontSize: 12,
+              margin: '-6px 0 8px 0',
+              fontWeight: 'normal',
+              color: '#fff',
+              opacity: 0.8,
+            }}
+          >
+            Any changes will take effect immediately
+          </h2>
         </div>
-        <div style={headerNavStyle}>
-          <span style={{ opacity: 0.8 }}>Welcome,&nbsp;<strong>admin</strong></span>
-          <a href="#" style={{ color: '#fff', fontSize: 13 }} onClick={(e) => e.preventDefault()}>
+
+        {/* User tools */}
+        <div
+          id="user-tools"
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            padding: '10px 12px',
+            fontSize: 11,
+            textAlign: 'right',
+            color: '#fff',
+          }}
+        >
+          Welcome, <strong>admin</strong>.&nbsp;&nbsp;
+          <a
+            href="#"
+            style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }}
+            onClick={(e) => e.preventDefault()}
+          >
             Change password
           </a>
-          <span style={{ opacity: 0.4 }}>|</span>
-          <a href="#" style={{ color: '#fff', fontSize: 13 }} onClick={(e) => e.preventDefault()}>
+          <a
+            href="/"
+            style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }}
+            onClick={go('/')}
+          >
             View site
           </a>
-          <span style={{ opacity: 0.4 }}>|</span>
-          <a href="#" style={{ color: '#fff', fontSize: 13 }} onClick={(e) => e.preventDefault()}>
+          <a
+            href="#"
+            style={{ color: '#fff', textDecoration: 'underline' }}
+            onClick={(e) => e.preventDefault()}
+          >
             Log out
           </a>
         </div>
       </div>
 
-      {/* ── Body ─────────────────────────────────────────────────────── */}
-      <div style={contentStyle}>
-        <h1
-          style={{
-            fontSize: 20,
-            fontWeight: 300,
-            color: '#333',
-            margin: '0 0 24px',
-            borderBottom: '1px solid #eee',
-            paddingBottom: 12,
-          }}
-        >
+      {/* ── Breadcrumb ──────────────────────────────────────────────────── */}
+      <div
+        style={{
+          padding: '2px 8px 3px 8px',
+          fontSize: 11,
+          color: '#999',
+          borderBottom: '1px solid #ccc',
+          background: '#fff',
+        }}
+      >
+        Home
+      </div>
+
+      {/* ── Content ─────────────────────────────────────────────────────── */}
+      <div
+        id="content"
+        style={{
+          margin: '10px 15px',
+          maxWidth: 600,
+        }}
+      >
+        <h1 style={{ fontSize: 18, color: '#666', margin: '0 0 12px 0', fontWeight: 'bold' }}>
           Site administration
         </h1>
 
-        {adminSections.map((section) => (
-          <div key={section.appName} style={sectionStyle}>
-            {/* Section header */}
-            <div style={sectionHeaderStyle}>{section.appName}</div>
-
-            {/* Model rows */}
-            {section.models.map((model, idx) => (
-              <Fragment key={model.name}>
-                <div
-                  style={{
-                    ...modelRowStyle,
-                    background: idx % 2 === 0 ? '#fff' : '#f9fbfc',
-                  }}
-                  onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLElement).style.background = '#e8f4f8')
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLElement).style.background =
-                      idx % 2 === 0 ? '#fff' : '#f9fbfc')
-                  }
+        {ADMIN_SECTIONS.map((section) => (
+          <div
+            key={section.appLabel}
+            style={{
+              border: '1px solid #ccc',
+              marginBottom: 8,
+              background: 'white',
+            }}
+          >
+            {/* Section caption */}
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+              }}
+            >
+              <caption
+                style={{
+                  margin: 0,
+                  padding: '2px 5px 3px 5px',
+                  fontSize: 11,
+                  textAlign: 'left',
+                  fontWeight: 'bold',
+                  background: '#008ca8',
+                  color: 'white',
+                  captionSide: 'top',
+                }}
+              >
+                <a
+                  href={`/admin/${section.appLabel}/`}
+                  style={{ color: 'white', textDecoration: 'none' }}
+                  onClick={(e) => e.preventDefault()}
                 >
-                  {/* Model name */}
-                  <a
-                    href={model.changeUrl}
-                    style={{ ...linkStyle, fontSize: 14 }}
-                    onClick={handleNav(model.changeUrl)}
-                  >
-                    {model.name}
-                  </a>
+                  {section.appName}
+                </a>
+              </caption>
 
-                  {/* Action buttons */}
-                  <div style={{ display: 'flex', gap: 4 }}>
-                    {model.addUrl && (
-                      <button
+              <tbody>
+                {section.models.map((model, idx) => (
+                  <Fragment key={model.name}>
+                    <tr
+                      style={{
+                        background: idx % 2 === 0 ? '#EDF3FE' : '#fff',
+                        cursor: 'default',
+                      }}
+                      onMouseEnter={(e) =>
+                        ((e.currentTarget as HTMLElement).style.background = '#d0e3f0')
+                      }
+                      onMouseLeave={(e) =>
+                        ((e.currentTarget as HTMLElement).style.background =
+                          idx % 2 === 0 ? '#EDF3FE' : '#fff')
+                      }
+                    >
+                      {/* Model name */}
+                      <th
+                        scope="row"
                         style={{
-                          ...actionBtnStyle,
-                          color: '#417690',
-                          border: '1px solid #417690',
-                        }}
-                        onClick={handleNav(model.addUrl)}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = '#417690';
-                          (e.currentTarget as HTMLElement).style.color = '#fff';
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = 'transparent';
-                          (e.currentTarget as HTMLElement).style.color = '#417690';
+                          padding: '5px 8px',
+                          fontWeight: 'normal',
+                          borderBottom: '1px solid #ddd',
+                          width: '60%',
                         }}
                       >
-                        + Add
-                      </button>
-                    )}
-                    <button
-                      style={{
-                        ...actionBtnStyle,
-                        color: '#417690',
-                        border: '1px solid #417690',
-                      }}
-                      onClick={handleNav(model.changeUrl)}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = '#417690';
-                        (e.currentTarget as HTMLElement).style.color = '#fff';
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = 'transparent';
-                        (e.currentTarget as HTMLElement).style.color = '#417690';
-                      }}
-                    >
-                      ✎ Change
-                    </button>
-                  </div>
-                </div>
-              </Fragment>
-            ))}
+                        {model.changeUrl ? (
+                          <a
+                            href={model.changeUrl}
+                            style={{ color: '#005a87', fontWeight: 'bold', textDecoration: 'none', fontSize: 12 }}
+                            onClick={go(model.changeUrl)}
+                          >
+                            {model.name}
+                          </a>
+                        ) : (
+                          <span style={{ fontSize: 12 }}>{model.name}</span>
+                        )}
+                      </th>
+
+                      {/* Add */}
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #ddd',
+                          width: '20%',
+                          textAlign: 'right',
+                        }}
+                      >
+                        {model.addUrl ? (
+                          <a
+                            href={model.addUrl}
+                            className="addlink"
+                            style={{
+                              color: '#417690',
+                              fontSize: 11,
+                              textDecoration: 'none',
+                              paddingLeft: 14,
+                              background:
+                                'url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 0 0.2em no-repeat',
+                            }}
+                            onClick={(e) => e.preventDefault()}
+                          >
+                            Add
+                          </a>
+                        ) : (
+                          <span>&nbsp;</span>
+                        )}
+                      </td>
+
+                      {/* Change */}
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #ddd',
+                          width: '20%',
+                          textAlign: 'right',
+                        }}
+                      >
+                        <a
+                          href={model.changeUrl}
+                          className="changelink"
+                          style={{
+                            color: '#417690',
+                            fontSize: 11,
+                            textDecoration: 'none',
+                            paddingLeft: 14,
+                            background:
+                              'url(https://legacy.slavevoyages.org/static/admin/img/icon_changelink.gif) 0 0.2em no-repeat',
+                          }}
+                          onClick={go(model.changeUrl)}
+                        >
+                          Change
+                        </a>
+                      </td>
+                    </tr>
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
           </div>
         ))}
+      </div>
+
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      <div
+        id="footer"
+        style={{
+          clear: 'both',
+          paddingLeft: 17,
+          paddingTop: 4,
+          fontSize: 11,
+          color: '#999',
+        }}
+      >
+        <p>
+          <a
+            href="https://legacy.slavevoyages.org/admin/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#417690' }}
+          >
+            Open Legacy Admin ↗
+          </a>
+        </p>
       </div>
     </div>
   );
