@@ -1,6 +1,12 @@
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
+
+import SidebarContribute from '@/components/NavigationComponents/SideBar/SidebarContribute';
+
+import ContributeNavBar from '../Contribute/ContributeNavBar';
+import '@/style/contributeContent.scss';
+import ContributeContent from '../Contribute/ContributeContent';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface ModelEntry {
@@ -32,57 +38,161 @@ const ADMIN_SECTIONS: AppSection[] = [
     appLabel: 'blog',
     appName: 'Blog',
     models: [
-      { name: 'Authors', addUrl: '/admin/blog/author/add/', changeUrl: '/admin/blog/author/' },
-      { name: 'Institutions', addUrl: '/admin/blog/institution/add/', changeUrl: '/admin/blog/institution/' },
-      { name: 'Posts', addUrl: '/admin/blog/post/add/', changeUrl: '/admin/blog/post/' },
-      { name: 'Short references', addUrl: '/admin/blog/shortref/add/', changeUrl: '/admin/blog/shortref/' },
-      { name: 'Tags', addUrl: '/admin/blog/tag/add/', changeUrl: '/admin/blog/tag/' },
+      {
+        name: 'Authors',
+        addUrl: '/admin/blog/author/add/',
+        changeUrl: '/admin/blog/author/',
+      },
+      {
+        name: 'Institutions',
+        addUrl: '/admin/blog/institution/add/',
+        changeUrl: '/admin/blog/institution/',
+      },
+      {
+        name: 'Posts',
+        addUrl: '/admin/blog/post/add/',
+        changeUrl: '/admin/blog/post/',
+      },
+      {
+        name: 'Short references',
+        addUrl: '/admin/blog/shortref/add/',
+        changeUrl: '/admin/blog/shortref/',
+      },
+      {
+        name: 'Tags',
+        addUrl: '/admin/blog/tag/add/',
+        changeUrl: '/admin/blog/tag/',
+      },
     ],
   },
   {
     appLabel: 'document',
     appName: 'Document',
     models: [
-      { name: 'Doc sparse dates', addUrl: '/admin/document/docsparsedate/add/', changeUrl: '/admin/document/docsparsedate/' },
-      { name: 'Doc tags', addUrl: '/admin/document/doctag/add/', changeUrl: '/admin/document/doctag/' },
-      { name: 'Docs', addUrl: '/admin/document/doc/add/', changeUrl: '/admin/document/doc/' },
-      { name: 'Pages', addUrl: '/admin/document/page/add/', changeUrl: '/admin/document/page/' },
+      {
+        name: 'Doc sparse dates',
+        addUrl: '/admin/document/docsparsedate/add/',
+        changeUrl: '/admin/document/docsparsedate/',
+      },
+      {
+        name: 'Doc tags',
+        addUrl: '/admin/document/doctag/add/',
+        changeUrl: '/admin/document/doctag/',
+      },
+      {
+        name: 'Docs',
+        addUrl: '/admin/document/doc/add/',
+        changeUrl: '/admin/document/doc/',
+      },
+      {
+        name: 'Pages',
+        addUrl: '/admin/document/page/add/',
+        changeUrl: '/admin/document/page/',
+      },
     ],
   },
   {
     appLabel: 'common',
     appName: 'Common',
     models: [
-      { name: 'Locations', addUrl: '/admin/common/location/add/', changeUrl: '/admin/common/location/' },
-      { name: 'Sources', addUrl: '/admin/common/source/add/', changeUrl: '/admin/common/source/' },
-      { name: 'Sparse dates', addUrl: '/admin/common/sparsedate/add/', changeUrl: '/admin/common/sparsedate/' },
+      {
+        name: 'Locations',
+        addUrl: '/admin/common/location/add/',
+        changeUrl: '/admin/common/location/',
+      },
+      {
+        name: 'Sources',
+        addUrl: '/admin/common/source/add/',
+        changeUrl: '/admin/common/source/',
+      },
+      {
+        name: 'Sparse dates',
+        addUrl: '/admin/common/sparsedate/add/',
+        changeUrl: '/admin/common/sparsedate/',
+      },
     ],
   },
   {
     appLabel: 'past',
     appName: 'Past',
     models: [
-      { name: 'Enslaved', addUrl: '/admin/past/enslaved/add/', changeUrl: '/admin/past/enslaved/' },
-      { name: 'Enslavement relations', addUrl: '/admin/past/enslavementrelation/add/', changeUrl: '/admin/past/enslavementrelation/' },
-      { name: 'Enslaver aliases', addUrl: '/admin/past/enslaveralias/add/', changeUrl: '/admin/past/enslaveralias/' },
-      { name: 'Enslaver identities', addUrl: '/admin/past/enslaveridentity/add/', changeUrl: '/admin/past/enslaveridentity/' },
+      {
+        name: 'Enslaved',
+        addUrl: '/admin/past/enslaved/add/',
+        changeUrl: '/admin/past/enslaved/',
+      },
+      {
+        name: 'Enslavement relations',
+        addUrl: '/admin/past/enslavementrelation/add/',
+        changeUrl: '/admin/past/enslavementrelation/',
+      },
+      {
+        name: 'Enslaver aliases',
+        addUrl: '/admin/past/enslaveralias/add/',
+        changeUrl: '/admin/past/enslaveralias/',
+      },
+      {
+        name: 'Enslaver identities',
+        addUrl: '/admin/past/enslaveridentity/add/',
+        changeUrl: '/admin/past/enslaveridentity/',
+      },
       { name: 'Enslaver roles', changeUrl: '/admin/past/enslaverrole/' },
-      { name: 'Owner outcomes', addUrl: '/admin/past/owneroutcome/add/', changeUrl: '/admin/past/owneroutcome/' },
-      { name: 'Particular outcomes', addUrl: '/admin/past/particularoutcome/add/', changeUrl: '/admin/past/particularoutcome/' },
-      { name: 'Slaves outcomes', addUrl: '/admin/past/slavesoutcome/add/', changeUrl: '/admin/past/slavesoutcome/' },
-      { name: 'Vessel captured outcomes', addUrl: '/admin/past/vesselcapturedoutcome/add/', changeUrl: '/admin/past/vesselcapturedoutcome/' },
+      {
+        name: 'Owner outcomes',
+        addUrl: '/admin/past/owneroutcome/add/',
+        changeUrl: '/admin/past/owneroutcome/',
+      },
+      {
+        name: 'Particular outcomes',
+        addUrl: '/admin/past/particularoutcome/add/',
+        changeUrl: '/admin/past/particularoutcome/',
+      },
+      {
+        name: 'Slaves outcomes',
+        addUrl: '/admin/past/slavesoutcome/add/',
+        changeUrl: '/admin/past/slavesoutcome/',
+      },
+      {
+        name: 'Vessel captured outcomes',
+        addUrl: '/admin/past/vesselcapturedoutcome/add/',
+        changeUrl: '/admin/past/vesselcapturedoutcome/',
+      },
     ],
   },
   {
     appLabel: 'voyage',
     appName: 'Voyage',
     models: [
-      { name: 'Cargo types', addUrl: '/admin/voyage/cargotype/add/', changeUrl: '/admin/voyage/cargotype/' },
-      { name: 'Cargo units', addUrl: '/admin/voyage/cargounit/add/', changeUrl: '/admin/voyage/cargounit/' },
-      { name: 'Nationalities', addUrl: '/admin/voyage/nationality/add/', changeUrl: '/admin/voyage/nationality/' },
-      { name: 'Resistances', addUrl: '/admin/voyage/resistance/add/', changeUrl: '/admin/voyage/resistance/' },
-      { name: 'Voyage sparse dates', addUrl: '/admin/voyage/voyagesparsedate/add/', changeUrl: '/admin/voyage/voyagesparsedate/' },
-      { name: 'Voyages', addUrl: '/admin/voyage/voyage/add/', changeUrl: '/admin/voyage/voyage/' },
+      {
+        name: 'Cargo types',
+        addUrl: '/admin/voyage/cargotype/add/',
+        changeUrl: '/admin/voyage/cargotype/',
+      },
+      {
+        name: 'Cargo units',
+        addUrl: '/admin/voyage/cargounit/add/',
+        changeUrl: '/admin/voyage/cargounit/',
+      },
+      {
+        name: 'Nationalities',
+        addUrl: '/admin/voyage/nationality/add/',
+        changeUrl: '/admin/voyage/nationality/',
+      },
+      {
+        name: 'Resistances',
+        addUrl: '/admin/voyage/resistance/add/',
+        changeUrl: '/admin/voyage/resistance/',
+      },
+      {
+        name: 'Voyage sparse dates',
+        addUrl: '/admin/voyage/voyagesparsedate/add/',
+        changeUrl: '/admin/voyage/voyagesparsedate/',
+      },
+      {
+        name: 'Voyages',
+        addUrl: '/admin/voyage/voyage/add/',
+        changeUrl: '/admin/voyage/voyage/',
+      },
     ],
   },
 ];
@@ -90,6 +200,8 @@ const ADMIN_SECTIONS: AppSection[] = [
 // ── Component ────────────────────────────────────────────────────────────────
 const AdminHome: React.FC = () => {
   const navigate = useNavigate();
+  const [openSideBar, setOpenSideBar] = useState(false);
+  const handleDrawerOpen = () => setOpenSideBar(!openSideBar);
 
   const go = (url: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -108,103 +220,46 @@ const AdminHome: React.FC = () => {
       }}
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div
-        id="header"
-        style={{
-          background: '#05768A',
-          color: '#fff',
-          overflow: 'hidden',
-          padding: '0 10px',
-          position: 'relative',
-        }}
-      >
-        {/* Branding */}
-        <div id="branding" style={{ float: 'left', paddingTop: 6 }}>
-          <h1
-            style={{
-              padding: '0px 10px 5px 0px',
-              margin: 0,
-              fontWeight: 'normal',
-              color: '#fff',
-              fontSize: 18,
-            }}
-          >
-            Voyage Admin Live
-          </h1>
-          <h2
-            style={{
-              padding: 0,
-              fontSize: 12,
-              margin: '-6px 0 8px 0',
-              fontWeight: 'normal',
-              color: '#fff',
-              opacity: 0.8,
-            }}
-          >
-            Any changes will take effect immediately
-          </h2>
-        </div>
-
-        {/* User tools */}
-        <div
-          id="user-tools"
+      <div id="branding" style={{ float: 'left', paddingTop: 6 }}>
+        <h1
           style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            padding: '10px 12px',
-            fontSize: 11,
-            textAlign: 'right',
-            color: '#fff',
+            padding: '0px 10px 5px 0px',
+            margin: 0,
+            fontWeight: 'normal',
+            fontSize: 18,
           }}
         >
-          Welcome, <strong>admin</strong>.&nbsp;&nbsp;
-          <a
-            href="#"
-            style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }}
-            onClick={(e) => e.preventDefault()}
-          >
-            Change password
-          </a>
-          <a
-            href="/"
-            style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }}
-            onClick={go('/')}
-          >
-            View site
-          </a>
-          <a
-            href="#"
-            style={{ color: '#fff', textDecoration: 'underline' }}
-            onClick={(e) => e.preventDefault()}
-          >
-            Log out
-          </a>
-        </div>
+          Voyage Admin Live
+        </h1>
+        <h2
+          style={{
+            padding: 0,
+            fontSize: 12,
+            margin: '-6px 0 8px 0',
+            fontWeight: 'normal',
+            opacity: 0.8,
+          }}
+        >
+          Any changes will take effect immediately
+        </h2>
       </div>
-
-      {/* ── Breadcrumb ──────────────────────────────────────────────────── */}
-      <div
-        style={{
-          padding: '2px 8px 3px 8px',
-          fontSize: 11,
-          color: '#999',
-          borderBottom: '1px solid #ccc',
-          background: '#fff',
-        }}
-      >
-        Home
-      </div>
-
       {/* ── Content ─────────────────────────────────────────────────────── */}
       <div
         id="content"
         style={{
-          margin: '10px 15px',
-          maxWidth: 600,
+          margin: '10px auto',
+          maxWidth: 700,
+          padding: '0 15px',
         }}
       >
-        <h1 style={{ fontSize: 18, color: '#666', margin: '0 0 12px 0', fontWeight: 'bold' }}>
+        <h1
+          style={{
+            fontSize: 18,
+            color: '#666',
+            margin: '0 0 12px 0',
+            fontWeight: 'bold',
+          }}
+        >
           Site administration
         </h1>
 
@@ -254,7 +309,8 @@ const AdminHome: React.FC = () => {
                         cursor: 'default',
                       }}
                       onMouseEnter={(e) =>
-                        ((e.currentTarget as HTMLElement).style.background = '#d0e3f0')
+                        ((e.currentTarget as HTMLElement).style.background =
+                          '#d0e3f0')
                       }
                       onMouseLeave={(e) =>
                         ((e.currentTarget as HTMLElement).style.background =
@@ -274,7 +330,12 @@ const AdminHome: React.FC = () => {
                         {model.changeUrl ? (
                           <a
                             href={model.changeUrl}
-                            style={{ color: '#005a87', fontWeight: 'bold', textDecoration: 'none', fontSize: 12 }}
+                            style={{
+                              color: '#005a87',
+                              fontWeight: 'bold',
+                              textDecoration: 'none',
+                              fontSize: 12,
+                            }}
                             onClick={go(model.changeUrl)}
                           >
                             {model.name}

@@ -14,7 +14,13 @@ type FilterKey =
   | 'active_yes'
   | 'active_no';
 
-type SortField = 'username' | 'email' | 'firstName' | 'lastName' | 'isStaff' | 'isSuperuser';
+type SortField =
+  | 'username'
+  | 'email'
+  | 'firstName'
+  | 'lastName'
+  | 'isStaff'
+  | 'isSuperuser';
 type SortDir = 'asc' | 'desc';
 
 // ── Bool icon (green check / red dash) ───────────────────────────────────────
@@ -62,8 +68,6 @@ const SortArrow: React.FC<{
 
 // ── Main component ────────────────────────────────────────────────────────────
 const AdminUserList: React.FC = () => {
-  const navigate = useNavigate();
-
   const [search, setSearch] = useState('');
   const [filterKey, setFilterKey] = useState<FilterKey>('all');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -78,8 +82,10 @@ const AdminUserList: React.FC = () => {
 
     if (filterKey === 'staff_yes') list = list.filter((u) => u.isStaff);
     else if (filterKey === 'staff_no') list = list.filter((u) => !u.isStaff);
-    else if (filterKey === 'super_yes') list = list.filter((u) => u.isSuperuser);
-    else if (filterKey === 'super_no') list = list.filter((u) => !u.isSuperuser);
+    else if (filterKey === 'super_yes')
+      list = list.filter((u) => u.isSuperuser);
+    else if (filterKey === 'super_no')
+      list = list.filter((u) => !u.isSuperuser);
     else if (filterKey === 'active_yes') list = list.filter((u) => u.isActive);
     else if (filterKey === 'active_no') list = list.filter((u) => !u.isActive);
 
@@ -136,11 +142,17 @@ const AdminUserList: React.FC = () => {
 
   const handleSort = (field: SortField) => {
     if (field === sortField) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    else { setSortField(field); setSortDir('asc'); }
+    else {
+      setSortField(field);
+      setSortDir('asc');
+    }
     setPage(1);
   };
 
-  const setFilter = (key: FilterKey) => { setFilterKey(key); setPage(1); };
+  const setFilter = (key: FilterKey) => {
+    setFilterKey(key);
+    setPage(1);
+  };
 
   const thStyle = (field: SortField): React.CSSProperties => ({
     padding: '2px 8px',
@@ -179,21 +191,16 @@ const AdminUserList: React.FC = () => {
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div
         style={{
-          background: '#05768A',
-          color: '#fff',
           overflow: 'hidden',
           padding: '0 10px',
-          position: 'relative',
         }}
       >
-        <div style={{ float: 'left', paddingTop: 6 }}>
+        <div style={{ float: 'left', padding: 6 }}>
           <h1
             style={{
               padding: '0 10px 5px 0',
               margin: 0,
               fontWeight: 'normal',
-              color: '#fff',
-              fontSize: 18,
             }}
           >
             Voyage Admin Live
@@ -204,61 +211,16 @@ const AdminUserList: React.FC = () => {
               fontSize: 12,
               margin: '-6px 0 8px 0',
               fontWeight: 'normal',
-              color: '#fff',
               opacity: 0.8,
             }}
           >
             Any changes will take effect immediately
           </h2>
         </div>
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            padding: '10px 12px',
-            fontSize: 11,
-            textAlign: 'right',
-            color: '#fff',
-          }}
-        >
-          Welcome, <strong>admin</strong>.&nbsp;&nbsp;
-          <a href="#" style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }} onClick={(e) => e.preventDefault()}>
-            Change password
-          </a>
-          <a href="/" style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }} onClick={(e) => { e.preventDefault(); navigate('/'); }}>
-            View site
-          </a>
-          <a href="#" style={{ color: '#fff', textDecoration: 'underline' }} onClick={(e) => e.preventDefault()}>
-            Log out
-          </a>
-        </div>
-      </div>
-
-      {/* ── Breadcrumb ──────────────────────────────────────────────────── */}
-      <div
-        style={{
-          padding: '2px 8px 3px 8px',
-          fontSize: 11,
-          color: '#999',
-          borderBottom: '1px solid #ccc',
-          background: '#fff',
-        }}
-      >
-        <a href="/admin/" style={{ color: '#417690' }} onClick={(e) => { e.preventDefault(); navigate('/admin/'); }}>
-          Home
-        </a>
-        {' › '}
-        <a href="#" style={{ color: '#417690' }} onClick={(e) => e.preventDefault()}>
-          Authentication and Authorization
-        </a>
-        {' › '}
-        Users
       </div>
 
       {/* ── Page content ────────────────────────────────────────────────── */}
-      <div id="content" style={{ margin: '10px 15px', position: 'relative' }}>
-
+      <div id="content" style={{ maxWidth: 1200, margin: '10px auto', padding: '0 15px', position: 'relative' }}>
         {/* Object tools (Add user button) */}
         <ul
           style={{
@@ -283,8 +245,14 @@ const AdminUserList: React.FC = () => {
                 textDecoration: 'none',
                 borderRadius: 2,
               }}
-              onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = '#205067 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat')}
-              onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = '#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat')}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  '#205067 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat')
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  '#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat')
+              }
               onClick={(e) => e.preventDefault()}
             >
               Add user
@@ -292,13 +260,11 @@ const AdminUserList: React.FC = () => {
           </li>
         </ul>
 
-        <h1 style={{ fontSize: 18, color: '#666', margin: '0 0 8px 0', fontWeight: 'bold', clear: 'none' }}>
-          Select user to change
-        </h1>
-
         {/* ── Changelist ──────────────────────────────────────────────── */}
-        <div id="changelist" style={{ position: 'relative', width: '100%', clear: 'both' }}>
-
+        <div
+          id="changelist"
+          style={{ position: 'relative', width: '100%', clear: 'both' }}
+        >
           {/* Filter sidebar */}
           <div
             id="changelist-filter"
@@ -327,7 +293,16 @@ const AdminUserList: React.FC = () => {
             </h2>
 
             {/* By staff status */}
-            <h3 style={{ padding: '4px 8px 2px', margin: 0, fontSize: 11, fontWeight: 'bold', color: '#666', borderTop: '1px solid #eee' }}>
+            <h3
+              style={{
+                padding: '4px 8px 2px',
+                margin: 0,
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: '#666',
+                borderTop: '1px solid #eee',
+              }}
+            >
               By staff status
             </h3>
             <ul style={{ listStyle: 'none', margin: 0, padding: '0 0 4px 0' }}>
@@ -337,7 +312,10 @@ const AdminUserList: React.FC = () => {
                 { key: 'staff_no', label: 'No' },
               ].map(({ key, label }) => (
                 <li key={key}>
-                  <a style={filterLinkStyle(key as FilterKey)} onClick={() => setFilter(key as FilterKey)}>
+                  <a
+                    style={filterLinkStyle(key as FilterKey)}
+                    onClick={() => setFilter(key as FilterKey)}
+                  >
                     {label}
                   </a>
                 </li>
@@ -345,7 +323,16 @@ const AdminUserList: React.FC = () => {
             </ul>
 
             {/* By superuser status */}
-            <h3 style={{ padding: '4px 8px 2px', margin: 0, fontSize: 11, fontWeight: 'bold', color: '#666', borderTop: '1px solid #eee' }}>
+            <h3
+              style={{
+                padding: '4px 8px 2px',
+                margin: 0,
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: '#666',
+                borderTop: '1px solid #eee',
+              }}
+            >
               By superuser status
             </h3>
             <ul style={{ listStyle: 'none', margin: 0, padding: '0 0 4px 0' }}>
@@ -355,7 +342,10 @@ const AdminUserList: React.FC = () => {
                 { key: 'super_no', label: 'No' },
               ].map(({ key, label }) => (
                 <li key={key}>
-                  <a style={filterLinkStyle(key as FilterKey)} onClick={() => setFilter(key as FilterKey)}>
+                  <a
+                    style={filterLinkStyle(key as FilterKey)}
+                    onClick={() => setFilter(key as FilterKey)}
+                  >
                     {label}
                   </a>
                 </li>
@@ -363,7 +353,16 @@ const AdminUserList: React.FC = () => {
             </ul>
 
             {/* By active */}
-            <h3 style={{ padding: '4px 8px 2px', margin: 0, fontSize: 11, fontWeight: 'bold', color: '#666', borderTop: '1px solid #eee' }}>
+            <h3
+              style={{
+                padding: '4px 8px 2px',
+                margin: 0,
+                fontSize: 11,
+                fontWeight: 'bold',
+                color: '#666',
+                borderTop: '1px solid #eee',
+              }}
+            >
               By active
             </h3>
             <ul style={{ listStyle: 'none', margin: 0, padding: '0 0 4px 0' }}>
@@ -373,7 +372,10 @@ const AdminUserList: React.FC = () => {
                 { key: 'active_no', label: 'No' },
               ].map(({ key, label }) => (
                 <li key={key}>
-                  <a style={filterLinkStyle(key as FilterKey)} onClick={() => setFilter(key as FilterKey)}>
+                  <a
+                    style={filterLinkStyle(key as FilterKey)}
+                    onClick={() => setFilter(key as FilterKey)}
+                  >
                     {label}
                   </a>
                 </li>
@@ -383,7 +385,6 @@ const AdminUserList: React.FC = () => {
 
           {/* ── Main results area ──────────────────────────────────────── */}
           <div style={{ marginRight: 180 }}>
-
             {/* Toolbar / Search */}
             <div
               id="toolbar"
@@ -399,12 +400,19 @@ const AdminUserList: React.FC = () => {
                 gap: 6,
               }}
             >
-              <label style={{ fontSize: 12, fontWeight: 'bold', marginRight: 4 }}>Search:</label>
+              <label
+                style={{ fontSize: 12, fontWeight: 'bold', marginRight: 4 }}
+              >
+                Search:
+              </label>
               <input
                 id="searchbar"
                 type="text"
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="username, name or email"
                 style={{
                   height: 19,
@@ -426,7 +434,9 @@ const AdminUserList: React.FC = () => {
                   background: '#e8e8e8',
                   cursor: 'pointer',
                 }}
-                onClick={() => { /* already reactive */ }}
+                onClick={() => {
+                  /* already reactive */
+                }}
               />
               <span style={{ marginLeft: 'auto', fontSize: 12 }}>
                 {filtered.length} user{filtered.length !== 1 ? 's' : ''}
@@ -448,15 +458,28 @@ const AdminUserList: React.FC = () => {
                   gap: 8,
                 }}
               >
-                <span>{selectedIds.size} of {filtered.length} selected</span>
+                <span>
+                  {selectedIds.size} of {filtered.length} selected
+                </span>
                 <select
-                  style={{ fontSize: 12, padding: '1px 4px', border: '1px solid #ccc' }}
+                  style={{
+                    fontSize: 12,
+                    padding: '1px 4px',
+                    border: '1px solid #ccc',
+                  }}
                   defaultValue=""
                 >
                   <option value="">---------</option>
                   <option value="delete">Delete selected users</option>
                 </select>
-                <button style={{ fontSize: 12, padding: '2px 6px', border: '1px solid #bbb', cursor: 'pointer' }}>
+                <button
+                  style={{
+                    fontSize: 12,
+                    padding: '2px 6px',
+                    border: '1px solid #bbb',
+                    cursor: 'pointer',
+                  }}
+                >
                   Go
                 </button>
               </div>
@@ -489,7 +512,8 @@ const AdminUserList: React.FC = () => {
                       ref={(el) => {
                         if (el)
                           el.indeterminate =
-                            !allOnPageSelected && paged.some((u) => selectedIds.has(u.id));
+                            !allOnPageSelected &&
+                            paged.some((u) => selectedIds.has(u.id));
                       }}
                       onChange={toggleSelectAll}
                       title="Select all"
@@ -511,7 +535,11 @@ const AdminUserList: React.FC = () => {
                       onClick={() => handleSort(field)}
                     >
                       {label}
-                      <SortArrow field={field} sortField={sortField} sortDir={sortDir} />
+                      <SortArrow
+                        field={field}
+                        sortField={sortField}
+                        sortDir={sortDir}
+                      />
                     </th>
                   ))}
                 </tr>
@@ -537,7 +565,8 @@ const AdminUserList: React.FC = () => {
                       key={user.id}
                       style={{ background: idx % 2 === 0 ? '#EDF3FE' : '#fff' }}
                       onMouseEnter={(e) =>
-                        ((e.currentTarget as HTMLElement).style.background = '#d0e3f0')
+                        ((e.currentTarget as HTMLElement).style.background =
+                          '#d0e3f0')
                       }
                       onMouseLeave={(e) =>
                         ((e.currentTarget as HTMLElement).style.background =
@@ -545,7 +574,11 @@ const AdminUserList: React.FC = () => {
                       }
                     >
                       <td
-                        style={{ textAlign: 'center', padding: '5px', borderBottom: '1px solid #eee' }}
+                        style={{
+                          textAlign: 'center',
+                          padding: '5px',
+                          borderBottom: '1px solid #eee',
+                        }}
                       >
                         <input
                           type="checkbox"
@@ -553,22 +586,68 @@ const AdminUserList: React.FC = () => {
                           onChange={() => toggleOne(user.id)}
                         />
                       </td>
-                      <td style={{ padding: '5px 8px', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #eee',
+                          fontWeight: 'bold',
+                        }}
+                      >
                         <a
                           href={`/admin/auth/user/${user.id}/change/`}
-                          style={{ color: '#417690', textDecoration: 'none', fontSize: 12 }}
+                          style={{
+                            color: '#417690',
+                            textDecoration: 'none',
+                            fontSize: 12,
+                          }}
                           onClick={(e) => e.preventDefault()}
                         >
                           {user.username}
                         </a>
                       </td>
-                      <td style={{ padding: '5px 8px', borderBottom: '1px solid #eee', fontSize: 12 }}>{user.email}</td>
-                      <td style={{ padding: '5px 8px', borderBottom: '1px solid #eee', fontSize: 12 }}>{user.firstName}</td>
-                      <td style={{ padding: '5px 8px', borderBottom: '1px solid #eee', fontSize: 12 }}>{user.lastName}</td>
-                      <td style={{ padding: '5px 8px', borderBottom: '1px solid #eee', textAlign: 'center' }}>
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #eee',
+                          fontSize: 12,
+                        }}
+                      >
+                        {user.email}
+                      </td>
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #eee',
+                          fontSize: 12,
+                        }}
+                      >
+                        {user.firstName}
+                      </td>
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #eee',
+                          fontSize: 12,
+                        }}
+                      >
+                        {user.lastName}
+                      </td>
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #eee',
+                          textAlign: 'center',
+                        }}
+                      >
                         <BoolIcon value={user.isStaff} />
                       </td>
-                      <td style={{ padding: '5px 8px', borderBottom: '1px solid #eee', textAlign: 'center' }}>
+                      <td
+                        style={{
+                          padding: '5px 8px',
+                          borderBottom: '1px solid #eee',
+                          textAlign: 'center',
+                        }}
+                      >
                         <BoolIcon value={user.isSuperuser} />
                       </td>
                     </tr>
@@ -603,12 +682,22 @@ const AdminUserList: React.FC = () => {
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <span key={p}>
                   {p === page ? (
-                    <strong style={{ padding: '2px 5px', background: '#c5c5c5', color: '#000' }}>
+                    <strong
+                      style={{
+                        padding: '2px 5px',
+                        background: '#c5c5c5',
+                        color: '#000',
+                      }}
+                    >
                       {p}
                     </strong>
                   ) : (
                     <a
-                      style={{ color: '#417690', cursor: 'pointer', padding: '2px 5px' }}
+                      style={{
+                        color: '#417690',
+                        cursor: 'pointer',
+                        padding: '2px 5px',
+                      }}
                       onClick={() => setPage(p)}
                     >
                       {p}
@@ -626,7 +715,8 @@ const AdminUserList: React.FC = () => {
               )}
               <span style={{ marginLeft: 'auto' }}>
                 {(page - 1) * pageSize + 1}–
-                {Math.min(page * pageSize, filtered.length)} of {filtered.length}
+                {Math.min(page * pageSize, filtered.length)} of{' '}
+                {filtered.length}
               </span>
             </p>
           </div>
@@ -634,7 +724,6 @@ const AdminUserList: React.FC = () => {
           <div style={{ clear: 'both' }} />
         </div>
       </div>
-
       {/* ── Footer ──────────────────────────────────────────────────────── */}
       <div
         style={{
