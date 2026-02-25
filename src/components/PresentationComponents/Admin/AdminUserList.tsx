@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
+import AdminHeader from './AdminHeader';
 import { MOCK_USERS } from '../Contribute/mockData/usersData';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -188,36 +189,12 @@ const AdminUserList: React.FC = () => {
         width: '85%',
       }}
     >
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div style={{ margin: '10px auto', padding: '0px 15px' }}>
-        <h1
-          style={{
-            padding: '0px 10px 5px 0px',
-            margin: 0,
-            fontWeight: 'bold',
-            fontSize: '1.99998em',
-          }}
-        >
-          Voyage Admin <span className="badge badge-secondary">Live</span>
-        </h1>
-        <h2
-          style={{
-            padding: 0,
-            fontSize: 12,
-            margin: '-6px 0 8px 0',
-            fontWeight: 'normal',
-            color: '#888888',
-          }}
-        >
-          Any changes will take effect immediately
-        </h2>
-      </div>
+      <AdminHeader />
 
       {/* ── Page content ────────────────────────────────────────────────── */}
       <div
         id="content"
         style={{
-          maxWidth: 1200,
           margin: '10px auto',
           padding: '0 15px',
           position: 'relative',
@@ -247,28 +224,7 @@ const AdminUserList: React.FC = () => {
             }}
           >
             <li>
-              <Link
-                to="/admin/auth/user/add/"
-                style={{
-                  display: 'inline-block',
-                  padding: '3px 12px 3px 22px',
-                  background: `#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 5px center no-repeat`,
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 'bold',
-                  textDecoration: 'none',
-                  borderRadius: 2,
-                  lineHeight: '20px',
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.background =
-                    '#205067 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 5px center no-repeat')
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.background =
-                    '#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 5px center no-repeat')
-                }
-              >
+              <Link to="/admin/auth/user/add/" className="admin-add-user">
                 Add user
               </Link>
             </li>

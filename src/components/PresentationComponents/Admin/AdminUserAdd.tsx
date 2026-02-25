@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+import AdminHeader from './AdminHeader';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface FormErrors {
@@ -42,7 +44,8 @@ const FormRow: React.FC<{
           fontSize: 13,
         }}
       >
-        {label}:{required && <span style={{ color: '#c00', marginLeft: 2 }}>*</span>}
+        {label}:
+        {required && <span style={{ color: '#c00', marginLeft: 2 }}>*</span>}
       </label>
       <div style={{ marginLeft: 170 }}>
         {children}
@@ -112,7 +115,8 @@ const AdminUserAdd: React.FC = () => {
       e.username = 'Username must be at least 3 characters.';
     if (!password1) e.password1 = 'This field is required.';
     else if (password1.length < 8)
-      e.password1 = 'This password is too short. It must contain at least 8 characters.';
+      e.password1 =
+        'This password is too short. It must contain at least 8 characters.';
     if (!password2) e.password2 = 'This field is required.';
     else if (password1 !== password2)
       e.password2 = "The two password fields didn't match.";
@@ -136,127 +140,17 @@ const AdminUserAdd: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        background: '#f8f8f8',
         fontFamily:
-          '"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif',
+          '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
         fontSize: 13,
         color: '#333',
+        width: '85%',
+        padding: '10px 20px',
       }}
     >
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          background: '#05768A',
-          color: '#fff',
-          overflow: 'hidden',
-          padding: '0 10px',
-          position: 'relative',
-        }}
-      >
-        <div style={{ float: 'left', paddingTop: 6 }}>
-          <h1
-            style={{
-              padding: '0 10px 5px 0',
-              margin: 0,
-              fontWeight: 'normal',
-              color: '#fff',
-              fontSize: 18,
-            }}
-          >
-            Voyage Admin Live
-          </h1>
-          <h2
-            style={{
-              padding: 0,
-              fontSize: 12,
-              margin: '-6px 0 8px 0',
-              fontWeight: 'normal',
-              color: '#fff',
-              opacity: 0.8,
-            }}
-          >
-            Any changes will take effect immediately
-          </h2>
-        </div>
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            padding: '10px 12px',
-            fontSize: 11,
-            textAlign: 'right',
-            color: '#fff',
-          }}
-        >
-          Welcome, <strong>admin</strong>.&nbsp;&nbsp;
-          <a
-            href="#"
-            style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }}
-            onClick={(e) => e.preventDefault()}
-          >
-            Change password
-          </a>
-          <a
-            href="/"
-            style={{ color: '#fff', textDecoration: 'underline', marginRight: 8 }}
-            onClick={(e) => { e.preventDefault(); navigate('/'); }}
-          >
-            View site
-          </a>
-          <a
-            href="#"
-            style={{ color: '#fff', textDecoration: 'underline' }}
-            onClick={(e) => e.preventDefault()}
-          >
-            Log out
-          </a>
-        </div>
-      </div>
-
-      {/* ── Breadcrumb ───────────────────────────────────────────────────── */}
-      <div
-        style={{
-          padding: '2px 8px 3px 8px',
-          fontSize: 11,
-          color: '#999',
-          borderBottom: '1px solid #ccc',
-          background: `white url(https://legacy.slavevoyages.org/static/admin/img/nav-bg-reverse.gif) 0 -10px repeat-x`,
-        }}
-      >
-        <a
-          href="/admin/"
-          style={{ color: '#417690' }}
-          onClick={(e) => { e.preventDefault(); navigate('/admin/'); }}
-        >
-          Home
-        </a>
-        {' › '}
-        <a href="#" style={{ color: '#417690' }} onClick={(e) => e.preventDefault()}>
-          Authentication and Authorization
-        </a>
-        {' › '}
-        <a
-          href="/admin/auth/user/"
-          style={{ color: '#417690' }}
-          onClick={(e) => { e.preventDefault(); navigate('/admin/auth/user/'); }}
-        >
-          Users
-        </a>
-        {' › '}
-        Add user
-      </div>
-
+      <AdminHeader />
       {/* ── Content ──────────────────────────────────────────────────────── */}
-      <div
-        id="content"
-        style={{
-          maxWidth: 1000,
-          margin: '10px auto',
-          padding: '0 15px',
-          position: 'relative',
-        }}
-      >
+      <div style={{ margin: '10px auto', padding: '0px 15px' }}>
         {/* Object tools */}
         <ul
           style={{
@@ -269,26 +163,44 @@ const AdminUserAdd: React.FC = () => {
           }}
         >
           <li>
-            <a
-              href="/admin/auth/user/"
-              style={{
-                display: 'inline-block',
-                padding: '3px 10px',
-                background: '#417690',
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: 'bold',
-                textDecoration: 'none',
-                borderRadius: 2,
-              }}
-              onClick={(e) => { e.preventDefault(); navigate('/admin/auth/user/'); }}
-            >
-              ← Back to Users
-            </a>
+            <Link to="/admin/auth/user/">
+              <button
+                style={{
+                  display: 'inline-block',
+                  padding: '5px 10px',
+                  background: 'rgb(55, 148, 141)',
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  borderRadius: 4,
+                  border: '1px solid rgb(0 172 159)',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLInputElement).style.background =
+                    'rgb(0 172 159)')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLInputElement).style.background =
+                    'rgb(55, 148, 141)')
+                }
+              >
+                ← Back to Users
+              </button>
+            </Link>
           </li>
         </ul>
 
-        <h1 style={{ fontSize: 18, color: '#666', margin: '0 0 16px 0', fontWeight: 'bold', clear: 'none' }}>
+        <h1
+          style={{
+            fontSize: 18,
+            color: '#666',
+            margin: '0 0 16px 0',
+            fontWeight: 'bold',
+            clear: 'none',
+          }}
+        >
           Add user
         </h1>
 
@@ -303,11 +215,12 @@ const AdminUserAdd: React.FC = () => {
                 marginBottom: 3,
                 borderBottom: '1px solid #ddd',
                 color: '#666',
-                background: `#ffc url(https://legacy.slavevoyages.org/static/admin/img/icon_success.gif) 5px 0.3em no-repeat`,
+                background: `rgb(55, 148, 141) 5px 0.3em no-repeat`,
                 listStyle: 'none',
               }}
             >
-              The user "<strong>{username}</strong>" was added successfully.
+              The user &quot;<strong>{username}</strong>&quot; was added
+              successfully.
             </li>
           </ul>
         )}
@@ -315,7 +228,8 @@ const AdminUserAdd: React.FC = () => {
         {/* ── Form ─────────────────────────────────────────────────────── */}
         <form onSubmit={handleSave} noValidate>
           <p style={{ fontSize: 13, color: '#666', marginBottom: 12 }}>
-            First, enter a username and password. Then, you'll be able to edit more user options.
+            First, enter a username and password. Then, you&apos;ll be able to
+            edit more user options.
           </p>
 
           {/* Fieldset */}
@@ -335,7 +249,7 @@ const AdminUserAdd: React.FC = () => {
                 fontSize: 11,
                 textAlign: 'left',
                 fontWeight: 'bold',
-                background: '#008ca8',
+                background: 'rgb(55, 148, 141)',
                 color: 'white',
               }}
             >
@@ -357,7 +271,6 @@ const AdminUserAdd: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 maxLength={150}
-                autoFocus
                 style={{
                   ...inputStyle,
                   borderColor: errors.username ? 'red' : '#ccc',
@@ -424,34 +337,36 @@ const AdminUserAdd: React.FC = () => {
               textAlign: 'right',
             }}
           >
-            <input
+            <button
               type="submit"
-              value="Save"
               className="default"
               style={{
                 height: 35,
                 lineHeight: '15px',
                 margin: '0 0 0 8px',
                 padding: '0 15px',
-                border: '2px solid #5b80b2',
-                background: '#7CA0C7',
+                border: '1px solid #007269',
+                background: 'rgb(55, 148, 141)',
                 fontWeight: 'bold',
                 color: 'white',
                 fontSize: 13,
                 textTransform: 'uppercase',
                 cursor: 'pointer',
-                borderRadius: 3,
+                borderRadius: 4,
               }}
               onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLInputElement).style.background = '#5b80b2')
+                ((e.currentTarget as HTMLInputElement).style.background =
+                  'rgb(0 172 159)')
               }
               onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLInputElement).style.background = '#7CA0C7')
+                ((e.currentTarget as HTMLInputElement).style.background =
+                  'rgb(55, 148, 141)')
               }
-            />
-            <input
+            >
+              Save
+            </button>
+            <button
               type="button"
-              value="Save and add another"
               style={{
                 height: 35,
                 lineHeight: '15px',
@@ -466,13 +381,20 @@ const AdminUserAdd: React.FC = () => {
               }}
               onClick={() => {
                 const errs = validate();
-                if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-                setUsername(''); setPassword1(''); setPassword2(''); setErrors({});
+                if (Object.keys(errs).length > 0) {
+                  setErrors(errs);
+                  return;
+                }
+                setUsername('');
+                setPassword1('');
+                setPassword2('');
+                setErrors({});
               }}
-            />
-            <input
+            >
+              Save and add another{' '}
+            </button>
+            <button
               type="button"
-              value="Save and continue editing"
               style={{
                 height: 35,
                 lineHeight: '15px',
@@ -486,7 +408,9 @@ const AdminUserAdd: React.FC = () => {
                 color: '#333',
               }}
               onClick={handleSave}
-            />
+            >
+              Save and continue editing{' '}
+            </button>
           </div>
         </form>
       </div>
