@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import { MOCK_USERS } from '../Contribute/mockData/usersData';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -221,44 +223,58 @@ const AdminUserList: React.FC = () => {
           position: 'relative',
         }}
       >
-        {/* Object tools (Add user button) */}
-        <ul
-          style={{
-            listStyle: 'none',
-            padding: 0,
-            margin: '0 0 4px 0',
-            float: 'right',
-            display: 'flex',
-            gap: 4,
-          }}
-        >
-          <li>
-            <a
-              href="/admin/auth/user/add/"
-              style={{
-                display: 'inline-block',
-                padding: '3px 10px 3px 20px',
-                background: `#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat`,
-                color: '#fff',
-                fontSize: 11,
-                fontWeight: 'bold',
-                textDecoration: 'none',
-                borderRadius: 2,
-              }}
-              onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.background =
-                  '#205067 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat')
-              }
-              onMouseLeave={(e) =>
-                ((e.currentTarget as HTMLElement).style.background =
-                  '#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 4px center no-repeat')
-              }
-              onClick={(e) => e.preventDefault()}
-            >
-              Add user
-            </a>
-          </li>
-        </ul>
+        {/* Object tools — Django admin style */}
+        <div style={{ overflow: 'hidden', marginBottom: 4 }}>
+          <h1
+            style={{
+              fontSize: 18,
+              color: '#666',
+              margin: 0,
+              fontWeight: 'bold',
+              float: 'left',
+            }}
+          >
+            Select user to change
+          </h1>
+          <ul
+            style={{
+              float: 'right',
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              display: 'flex',
+              gap: 4,
+            }}
+          >
+            <li>
+              <Link
+                to="/admin/auth/user/add/"
+                style={{
+                  display: 'inline-block',
+                  padding: '3px 12px 3px 22px',
+                  background: `#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 5px center no-repeat`,
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  borderRadius: 2,
+                  lineHeight: '20px',
+                }}
+                onMouseEnter={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    '#205067 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 5px center no-repeat')
+                }
+                onMouseLeave={(e) =>
+                  ((e.currentTarget as HTMLElement).style.background =
+                    '#417690 url(https://legacy.slavevoyages.org/static/admin/img/icon_addlink.gif) 5px center no-repeat')
+                }
+              >
+                Add user
+              </Link>
+            </li>
+          </ul>
+          <div style={{ clear: 'both' }} />
+        </div>
 
         {/* ── Changelist ──────────────────────────────────────────────── */}
         <div
@@ -283,7 +299,7 @@ const AdminUserList: React.FC = () => {
                 margin: 0,
                 fontSize: 11,
                 fontWeight: 'bold',
-                background: '#008ca8',
+                background: `rgb(55, 148, 141) 4px center no-repeat`,
                 color: '#fff',
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px',
