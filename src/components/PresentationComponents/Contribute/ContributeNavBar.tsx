@@ -11,15 +11,20 @@ import { translationLanguagesContribute } from '@/utils/functions/translationLan
 
 interface ContributeNavBarProps {
   handleDrawerOpen: () => void;
+  isAdminRoute?: boolean;
 }
 
-const ContributeNavBar = ({ handleDrawerOpen }: ContributeNavBarProps) => {
+const ContributeNavBar = ({
+  handleDrawerOpen,
+  isAdminRoute,
+}: ContributeNavBarProps) => {
   const { languageValue } = useSelector(
     (state: RootState) => state.getLanguages,
   );
 
   const { user } = useSelector((state: RootState) => state.getAuthUserSlice);
   const translatedcontribute = translationLanguagesContribute(languageValue);
+
   const userName =
     user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
@@ -46,12 +51,20 @@ const ContributeNavBar = ({ handleDrawerOpen }: ContributeNavBarProps) => {
                   {translatedcontribute.contributeContributeHome}
                 </Link>{' '}
                 |
+                {isAdminRoute && (
+                  <>
+                    <Link className="navbar-subitem-link" to="/admin/">
+                      {translatedcontribute.adminPage}
+                    </Link>
+                    {' | '}
+                  </>
+                )}
                 <Link
                   className="navbar-subitem-link"
                   to="/accounts/password_change/"
                 >
                   {translatedcontribute.contributeChangePassword}
-                </Link>{' '}
+                </Link>
                 |
                 <Link className="navbar-subitem-link" to="/accounts/logout/">
                   {translatedcontribute.contributeLogOut}

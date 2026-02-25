@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
-import SidebarContribute from '@/components/NavigationComponents/SideBar/SidebarContribute';
 import { useLocation } from 'react-router-dom';
+
+import SidebarContribute from '@/components/NavigationComponents/SideBar/SidebarContribute';
 
 import ContributeContent from './ContributeContent';
 import ContributeNavBar from './ContributeNavBar';
@@ -12,10 +13,12 @@ const Contribute: React.FC = () => {
   const handleDrawerOpen = () => setOpenSideBar(!openSideBar);
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-
   return (
     <>
-      <ContributeNavBar handleDrawerOpen={handleDrawerOpen} />
+      <ContributeNavBar
+        handleDrawerOpen={handleDrawerOpen}
+        isAdminRoute={isAdminRoute}
+      />
       {isAdminRoute ? (
         <div className="admin-main-content">
           <SidebarContribute openSideBar={openSideBar} />

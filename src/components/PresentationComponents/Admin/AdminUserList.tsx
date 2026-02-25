@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
-
-import { MOCK_USERS, UserRecord } from '../Contribute/mockData/usersData';
+import { MOCK_USERS } from '../Contribute/mockData/usersData';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type FilterKey =
@@ -42,7 +40,7 @@ const BoolIcon: React.FC<{ value: boolean }> = ({ value }) =>
   ) : (
     <img
       src="https://legacy.slavevoyages.org/static/admin/img/icon-no.gif"
-      alt="False"
+      alt="" // Fixed: Use alt="" for presentational images
       title="False"
       style={{ width: 16, height: 16 }}
       onError={(e) => {
@@ -181,46 +179,48 @@ const AdminUserList: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: '100vh',
         background: '#f8f8f8',
         fontFamily:
-          '"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif',
+          '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
         fontSize: 13,
+        width: '85%',
       }}
     >
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          overflow: 'hidden',
-          padding: '0 10px',
-        }}
-      >
-        <div style={{ float: 'left', padding: 6 }}>
-          <h1
-            style={{
-              padding: '0 10px 5px 0',
-              margin: 0,
-              fontWeight: 'normal',
-            }}
-          >
-            Voyage Admin Live
-          </h1>
-          <h2
-            style={{
-              padding: 0,
-              fontSize: 12,
-              margin: '-6px 0 8px 0',
-              fontWeight: 'normal',
-              opacity: 0.8,
-            }}
-          >
-            Any changes will take effect immediately
-          </h2>
-        </div>
+      <div style={{ margin: '10px auto', padding: '0px 15px' }}>
+        <h1
+          style={{
+            padding: '0px 10px 5px 0px',
+            margin: 0,
+            fontWeight: 'bold',
+            fontSize: '1.99998em',
+          }}
+        >
+          Voyage Admin <span className="badge badge-secondary">Live</span>
+        </h1>
+        <h2
+          style={{
+            padding: 0,
+            fontSize: 12,
+            margin: '-6px 0 8px 0',
+            fontWeight: 'normal',
+            color: '#888888',
+          }}
+        >
+          Any changes will take effect immediately
+        </h2>
       </div>
 
       {/* ── Page content ────────────────────────────────────────────────── */}
-      <div id="content" style={{ maxWidth: 1200, margin: '10px auto', padding: '0 15px', position: 'relative' }}>
+      <div
+        id="content"
+        style={{
+          maxWidth: 1200,
+          margin: '10px auto',
+          padding: '0 15px',
+          position: 'relative',
+        }}
+      >
         {/* Object tools (Add user button) */}
         <ul
           style={{
@@ -311,13 +311,23 @@ const AdminUserList: React.FC = () => {
                 { key: 'staff_yes', label: 'Yes' },
                 { key: 'staff_no', label: 'No' },
               ].map(({ key, label }) => (
-                <li key={key}>
-                  <a
-                    style={filterLinkStyle(key as FilterKey)}
+                <li key={key} style={{ padding: '0 0 0 12px' }}>
+                  <button
+                    type="button"
+                    style={{
+                      ...filterLinkStyle(key as FilterKey),
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      margin: 0,
+                      cursor: 'pointer',
+                      font: 'inherit',
+                      textAlign: 'left',
+                    }}
                     onClick={() => setFilter(key as FilterKey)}
                   >
                     {label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -341,13 +351,23 @@ const AdminUserList: React.FC = () => {
                 { key: 'super_yes', label: 'Yes' },
                 { key: 'super_no', label: 'No' },
               ].map(({ key, label }) => (
-                <li key={key}>
-                  <a
-                    style={filterLinkStyle(key as FilterKey)}
+                <li key={key} style={{ padding: '0 0 0 12px' }}>
+                  <button
+                    type="button"
+                    style={{
+                      ...filterLinkStyle(key as FilterKey),
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      margin: 0,
+                      cursor: 'pointer',
+                      font: 'inherit',
+                      textAlign: 'left',
+                    }}
                     onClick={() => setFilter(key as FilterKey)}
                   >
                     {label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -371,13 +391,23 @@ const AdminUserList: React.FC = () => {
                 { key: 'active_yes', label: 'Yes' },
                 { key: 'active_no', label: 'No' },
               ].map(({ key, label }) => (
-                <li key={key}>
-                  <a
-                    style={filterLinkStyle(key as FilterKey)}
+                <li key={key} style={{ padding: '0 0 0 12px' }}>
+                  <button
+                    type="button"
+                    style={{
+                      ...filterLinkStyle(key as FilterKey),
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      margin: 0,
+                      cursor: 'pointer',
+                      font: 'inherit',
+                      textAlign: 'left',
+                    }}
                     onClick={() => setFilter(key as FilterKey)}
                   >
                     {label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -401,6 +431,7 @@ const AdminUserList: React.FC = () => {
               }}
             >
               <label
+                htmlFor="searchbar"
                 style={{ fontSize: 12, fontWeight: 'bold', marginRight: 4 }}
               >
                 Search:
@@ -672,12 +703,20 @@ const AdminUserList: React.FC = () => {
               }}
             >
               {page > 1 && (
-                <a
-                  style={{ color: '#417690', cursor: 'pointer' }}
+                <button
+                  type="button"
+                  style={{
+                    color: '#417690',
+                    cursor: 'pointer',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                  }}
                   onClick={() => setPage((p) => p - 1)}
+                  aria-label="Previous page"
                 >
                   « Previous
-                </a>
+                </button>
               )}
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                 <span key={p}>
@@ -692,26 +731,38 @@ const AdminUserList: React.FC = () => {
                       {p}
                     </strong>
                   ) : (
-                    <a
+                    <button
+                      type="button"
                       style={{
                         color: '#417690',
                         cursor: 'pointer',
                         padding: '2px 5px',
+                        background: 'none',
+                        border: 'none',
                       }}
                       onClick={() => setPage(p)}
+                      aria-label={`Go to page ${p}`}
                     >
                       {p}
-                    </a>
+                    </button>
                   )}
                 </span>
               ))}
               {page < totalPages && (
-                <a
-                  style={{ color: '#417690', cursor: 'pointer' }}
+                <button
+                  type="button"
+                  style={{
+                    color: '#417690',
+                    cursor: 'pointer',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                  }}
                   onClick={() => setPage((p) => p + 1)}
+                  aria-label="Next page"
                 >
                   Next »
-                </a>
+                </button>
               )}
               <span style={{ marginLeft: 'auto' }}>
                 {(page - 1) * pageSize + 1}–

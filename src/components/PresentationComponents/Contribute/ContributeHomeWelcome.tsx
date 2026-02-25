@@ -35,7 +35,6 @@ import { translationLanguagesContribute } from '@/utils/functions/translationLan
 
 import { useColumnNewVoyagesDefs } from './commons/useColumnDefs';
 import { ReviewMode } from './ContributionForm';
-import NewVoyage from './Form/NewVoyage';
 import {
   TransformedContribution,
   transformContributionData,

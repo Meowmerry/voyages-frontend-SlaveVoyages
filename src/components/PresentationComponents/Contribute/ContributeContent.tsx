@@ -17,8 +17,8 @@ import { usePageRouter } from '@/hooks/usePageRouter';
 import { RootState } from '@/redux/store';
 import { translationLanguagesContribute } from '@/utils/functions/translationLanguages';
 
-import AdminHome from '../Admin/AdminHome';
 import ContributeHomeWelcome from './ContributeHomeWelcome';
+import AdminHome from '../Admin/AdminHome';
 import DownloadVoyages from './editorialPlatform/DownloadVoyages';
 import EditEnslaved from './editorialPlatform/EditEnslaved';
 import EditEnslavers from './editorialPlatform/EditEnslavers';
@@ -95,7 +95,6 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
     edit_voyage: () => <EditExistingVoyage openSideBar={openSideBar} />,
     merge_voyages: () => <MergeVoyages />,
     delete_voyage: () => <RecommendVoyageDeletion />,
-    admin: () => <AdminUserList />,
 
     // Editorial platform routes
     'editor_main/pending': () => <EditVoyages />,
@@ -129,10 +128,7 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
 
     // ── Admin routes (/admin/ and /admin/auth/user/) ─────────────────────
     if (endpointPath === 'admin') {
-      if (
-        location.pathname === '/admin/' ||
-        location.pathname === '/admin'
-      ) {
+      if (location.pathname === '/admin/' || location.pathname === '/admin') {
         return <AdminHome />;
       }
       if (location.pathname.startsWith('/admin/auth/user')) {

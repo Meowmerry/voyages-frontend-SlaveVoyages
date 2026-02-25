@@ -1,12 +1,8 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
-import SidebarContribute from '@/components/NavigationComponents/SideBar/SidebarContribute';
-
-import ContributeNavBar from '../Contribute/ContributeNavBar';
 import '@/style/contributeContent.scss';
-import ContributeContent from '../Contribute/ContributeContent';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface ModelEntry {
@@ -200,8 +196,6 @@ const ADMIN_SECTIONS: AppSection[] = [
 // ── Component ────────────────────────────────────────────────────────────────
 const AdminHome: React.FC = () => {
   const navigate = useNavigate();
-  const [openSideBar, setOpenSideBar] = useState(false);
-  const handleDrawerOpen = () => setOpenSideBar(!openSideBar);
 
   const go = (url: string) => (e: React.MouseEvent) => {
     e.preventDefault();
@@ -212,24 +206,24 @@ const AdminHome: React.FC = () => {
     <div
       style={{
         minHeight: '100vh',
-        background: '#f8f8f8',
         fontFamily:
-          '"Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif',
+          '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
         fontSize: 13,
         color: '#333',
+        width: '85%',
+        padding: '10px 20px',
       }}
     >
-      {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div id="branding" style={{ float: 'left', paddingTop: 6 }}>
+      <div style={{ margin: '10px auto', padding: '0px 15px' }}>
         <h1
           style={{
             padding: '0px 10px 5px 0px',
             margin: 0,
-            fontWeight: 'normal',
-            fontSize: 18,
+            fontWeight: 'bold',
+            fontSize: '1.99998em',
           }}
         >
-          Voyage Admin Live
+          Voyage Admin <span className="badge badge-secondary">Live</span>
         </h1>
         <h2
           style={{
@@ -237,31 +231,31 @@ const AdminHome: React.FC = () => {
             fontSize: 12,
             margin: '-6px 0 8px 0',
             fontWeight: 'normal',
-            opacity: 0.8,
+            color: '#888888',
           }}
         >
           Any changes will take effect immediately
         </h2>
+        <h1
+          style={{
+            fontSize: '1.6em',
+            fontWeight: 500,
+            padding: '1rem 0',
+            color: '#212529',
+          }}
+        >
+          Site administration
+        </h1>
       </div>
       {/* ── Content ─────────────────────────────────────────────────────── */}
       <div
         id="content"
         style={{
           margin: '10px auto',
-          maxWidth: 700,
           padding: '0 15px',
         }}
       >
-        <h1
-          style={{
-            fontSize: 18,
-            color: '#666',
-            margin: '0 0 12px 0',
-            fontWeight: 'bold',
-          }}
-        >
-          Site administration
-        </h1>
+        {/* ── Header ─────────────────────────────────────────────────────── */}
 
         {ADMIN_SECTIONS.map((section) => (
           <div
