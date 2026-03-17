@@ -298,6 +298,7 @@ const VoyageCard = () => {
                                   key={`${index}-${uuidv4()}`}
                                   className="fa fa-file-text"
                                   aria-hidden="true"
+                                  title="View Source Document"
                                 ></i>,
                               );
                               additionalStyles.borderColor = 'blue';
