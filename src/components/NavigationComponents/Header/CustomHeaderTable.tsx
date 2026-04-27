@@ -86,10 +86,10 @@ const CustomHeaderTable = (props: MyCustomHeaderProps) => {
         | React.MouseEvent<HTMLButtonElement>
         | React.TouchEvent<HTMLButtonElement>,
     ) => {
-      props.setSort(order, event.shiftKey);
-      console.log({ order });
+      // Do NOT call props.setSort — that would trigger ag-grid's client-side sort
+      // and reorder the rows. Sorting is handled server-side via order_by.
+      event.preventDefault();
 
-      // ✅ Use order_by fields from context (set by generateColumnDef)
       const sortingFields = props.column.colDef?.context?.fieldToSort || [];
 
       if (sortingFields.length > 0) {
