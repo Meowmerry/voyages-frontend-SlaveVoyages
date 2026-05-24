@@ -20,7 +20,6 @@ import { translationLanguagesContribute } from '@/utils/functions/translationLan
 import ContributeHomeWelcome from './ContributeHomeWelcome';
 import AdminHome from '../Admin/AdminHome';
 import AdminUserAdd from '../Admin/AdminUserAdd';
-import BatchUploadPage from './BatchComponent/BatchUploadPage';
 import DownloadVoyages from './editorialPlatform/DownloadVoyages';
 import EditEnslaved from './editorialPlatform/EditEnslaved';
 import EditEnslavers from './editorialPlatform/EditEnslavers';
@@ -106,7 +105,7 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
     'editor_main/sources': () => <EditSourceCodes />,
     'editor_main/publish': () => <PublishNewDBVersion />,
     'editor_main/downloads': () => <DownloadVoyages />,
-    'editor_main/batch_upload': () => <BatchUploadPage />,
+
 
     // 'admin/auth/user/': () => <AdminUserList />,
   };

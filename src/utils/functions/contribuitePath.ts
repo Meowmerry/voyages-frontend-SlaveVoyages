@@ -1,15 +1,7 @@
 //https://www.slavevoyages.org/contribute/interim/new/2976
 import { createElement } from 'react';
 
-import {
-  Add,
-  Edit,
-  Merge,
-  Delete,
-  List,
-  Download,
-  Upload,
-} from '@mui/icons-material';
+import { Add, Edit, Merge, Delete, List, Download } from '@mui/icons-material';
 const generateId = '';
 export const getDisplayButtons = (
   translatedContribute: Record<string, string>,
@@ -83,10 +75,5 @@ export const getDisplayButtonsEditorial = (
     nameBtn: translatedContribute.contributeDownloadVoyages,
     path: `/contribute/editor_main/downloads`,
     icon: createElement(Download),
-  },
-  {
-    nameBtn: translatedContribute.contributeBatchUpload,
-    path: `/contribute/editor_main/batch_upload`,
-    icon: createElement(Upload),
   },
 ];

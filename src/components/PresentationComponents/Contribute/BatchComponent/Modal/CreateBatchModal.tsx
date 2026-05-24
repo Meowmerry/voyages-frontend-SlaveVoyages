@@ -3,27 +3,35 @@ import React, { useState } from 'react';
 import { Close } from '@mui/icons-material';
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
 } from '@mui/material';
 import { PublicationBatch } from '@slavevoyages/voyages-contribute';
-import { Button, Input, Typography, Space, Spin, Card, Row, Col } from 'antd';
+import { Button, Card, Col, Input, Row, Space, Spin, Typography } from 'antd';
 
 import { PaperDraggableCreateBatch } from '@/components/SelectorComponents/Cascading/PaperDraggable';
-import { StyleDialog } from '@/styleMUI';
+import { StyleDialogOnTop } from '@/styleMUI';
 
 const { TextArea } = Input;
 const { Text } = Typography;
 
-const CreateBatchModal: React.FC<{
+interface CreateBatchModalProps {
   visible: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  createBatch: (data: PublicationBatch) => Promise<PublicationBatch | null>; // Add this
-  loading: boolean; // Add this
-}> = ({ visible, onClose, onSuccess, createBatch, loading }) => {
+  createBatch: (data: PublicationBatch) => Promise<PublicationBatch | null>;
+  loading: boolean;
+}
+
+const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
+  visible,
+  onClose,
+  onSuccess,
+  createBatch,
+  loading,
+}) => {
   const [formData, setFormData] = useState<PublicationBatch>({
     id: 0,
     title: '',
@@ -34,34 +42,22 @@ const CreateBatchModal: React.FC<{
 
   const validateForm = (): boolean => {
     const newErrors: Partial<PublicationBatch> = {};
-
     if (!formData.title.trim()) {
       newErrors.title = 'Please enter a batch title';
     } else if (formData.title.length > 100) {
       newErrors.title = 'Title must be less than 100 characters';
     }
-
     if (formData.comments.length > 500) {
       newErrors.comments = 'Comments must be less than 500 characters';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    const batchData = {
-      ...formData,
-      id: 0,
-      published: 0,
-    };
-    const result = await createBatch(batchData);
+    if (!validateForm()) return;
+    const result = await createBatch({ ...formData, id: 0, published: 0 });
     if (result) {
       handleClose();
       onSuccess();
@@ -76,8 +72,6 @@ const CreateBatchModal: React.FC<{
 
   const handleInputChange = (field: keyof PublicationBatch, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -88,9 +82,7 @@ const CreateBatchModal: React.FC<{
       open={visible}
       onClose={handleClose}
       disableScrollLock={false}
-      sx={{
-        ...StyleDialog,
-      }}
+      sx={StyleDialogOnTop}
       fullWidth
       maxWidth="sm"
       PaperComponent={PaperDraggableCreateBatch}
@@ -177,9 +169,7 @@ const CreateBatchModal: React.FC<{
                 <TextArea
                   placeholder="Add any notes or comments about this batch..."
                   value={formData.comments}
-                  onChange={(e) =>
-                    handleInputChange('comments', e.target.value)
-                  }
+                  onChange={(e) => handleInputChange('comments', e.target.value)}
                   status={errors.comments ? 'error' : ''}
                   rows={4}
                   maxLength={500}
@@ -193,7 +183,6 @@ const CreateBatchModal: React.FC<{
                 )}
               </div>
 
-              {/* Character count display */}
               <Row justify="space-between">
                 <Col>
                   <Text type="secondary" style={{ fontSize: 12 }}>
@@ -212,15 +201,7 @@ const CreateBatchModal: React.FC<{
 
         <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>
           <Space>
-            <Button
-              onClick={handleClose}
-              disabled={loading}
-              style={{
-                textTransform: 'unset',
-                height: 32,
-                border: '1px solid #d9d9d9',
-              }}
-            >
+            <Button onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
             <Button
@@ -237,7 +218,7 @@ const CreateBatchModal: React.FC<{
               {loading ? (
                 <Space>
                   <Spin size="small" />
-                  Creating...
+                  Creating…
                 </Space>
               ) : (
                 'Create Batch'

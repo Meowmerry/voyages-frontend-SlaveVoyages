@@ -113,6 +113,28 @@ export const StyleDialog: SxProps = {
     padding: '10px 15px',
   },
 };
+
+/**
+ * Use this for modals that open ON TOP of another modal (e.g. CreateBatchModal
+ * or BatchUploadModal over BatchManagement). A dark semi-transparent backdrop
+ * and strong box-shadow make the layering immediately obvious.
+ */
+export const StyleDialogOnTop: SxProps = {
+  '& .MuiDialog-container': {
+    position: 'relative',
+    top: '10%',
+    alignItems: 'flex-start',
+  },
+  '& .MuiBackdrop-root': {
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+  },
+  '& .MuiDialogContent-root': {
+    padding: '10px 15px',
+  },
+  '& .MuiPaper-root': {
+    boxShadow: '0 24px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,0,0,0.08)',
+  },
+};
 export const footerStyle = {
   p: 2,
   borderTop: '1px solid #ddd',
