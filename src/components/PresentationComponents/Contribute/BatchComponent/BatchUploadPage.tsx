@@ -224,11 +224,15 @@ const BatchUploadPage: React.FC = () => {
               loading={uploading}
               style={{
                 textTransform: 'unset',
-                background: 'rgb(55, 148, 141)',
-                border: 'none',
-                color: '#fff',
                 fontSize: '0.75rem',
                 fontWeight: 600,
+                border: 'none',
+                color: '#fff',
+                background:
+                  !selectedFile || uploading ? '#b0b0b0' : 'rgb(55, 148, 141)',
+                cursor: !selectedFile ? 'not-allowed' : 'pointer',
+                opacity: !selectedFile ? 0.6 : 1,
+                transition: 'background 0.2s, opacity 0.2s',
               }}
             >
               {uploading ? 'Uploading…' : 'Upload CSV'}
