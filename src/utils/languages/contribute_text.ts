@@ -393,6 +393,13 @@ export const contributeTranslate: TranslateType = {
       pt: `Download Voyages`,
     },
   },
+  contributeBatchUpload: {
+    label: {
+      en: `Batch Upload`,
+      es: `Batch Upload`,
+      pt: `Batch Upload`,
+    },
+  },
   adminPage: {
     label: {
       en: `Admin Home`,
