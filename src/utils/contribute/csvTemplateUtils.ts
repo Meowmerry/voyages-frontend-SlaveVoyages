@@ -1,4 +1,5 @@
 import {
+  HttpError,
   inspectBatchedContributions,
   UploadEntity,
 } from '@/fetch/contributeFetch/batchUploadApi';
@@ -21,8 +22,7 @@ export async function fetchTemplateHeaders(
     const result = await inspectBatchedContributions(entity, emptyFile);
     return result.mappingHeadersNotInCsv;
   } catch (err) {
-    const message = err instanceof Error ? err.message : '';
-    if (message.toLowerCase().includes('editor') || message.includes('403')) {
+    if (err instanceof HttpError && err.status === 403) {
       throw new Error(
         'Your account needs Editor privileges to download the template. ' +
           'Ask your admin to grant the Editor role in Supabase (Authentication → Users → edit app_metadata).',

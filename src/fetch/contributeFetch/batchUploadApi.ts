@@ -50,6 +50,16 @@ export interface UploadJobStatus {
   failureReason?: string;
 }
 
+export class HttpError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'HttpError';
+  }
+}
+
 const authHeaders = () => ({ Authorization: getAuthHeader() });
 
 /**
@@ -78,7 +88,8 @@ export async function inspectBatchedContributions(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(
+    throw new HttpError(
+      response.status,
       error.error ?? `inspect-batched-contributions failed (${response.status})`,
     );
   }
@@ -117,7 +128,8 @@ export async function uploadBatchedContributions(
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(
+    throw new HttpError(
+      response.status,
       error.error ?? `upload-batched-contributions failed (${response.status})`,
     );
   }
@@ -138,7 +150,10 @@ export async function pollUploadJob(jobId: string): Promise<UploadJobStatus> {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.error ?? `poll upload-jobs failed (${response.status})`);
+    throw new HttpError(
+      response.status,
+      error.error ?? `poll upload-jobs failed (${response.status})`,
+    );
   }
 
   return response.json();

@@ -58,6 +58,7 @@ export function useBatchUpload(): UseBatchUploadReturn {
   const [jobStatus, setJobStatus] = useState<UploadJobStatus | null>(null);
 
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeJobIdRef = useRef<string | null>(null);
 
   // Clean up polling timer on unmount to prevent memory leaks
   useEffect(() => {
@@ -111,16 +112,23 @@ export function useBatchUpload(): UseBatchUploadReturn {
       clearTimeout(pollTimerRef.current);
       pollTimerRef.current = null;
     }
+    activeJobIdRef.current = null;
   };
 
   const startPolling = (jobId: string) => {
+    activeJobIdRef.current = jobId;
     // We use recursive setTimeout instead of setInterval so that we always
     // wait for the previous GET response before scheduling the next request.
     // This prevents overlapping requests if the server is slow to respond.
     const tick = async () => {
+      // Bail out if a newer upload has superseded this polling loop.
+      if (activeJobIdRef.current !== jobId) return;
       try {
         // Ask the backend how the job is progressing.
         const status = await pollUploadJob(jobId);
+        // Guard again after the await — a new upload may have started while
+        // this request was in-flight.
+        if (activeJobIdRef.current !== jobId) return;
         setJobStatus(status);
 
         if (status.status === 'completed' || status.status === 'failed') {
@@ -132,6 +140,7 @@ export function useBatchUpload(): UseBatchUploadReturn {
           pollTimerRef.current = setTimeout(tick, POLL_INTERVAL_MS);
         }
       } catch {
+        if (activeJobIdRef.current !== jobId) return;
         // Network or server error — stop polling and surface the message.
         setUploading(false);
         setUploadError(
@@ -147,6 +156,7 @@ export function useBatchUpload(): UseBatchUploadReturn {
 
   const handleUpload = async () => {
     if (!selectedFile) return;
+    stopPolling();
     setUploading(true);
     setUploadError(null);
     setJobStatus(null);
