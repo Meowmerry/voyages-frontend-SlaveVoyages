@@ -4,7 +4,7 @@ import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
 
 const DownloadVoyages: React.FC = () => {
   return (
-    <Box sx={{ pr: 4, pt: 2, pl: 2, pb: 2, width: '100%' }}>
+    <Box sx={{ pr: 4, pl: 2, pb: 2, width: '100%' }}>
       <ListEditorialPlatForm />
       <Typography
         variant="h4"

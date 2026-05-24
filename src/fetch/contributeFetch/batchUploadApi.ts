@@ -111,10 +111,9 @@ export async function uploadBatchedContributions(
   const form = new FormData();
   form.append('file', file, file.name);
   if (metadata) {
-    form.append(
-      'metadata',
-      new Blob([JSON.stringify(metadata)], { type: 'application/json' }),
-    );
+    // Send as a plain string field, not a Blob — backend expects a single file
+    // and counts Blob entries as additional files (triggers "Too many files").
+    form.append('metadata', JSON.stringify(metadata));
   }
 
   const response = await fetch(

@@ -41,15 +41,25 @@ const BatchUploadPage: React.FC = () => {
   } = useBatchUpload();
 
   return (
-    <Box sx={{ pr: 4, pt: 2, pl: 2, pb: 4, width: '100%' }}>
-      <ListEditorialPlatForm />
-
-      <MuiTypography
-        variant="h4"
-        sx={{ mb: 1, fontSize: '24px', fontWeight: 600 }}
+    <Box sx={{ pr: 4, pl: 2, pb: 4, width: '100%' }}>
+      <Box
+        sx={{
+          position: 'sticky',
+          top: '7rem',
+          zIndex: 40,
+          background: '#fff',
+          pb: 1,
+        }}
       >
-        Batch Upload
-      </MuiTypography>
+        <ListEditorialPlatForm />
+        <MuiTypography
+          variant="h4"
+          sx={{ mb: 1, fontSize: '24px', fontWeight: 600 }}
+        >
+          Batch Upload
+        </MuiTypography>
+      </Box>
+
       <MuiTypography variant="body2" sx={{ mb: 4, color: 'text.secondary' }}>
         Upload a CSV file to create contributions in bulk. Download the blank
         template below to ensure your file uses the correct column headers.
@@ -96,7 +106,13 @@ const BatchUploadPage: React.FC = () => {
             onClick={() => downloadTemplate(selectedEntity)}
             loading={templateLoading}
             disabled={templateLoading}
-            style={{ textTransform: 'unset' }}
+            style={{
+              textTransform: 'unset',
+              color: 'rgb(55, 148, 141)',
+              border: '1px solid rgb(55, 148, 141)',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}
           >
             Download template
           </Button>
@@ -208,8 +224,11 @@ const BatchUploadPage: React.FC = () => {
               loading={uploading}
               style={{
                 textTransform: 'unset',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                background: 'rgb(55, 148, 141)',
                 border: 'none',
+                color: '#fff',
+                fontSize: '0.75rem',
+                fontWeight: 600,
               }}
             >
               {uploading ? 'Uploading…' : 'Upload CSV'}

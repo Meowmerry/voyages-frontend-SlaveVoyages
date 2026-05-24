@@ -27,3 +27,17 @@
       min-width: 95vw;
     }
   }
+
+.paper-draggable-batch-dialog{
+    width:70vw;
+  
+    @media (max-width: 768px) {
+      max-width: 90vw !important;
+      min-width: 90vw !important;
+    }
+  
+    @media (max-width: 480px) {
+      max-width: 95vw;
+      min-width: 95vw;
+    }
+}

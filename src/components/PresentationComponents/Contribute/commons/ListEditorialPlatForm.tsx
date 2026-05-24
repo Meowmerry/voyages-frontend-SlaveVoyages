@@ -39,7 +39,16 @@ const ListEditorialPlatForm: React.FC = () => {
   };
 
   return (
-    <div className="list-edittorial-container">
+    <div
+      className="list-edittorial-container"
+      style={{
+        position: 'sticky',
+        top: '7rem',
+        zIndex: 40,
+        background: '#fff',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+      }}
+    >
       <div>
         {buttons.map((btn) => (
           <Button

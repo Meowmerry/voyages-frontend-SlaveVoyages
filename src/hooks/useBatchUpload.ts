@@ -161,9 +161,12 @@ export function useBatchUpload(): UseBatchUploadReturn {
     setUploadError(null);
     setJobStatus(null);
 
+    const baseName = selectedFile.name.replace(/\.csv$/i, '');
     const metadata: UploadMetadata = {
       contribStatus: 0,
       onError: 'continue',
+      batchTitle: `${selectedEntity} import – ${baseName}`,
+      batchComments: `Bulk import of ${selectedEntity} from ${selectedFile.name}`,
     };
 
     try {

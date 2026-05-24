@@ -252,7 +252,7 @@ const EditVoyages: React.FC = () => {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <Box style={{ paddingTop: '16px', paddingBottom: '16px', width: '100%' }}>
+    <Box sx={{ pr: 4, pl: 2, pb: 4, width: '100%' }}>
       <ListEditorialPlatForm />
 
       {/* Header */}
