@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FunctionComponent, useState } from 'react';
 
-import { PlusOutlined, FileTextOutlined } from '@ant-design/icons';
+import {
+  PlusOutlined,
+  FileTextOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import {
   Button as MuiButton,
   Select,
@@ -15,6 +19,7 @@ import {
 } from '@mui/material';
 import { PublicationBatch } from '@slavevoyages/voyages-contribute';
 
+import BatchUploadModal from './BatchUploadModal';
 import DeleteBatchModal from './DeleteBatchModal';
 import EditBatchModal from './EditBatchModal';
 import BatchTable from '../Table/BatchTable';
@@ -40,6 +45,7 @@ const BatchManagementContentDialog: FunctionComponent<
 }) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [selectedBatch, setSelectedBatch] = useState<PublicationBatch | null>(
     null,
   );
@@ -67,14 +73,18 @@ const BatchManagementContentDialog: FunctionComponent<
   };
   return (
     <>
-      <Box sx={{ mb: 4, mt: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }}>
-          <InputLabel
-            style={{
-              fontSize: 12,
-              color: '#4e4e4e',
-            }}
-          >
+      <Box
+        sx={{
+          mb: 2,
+          mt: 4,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        {/* Left — filter */}
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel style={{ fontSize: 12, color: '#4e4e4e' }}>
             Filter
           </InputLabel>
           <Select
@@ -94,23 +104,43 @@ const BatchManagementContentDialog: FunctionComponent<
           </Select>
         </FormControl>
 
-        <MuiButton
-          variant="contained"
-          size="small"
-          startIcon={<PlusOutlined />}
-          onClick={() => setCreateModalVisible(true)}
-          sx={{
-            textTransform: 'unset',
-            height: 34,
-            fontSize: 16,
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #0f766e 0%, #047857 100%)',
-            },
-          }}
-        >
-          Create Batch
-        </MuiButton>
+        {/* Right — action buttons */}
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <MuiButton
+            variant="contained"
+            size="small"
+            startIcon={<PlusOutlined />}
+            onClick={() => setCreateModalVisible(true)}
+            sx={{
+              textTransform: 'unset',
+              height: 32,
+              fontSize: 14,
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #0f766e 0%, #047857 100%)',
+              },
+            }}
+          >
+            Create Batch
+          </MuiButton>
+          <MuiButton
+            variant="contained"
+            size="small"
+            startIcon={<UploadOutlined />}
+            onClick={() => setUploadModalVisible(true)}
+            sx={{
+              textTransform: 'unset',
+              height: 32,
+              fontSize: 14,
+              background: 'linear-gradient(135deg, #37948d 0%, #2a7a74 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #2a7a74 0%, #1f5f5a 100%)',
+              },
+            }}
+          >
+            Upload Batch
+          </MuiButton>
+        </Box>
       </Box>
 
       <Divider sx={{ mb: 3 }} />
@@ -164,6 +194,13 @@ const BatchManagementContentDialog: FunctionComponent<
         }}
         onSuccess={handleDeleteSuccess}
         batch={selectedBatch}
+      />
+
+      {/* Upload Batch Modal */}
+      <BatchUploadModal
+        visible={uploadModalVisible}
+        onClose={() => setUploadModalVisible(false)}
+        onSuccess={refreshBatches}
       />
     </>
   );

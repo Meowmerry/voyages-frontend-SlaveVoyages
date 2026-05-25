@@ -62,11 +62,7 @@ export function PaperDraggableNumbersTable(props: PaperProps) {
       cancel={'[class*="MuiDialogContent-root"]'}
       nodeRef={paperRef}
     >
-      <Paper
-        {...props}
-        ref={paperRef}
-        className="paper-draggable-md-dialog"
-      />
+      <Paper {...props} ref={paperRef} className="paper-draggable-md-dialog" />
     </Draggable>
   );
 }
@@ -127,6 +123,20 @@ export function PaperDraggableCreateBatch(props: PaperProps) {
   );
 }
 
+export function PaperDraggableUploadBatch(props: PaperProps) {
+  const paperRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <Draggable
+      handle="#draggable-dialog-upload-batch"
+      cancel={'[class*="MuiDialogContent-root"]'}
+      nodeRef={paperRef}
+    >
+      <Paper {...props} ref={paperRef} className="paper-draggable-md-dialog" />
+    </Draggable>
+  );
+}
+
 export function PaperDraggableBatchManagement(props: PaperProps) {
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -139,7 +149,7 @@ export function PaperDraggableBatchManagement(props: PaperProps) {
       <Paper
         {...props}
         ref={paperRef}
-        className="paper-draggable-md-dialog"
+        className="paper-draggable-batch-dialog"
       />
     </Draggable>
   );

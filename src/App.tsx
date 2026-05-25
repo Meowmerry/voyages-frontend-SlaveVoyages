@@ -327,6 +327,7 @@ const App: React.FC = () => {
         path={`${CONTRIBUTE}editor_main/downloads`}
         element={<ContributePage />}
       />
+
       <Route path={`${LESSONPLANS}/`} element={<LessonPlans />} />
       <Route path={`${INTRODUCTORYMAPS}/`} element={<IntroductoryMaps />} />
       <Route path={`${ABOUTPAGE}`} element={<AboutPage />} />

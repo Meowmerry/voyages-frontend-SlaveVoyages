@@ -13,12 +13,12 @@ import { getHeaderColomnColor } from '@/utils/functions/getColorStyle';
 
 type SortOrder = 'asc' | 'desc' | null;
 
-export interface CustomHeaderTableProps extends CustomHeaderProps {
+export interface MyCustomHeaderProps extends CustomHeaderProps {
   menuIcon: string;
   column: any;
 }
 
-const CustomHeaderTable = (props: CustomHeaderTableProps) => {
+const CustomHeaderTable = (props: MyCustomHeaderProps) => {
   const { styleName } = usePageRouter();
   const dispatch: AppDispatch = useDispatch();
   const [ascSort, setAscSort] = useState('inactive');
@@ -53,21 +53,19 @@ const CustomHeaderTable = (props: CustomHeaderTableProps) => {
     }
 
     const sortedField = sortColumn[0];
-    const isAscending = sortedField?.startsWith('-');
-    const fieldName = isAscending ? sortedField.substring(1) : sortedField;
+    const hasDash = sortedField?.startsWith('-');
+    const fieldName = hasDash ? sortedField.substring(1) : sortedField;
 
-    // ✅ Get order_by from column context/definition
-    // This should come from your generateColumnDef function where you set:
     const orderByFields = props.column?.colDef?.context?.fieldToSort || [];
-
-    // ✅ Check if current column's order_by includes the sorted field
     const isMatch = orderByFields.includes(fieldName);
 
     if (isMatch) {
-      if (isAscending) {
+      if (hasDash) {
+        // dash = server ascending (oldest first) → ↑ active
         setAscSort('active');
         setDescSort('inactive');
       } else {
+        // no dash = server descending (newest first) → ↓ active
         setAscSort('inactive');
         setDescSort('active');
       }
@@ -83,14 +81,15 @@ const CustomHeaderTable = (props: CustomHeaderTableProps) => {
 
   const handleSortRequest = useCallback(
     (
-      order: SortOrder,
+      order: 'asc' | 'desc' | null,
       event:
         | React.MouseEvent<HTMLButtonElement>
         | React.TouchEvent<HTMLButtonElement>,
     ) => {
-      props.setSort(order, event.shiftKey);
+      // Do NOT call props.setSort — that would trigger ag-grid's client-side sort
+      // and reorder the rows. Sorting is handled server-side via order_by.
+      event.preventDefault();
 
-      // ✅ Use order_by fields from context (set by generateColumnDef)
       const sortingFields = props.column.colDef?.context?.fieldToSort || [];
 
       if (sortingFields.length > 0) {

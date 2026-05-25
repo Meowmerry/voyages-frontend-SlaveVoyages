@@ -393,6 +393,7 @@ export const contributeTranslate: TranslateType = {
       pt: `Download Voyages`,
     },
   },
+
   adminPage: {
     label: {
       en: `Admin Home`,

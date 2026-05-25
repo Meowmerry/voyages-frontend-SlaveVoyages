@@ -1,4 +1,3 @@
-import { BASE_URL_FRONTEND } from '@/share/AUTH_BASEURL';
 import {
   ACCOUNTS,
   ASSESSMENT,
@@ -58,6 +57,14 @@ export const menuLists: MenuListsProps[] = [
           pt: 'Destino Texas',
         },
         url: `${BLOGPAGE}/tag/texas-bound#texas-bound`,
+      },
+      {
+        name: {
+          en: 'Indian Ocean',
+          es: 'Océano Índico',
+          pt: 'Oceano Índico',
+        },
+        url: `${BLOGPAGE}/tag/indian-ocean#indian-ocean`,
       },
     ],
   },

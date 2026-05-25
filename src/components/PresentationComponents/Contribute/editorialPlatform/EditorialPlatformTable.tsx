@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CheckCircleOutlined,
   DownOutlined,
@@ -6,6 +6,7 @@ import {
   SettingOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
+import { Box } from '@mui/material';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import {
@@ -18,9 +19,8 @@ import {
   Typography,
   message,
 } from 'antd';
-import { Box } from '@mui/material';
-import { CustomLoadingOverlay } from '@/components/CommonComponts/CustomLoadingOverlay';
 
+import { CustomLoadingOverlay } from '@/components/CommonComponts/CustomLoadingOverlay';
 import { useEditorialPlatformTable } from '@/hooks/contribute/useEditorialPlatformTable';
 
 import BatchManagement from '../BatchComponent/BatchManagement';
@@ -219,65 +219,78 @@ const EditorialPlatformTable: React.FC<EditorialPlatformTableProps> = ({
 
   // ── List view ────────────────────────────────────────────────────────────
   return (
-    <Box style={{ paddingTop: '16px', paddingBottom: '16px', width: '100%' }}>
-      <ListEditorialPlatForm />
-
-      {/* Toolbar */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-          borderRadius: '12px 12px 4px 4px',
-          padding: '12px',
-          marginBottom: '12px',
-          border: '1px solid #e8f0fe',
+    <Box sx={{ pr: 4, pl: 2, pb: 4, width: '100%' }}>
+      {/* Sticky header: tab bar + toolbar */}
+      <Box
+        sx={{
+          position: 'sticky',
+          top: '7rem',
+          zIndex: 40,
+          background: '#fff',
+          pb: 1,
         }}
       >
+        <ListEditorialPlatForm />
+
+        {/* Toolbar */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            borderRadius: '12px 12px 4px 4px',
+            padding: '12px',
+            marginBottom: '0',
+            border: '1px solid #e8f0fe',
           }}
         >
-          <div>
-            <Title level={2} style={{ margin: 0, color: '#333' }}>
-              Edit Requests
-            </Title>
-            <div style={{ marginTop: '4px', color: '#6b7280' }}>
-              Manage and review Edit Requests
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <Title level={2} style={{ margin: 0, color: '#333' }}>
+                Edit Requests
+              </Title>
+              <div style={{ marginTop: '4px', color: '#6b7280' }}>
+                Manage and review Edit Requests
+              </div>
             </div>
-          </div>
-          <Space size="middle">
-            <SearchInput
-              value={filters.search || ''}
-              onChange={handleSearchChange}
-            />
-            {hasActiveFilters && (
-              <ActiveFiltersTag
-                count={activeFilterCount}
-                onClose={handleClearFilters}
+            <Space size="middle">
+              <SearchInput
+                value={filters.search || ''}
+                onChange={handleSearchChange}
               />
-            )}
-            <FilterToggleButton
-              showFilters={showFilters}
-              onClick={() => setShowFilters(!showFilters)}
-            />
-            <Button
-              icon={<SettingOutlined />}
-              onClick={() => setBatchManagementVisible(true)}
-              style={{
-                borderRadius: '6px',
-                height: '30px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                border: 'none',
-                color: 'white',
-              }}
-            >
-              Batch Management
-            </Button>
-          </Space>
+              {hasActiveFilters && (
+                <ActiveFiltersTag
+                  count={activeFilterCount}
+                  onClose={handleClearFilters}
+                />
+              )}
+              <FilterToggleButton
+                showFilters={showFilters}
+                onClick={() => setShowFilters(!showFilters)}
+              />
+              <Button
+                icon={<SettingOutlined />}
+                onClick={() => setBatchManagementVisible(true)}
+                style={{
+                  borderRadius: '6px',
+                  height: '30px',
+                  background:
+                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: 'none',
+                  color: 'white',
+                }}
+              >
+                Batch Management
+              </Button>
+            </Space>
+          </div>
         </div>
-      </div>
+      </Box>
+      {/* end sticky header */}
 
       {/* Bulk Actions Bar */}
       {selectedRows.length > 0 && (

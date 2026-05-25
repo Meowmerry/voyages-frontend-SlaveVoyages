@@ -192,64 +192,79 @@ const EditEnslaved: React.FC = () => {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <Box style={{ paddingTop: '16px', paddingBottom: '16px', width: '100%' }}>
-      <ListEditorialPlatForm />
-
-      {/* Header */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-          borderRadius: '12px 12px 4px 4px',
-          padding: '12px',
-          marginBottom: '12px',
-          border: '1px solid #e8f0fe',
+    <Box sx={{ pr: 4, pl: 2, pb: 4, width: '100%' }}>
+      <Box
+        sx={{
+          position: 'sticky',
+          top: '7rem',
+          zIndex: 40,
+          background: '#fff',
+          pb: 1,
         }}
       >
+        <ListEditorialPlatForm />
+
+        {/* Header */}
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            borderRadius: '12px 12px 4px 4px',
+            padding: '12px',
+            marginBottom: '12px',
+            border: '1px solid #e8f0fe',
           }}
         >
-          <div>
-            <Title level={2} style={{ margin: 0, color: '#333' }}>
-              Edit Enslaved
-            </Title>
-            <div style={{ marginTop: '4px', color: '#6b7280' }}>
-              {pendingCount} contribution{pendingCount !== 1 ? 's' : ''}{' '}
-              awaiting review
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <Title level={2} style={{ margin: 0, color: '#333' }}>
+                Edit Enslaved
+              </Title>
+              <div style={{ marginTop: '4px', color: '#6b7280' }}>
+                {pendingCount} contribution{pendingCount !== 1 ? 's' : ''}{' '}
+                awaiting review
+              </div>
             </div>
+            <Search
+              placeholder="Search enslaver, contributor, type..."
+              value={search}
+              onChange={handleSearchChange}
+              onSearch={(val) => setSearch(val)}
+              style={{ width: 340 }}
+              allowClear
+            />
           </div>
-          <Search
-            placeholder="Search enslaver, contributor, type..."
-            value={search}
-            onChange={handleSearchChange}
-            onSearch={(val) => setSearch(val)}
-            style={{ width: 340 }}
-            allowClear
-          />
-        </div>
 
-        {/* Type legend */}
-        <div
-          style={{ marginTop: 10, display: 'flex', gap: 12, flexWrap: 'wrap' }}
-        >
-          <span style={{ fontSize: 12, color: '#6b7280' }}>Types:</span>
-          <Tag icon={<EditOutlined />} color="default">
-            Edit
-          </Tag>
-          <Tag icon={<MergeCellsOutlined />} color="purple">
-            Merge
-          </Tag>
-          <Tag icon={<FileAddOutlined />} color="blue">
-            New
-          </Tag>
-          <Tag icon={<DeleteOutlined />} color="red">
-            Recommend Deletion
-          </Tag>
+          {/* Type legend */}
+          <div
+            style={{
+              marginTop: 10,
+              display: 'flex',
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <span style={{ fontSize: 12, color: '#6b7280' }}>Types:</span>
+            <Tag icon={<EditOutlined />} color="default">
+              Edit
+            </Tag>
+            <Tag icon={<MergeCellsOutlined />} color="purple">
+              Merge
+            </Tag>
+            <Tag icon={<FileAddOutlined />} color="blue">
+              New
+            </Tag>
+            <Tag icon={<DeleteOutlined />} color="red">
+              Recommend Deletion
+            </Tag>
+          </div>
         </div>
-      </div>
+      </Box>
 
       {/* Demo banner */}
       <Alert

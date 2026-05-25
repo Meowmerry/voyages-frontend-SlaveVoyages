@@ -8,6 +8,7 @@ import {
   Chip,
   Typography as MuiTypography,
 } from '@mui/material';
+import { Tooltip } from 'antd';
 import { PublicationBatch } from '@slavevoyages/voyages-contribute';
 import { AgGridReact } from 'ag-grid-react';
 
@@ -119,17 +120,16 @@ const ActionsCellRenderer = (
 
   return (
     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', height: '100%' }}>
-      <IconButton size="small" onClick={handleEdit} title="Edit batch">
-        <EditOutlined style={{ fontSize: '16px' }} />
-      </IconButton>
-      <IconButton
-        size="small"
-        color="error"
-        onClick={handleDelete}
-        title="Delete batch"
-      >
-        <DeleteOutlined style={{ fontSize: '16px' }} />
-      </IconButton>
+      <Tooltip title="Edit batch">
+        <IconButton size="small" onClick={handleEdit}>
+          <EditOutlined style={{ fontSize: '16px' }} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete batch">
+        <IconButton size="small" color="error" onClick={handleDelete}>
+          <DeleteOutlined style={{ fontSize: '16px' }} />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };
@@ -149,6 +149,8 @@ const BatchTable: React.FC<BatchTableProps> = ({
         width: 80,
         minWidth: 80,
         sortable: true,
+        headerTooltip: 'Unique batch ID',
+        tooltipValueGetter: (params: any) => `Batch ID: ${params.data?.id}`,
       },
       {
         headerName: 'Title',
@@ -158,6 +160,8 @@ const BatchTable: React.FC<BatchTableProps> = ({
         minWidth: 120,
         flex: 1,
         sortable: true,
+        headerTooltip: 'Title of the publication batch',
+        tooltipValueGetter: (params: any) => params.data?.title,
       },
       {
         headerName: 'Status',
@@ -165,6 +169,9 @@ const BatchTable: React.FC<BatchTableProps> = ({
         cellRenderer: StatusCellRenderer,
         width: 120,
         sortable: true,
+        headerTooltip: 'Pending = not yet published, Published = live',
+        tooltipValueGetter: (params: any) =>
+          params.data?.published !== null ? 'Published' : 'Pending',
         filterParams: {
           values: ['Published', 'Pending'],
           valueGetter: (params: any) => {
@@ -178,8 +185,12 @@ const BatchTable: React.FC<BatchTableProps> = ({
         cellRenderer: PublishedDateCellRenderer,
         width: 150,
         sortable: true,
+        headerTooltip: 'Date the batch was published',
+        tooltipValueGetter: (params: any) =>
+          params.data?.published
+            ? new Date(params.data.published).toLocaleDateString()
+            : 'Not published yet',
         comparator: (valueA: any, valueB: any) => {
-          // Custom comparator for published dates
           const dateA = valueA ? new Date(valueA).getTime() : 0;
           const dateB = valueB ? new Date(valueB).getTime() : 0;
           return dateA - dateB;
@@ -191,6 +202,11 @@ const BatchTable: React.FC<BatchTableProps> = ({
         cellRenderer: ContributionsCellRenderer,
         width: 120,
         sortable: true,
+        headerTooltip: 'Number of voyage contributions in this batch',
+        tooltipValueGetter: (params: any) => {
+          const count = params.data?.contributions?.length || 0;
+          return `${count} contribution${count !== 1 ? 's' : ''} in this batch`;
+        },
       },
       {
         headerName: 'Comments',
@@ -199,6 +215,9 @@ const BatchTable: React.FC<BatchTableProps> = ({
         width: 150,
         flex: 1,
         sortable: true,
+        headerTooltip: 'Notes or comments added to this batch',
+        tooltipValueGetter: (params: any) =>
+          params.data?.comments || 'No comments',
       },
       {
         headerName: 'Actions',
@@ -210,6 +229,8 @@ const BatchTable: React.FC<BatchTableProps> = ({
         filter: false,
         resizable: false,
         pinned: 'right',
+        headerTooltip: 'Edit or delete this batch',
+        tooltipValueGetter: () => 'Edit or delete this batch',
       },
     ],
     [onEditBatch, onDeleteBatch],
@@ -236,6 +257,8 @@ const BatchTable: React.FC<BatchTableProps> = ({
       headerHeight: 45,
       suppressMovableColumns: true,
       suppressFieldDotNotation: true,
+      enableBrowserTooltips: true,
+      tooltipShowDelay: 300,
     }),
     [],
   );
@@ -281,7 +304,6 @@ const BatchTable: React.FC<BatchTableProps> = ({
         paginationPageSize={10}
         paginationPageSizeSelector={[5, 10, 20, 50]}
         suppressPaginationPanel={false}
-        enableBrowserTooltips={true}
         noRowsOverlayComponent={() => (
           <Box
             sx={{

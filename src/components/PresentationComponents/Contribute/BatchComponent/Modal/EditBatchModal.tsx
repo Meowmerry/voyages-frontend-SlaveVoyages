@@ -139,67 +139,44 @@ const EditBatchModal: React.FC<EditBatchModalProps> = ({
       </DialogTitle>
 
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ p: 3 }}>
-          <Box sx={{ mb: 3 }}>
+        <DialogContent sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+
+          {/* Batch Title */}
+          <Box>
+            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 0.5, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 11 }}>
+              Batch Title <span style={{ color: '#e53e3e' }}>*</span>
+            </Typography>
             <TextField
               fullWidth
-              placeholder="Batch Title"
+              placeholder="e.g. Voyage import – Q1 2024"
               value={formData.title || ''}
               onChange={(e) => handleInputChange('title', e.target.value)}
               error={!!errors.title}
-              helperText={errors.title}
+              helperText={errors.title || `${(formData.title || '').length}/100`}
               required
-              slotProps={{ input: { inputProps: { maxLength: 100 } } }}
               size="small"
-              label={
-                <Typography
-                  variant="body1"
-                  style={{
-                    fontSize: 16,
-                    color: '#4e4e4e',
-                  }}
-                >
-                  Batch Title:
-                </Typography>
-              }
+              slotProps={{ input: { inputProps: { maxLength: 100 } } }}
             />
+          </Box>
 
+          {/* Comments */}
+          <Box>
+            <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 0.5, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 11 }}>
+              Comments
+            </Typography>
             <TextField
               fullWidth
-              label={
-                <Typography
-                  variant="body1"
-                  style={{
-                    fontSize: 16,
-                    color: '#4e4e4e',
-                  }}
-                >
-                  Comments
-                </Typography>
-              }
               placeholder="Add any notes or comments about this batch..."
               value={formData.comments || ''}
               onChange={(e) => handleInputChange('comments', e.target.value)}
               error={!!errors.comments}
-              helperText={
-                errors.comments ||
-                `${(formData.comments || '').length}/500 characters`
-              }
+              helperText={errors.comments || `${(formData.comments || '').length}/500`}
               multiline
               rows={4}
               slotProps={{ input: { inputProps: { maxLength: 500 } } }}
             />
           </Box>
 
-          {/* Character count display */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="caption" color="text.secondary">
-              Title: {(formData.title || '').length}/100 characters
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Comments: {(formData.comments || '').length}/500 characters
-            </Typography>
-          </Box>
         </DialogContent>
 
         <DialogActions sx={{ p: 3, bgcolor: 'grey.50' }}>

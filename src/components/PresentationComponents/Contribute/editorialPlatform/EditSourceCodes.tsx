@@ -4,7 +4,7 @@ import ListEditorialPlatForm from '../commons/ListEditorialPlatForm';
 
 const EditSourceCodes: React.FC = () => {
   return (
-    <Box sx={{ p: 2, width: '100%' }}>
+    <Box sx={{ pr: 4, pl: 2, pb: 4, width: '100%' }}>
       <ListEditorialPlatForm />
       <Typography
         variant="h4"

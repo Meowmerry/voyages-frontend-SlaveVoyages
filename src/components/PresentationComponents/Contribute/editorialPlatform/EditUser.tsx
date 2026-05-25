@@ -7,7 +7,7 @@ const EditUser: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ p: 2, width: '100%' }}>
+    <Box sx={{ pr: 4, pl: 2, pb: 4, width: '100%' }}>
       <ListEditorialPlatForm />
 
       <Box

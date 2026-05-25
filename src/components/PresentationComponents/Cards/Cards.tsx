@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable indent */
 import React, { useContext, useEffect, useRef, useState } from 'react';
 
@@ -28,11 +27,11 @@ import {
   ENSLAVEDNODE,
   ENSLAVERSCARDFILE,
   ENSLAVERSNODE,
-  INDIANOCEANANDASIANFILECARD,
   INTRAAMERICANFILECARD,
   TRANSATLANTICFILECARD,
   VOYAGESNODE,
   VOYAGESNODECLASS,
+  urlRegex,
 } from '@/share/CONST_DATA';
 import '@/style/cards.scss';
 import { TransatlanticCardProps } from '@/share/InterfaceTypes';
@@ -43,7 +42,6 @@ import CARDS_ALLENSLAVED from '@/utils/flatfiles/enslaved/enslaved_all_card.json
 import CARDS_TEXAS_ENSLAVED from '@/utils/flatfiles/enslaved/enslaved_texas_card.json';
 import CARDS_ENSLAVERS_COLLECTION from '@/utils/flatfiles/enslavers/enslavers_card.json';
 import CARDS_ALLVOYAGES_COLLECTION from '@/utils/flatfiles/voyages/voyages_all_card.json';
-import CARDS_INDIANOCEANANDASIANFILE_COLLECTION from '@/utils/flatfiles/voyages/voyages_indian_ocean_and_asia_slave_trade_database_card.json';
 import CARDS_INTRAAMERICAN_COLLECTION from '@/utils/flatfiles/voyages/voyages_intraamerican_card.json';
 import CARDS_TRANSATLANTIC_COLLECTION from '@/utils/flatfiles/voyages/voyages_transatlantic_card.json';
 import {
@@ -72,6 +70,24 @@ function isDocumentReference(
     cast?.sources__has_published_manifest &&
     !!cast.sources__zotero_group_id &&
     !!cast.sources__zotero_item_id
+  );
+}
+
+type ExternalReference = {
+  sources__has_published_manifest: boolean;
+  sources__bib: string;
+};
+
+function isExternalReference(
+  s?: string | ExternalReference,
+): s is ExternalReference {
+  if (typeof s !== 'object' || s === null) {
+    return false;
+  }
+  return (
+    s.sources__has_published_manifest === false &&
+    typeof s.sources__bib === 'string' &&
+    urlRegex.test(s.sources__bib)
   );
 }
 
@@ -114,11 +130,6 @@ const VoyageCard = () => {
         } else if (cardFileName === INTRAAMERICANFILECARD) {
           newCardFileName = INTRAAMERICANFILECARD;
           newCardDataArray.push(...(CARDS_INTRAAMERICAN_COLLECTION as any));
-        } else if (cardFileName === INDIANOCEANANDASIANFILECARD) {
-          newCardFileName = INDIANOCEANANDASIANFILECARD;
-          newCardDataArray.push(
-            ...(CARDS_INDIANOCEANANDASIANFILE_COLLECTION as any),
-          );
         } else {
           newCardFileName = ALLVOYAGESFILECARD;
           newCardDataArray.push(...(CARDS_ALLVOYAGES_COLLECTION as any));
@@ -241,22 +252,9 @@ const VoyageCard = () => {
     <div>
       <p className="body-text">
         {translatedCard.title}{' '}
-        <button
-          type="button"
-          className="link-button"
-          onClick={toggleExpandAll}
-          style={{
-            color: 'rgb(0, 140, 168)',
-            border: 'none',
-            background: 'transparent',
-            fontSize: '15px',
-            fontWeight: 500,
-            textDecoration: 'underline',
-            cursor: 'pointer',
-          }}
-        >
+        <a href="#" onClick={toggleExpandAll}>
           {!globalExpand ? translatedCard.expand : translatedCard.collapse}
-        </button>{' '}
+        </a>{' '}
       </p>
       <Card style={{ border: '1px solid rgba(0,0,0,.1)' }}>
         {newCardData.length > 0 &&
@@ -279,7 +277,6 @@ const VoyageCard = () => {
                   <div className="container-card-body">
                     {childValue.map((child: any) => {
                       const values = child.value;
-                      // console.log({ values })
                       const numberFormat = child.number_format;
                       if (Array.isArray(values)) {
                         const renderedValues = values.map(
@@ -300,6 +297,7 @@ const VoyageCard = () => {
                                   key={`${index}-${uuidv4()}`}
                                   className="fa fa-file-text"
                                   aria-hidden="true"
+                                  title="View Source Document"
                                 ></i>,
                               );
                               additionalStyles.borderColor = 'blue';
@@ -320,6 +318,44 @@ const VoyageCard = () => {
                                 dispatch(setIsModalCard(false));
                               };
                             }
+                            // Check if the value is an external reference with a valid URL in the bib
+                            if (isExternalReference(value)) {
+                              const sourceString = value.sources__bib;
+                              console.log(
+                                'Checking source string for URL:',
+                                sourceString,
+                              );
+                              const foundUrl =
+                                sourceString?.match(urlRegex) ?? null;
+                              if (foundUrl) {
+                                const urlString = foundUrl[0];
+                                try {
+                                  new URL(urlString); // Validate the URL
+                                  valueToRender += ' ';
+                                  extraElements.push(
+                                    <i
+                                      key={`${index}-${uuidv4()}`}
+                                      className="fa fa-file-text"
+                                      aria-hidden="true"
+                                      title="View External Source"
+                                    ></i>,
+                                  );
+                                  additionalStyles.borderColor = 'red';
+                                  additionalStyles.borderWidth = 1;
+                                  additionalStyles.borderStyle = 'solid';
+                                  additionalProps.onClick = () => {
+                                    window.open(
+                                      urlString,
+                                      '_blank',
+                                      'noopener,noreferrer',
+                                    );
+                                  };
+                                } catch (e) {
+                                  console.error('Invalid URL:', urlString);
+                                }
+                              }
+                            }
+
                             let component = valueToRender ? (
                               <div
                                 key={`${index}-${value}-${uuidv4()}`}

@@ -106,6 +106,7 @@ const ContributeContent: React.FC<ContributeContentProps> = ({
     'editor_main/publish': () => <PublishNewDBVersion />,
     'editor_main/downloads': () => <DownloadVoyages />,
 
+
     // 'admin/auth/user/': () => <AdminUserList />,
   };
 
