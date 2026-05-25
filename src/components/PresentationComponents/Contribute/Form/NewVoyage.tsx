@@ -10,7 +10,7 @@ import {
   ContributionStatus,
   getSchema,
 } from '@slavevoyages/voyages-contribute';
-import { Button, Divider } from 'antd';
+import { Divider } from 'antd';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +23,7 @@ import { useVoyageContribution } from '@/hooks/useVoyageContribution';
 import { RootState } from '@/redux/store';
 
 import { ContributionFormWrapper } from '../commons/ContributionFormWrapper';
+import PageBackHeader from '../commons/PageBackHeader';
 import { ReviewMode } from '../ContributionForm';
 import { TransformedContribution } from '../utils/transformContributionData';
 
@@ -267,20 +268,11 @@ const NewVoyage: React.FC<NewVoyageProps> = ({
     return (
       <>
         <div className="contribute-content" style={{ width: '100%' }}>
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '16px',
-            }}
-          >
-            <Button onClick={handleBackClick} style={{ height: '32px' }}>
-              ← Back to Home
-            </Button>
-          </div>
-          <h1 className="page-title-1" style={{ margin: '10px 0' }}>
-            New Voyage
-          </h1>
+          <PageBackHeader
+            title="New Voyage"
+            onBack={handleBackClick}
+            backTooltip="Back to Home"
+          />
 
           <Divider style={{ margin: '12px 0' }} />
           <ContributionFormWrapper
