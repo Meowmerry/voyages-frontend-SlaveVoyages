@@ -11,17 +11,13 @@ export const useColumnDefs = () => {
     () =>
       [
         {
-          headerName: 'Title',
-          field: 'title' as string,
-          tooltipField: 'title',
-          width: 200,
-          sortable: true,
-        },
-        {
           headerName: 'Comments',
           field: 'comments' as string,
-          tooltipField: 'comments',
-          width: 250,
+          valueGetter: (params: any) =>
+            params.data?.changeSet?.comments || params.data?.comments || '—',
+          tooltipValueGetter: (params: any) =>
+            params.data?.changeSet?.comments || params.data?.comments || '—',
+          width: 200,
           sortable: true,
         },
         {
@@ -35,14 +31,6 @@ export const useColumnDefs = () => {
           },
           width: 180,
           sortable: true,
-        },
-        {
-          headerName: 'Date',
-          field: 'timestamp' as any,
-          valueFormatter: ({ value }: { value: number }) =>
-            dayjs(value).format('MM/DD/YYYY'),
-          width: 100,
-          sort: 'desc',
         },
         {
           headerName: 'Voyage ID',
@@ -61,6 +49,27 @@ export const useColumnDefs = () => {
           width: 150,
           tooltipField: 'shipName',
           sortable: true,
+        },
+        {
+          headerName: 'Contributor',
+          field: 'author' as any,
+          valueGetter: (params: any) =>
+            params.data?.changeSet?.author || params.data?.author || '—',
+          tooltipValueGetter: (params: any) =>
+            params.data?.changeSet?.author || params.data?.author || '—',
+          width: 200,
+          sortable: true,
+        },
+        {
+          headerName: 'Date',
+          field: 'timestamp' as any,
+          valueGetter: (p: any) => p.data?.timestamp,
+          valueFormatter: ({ value }: { value: number }) =>
+            value && dayjs(value).isValid()
+              ? dayjs(value).format('MM/DD/YYYY')
+              : '—',
+          width: 100,
+          sort: 'desc',
         },
         {
           headerName: 'Nationality',
@@ -110,10 +119,12 @@ export const useColumnNewVoyagesDefs = (
           flex: 1,
         },
         {
-          headerName: 'Title',
-          field: 'title' as any,
+          headerName: 'Comments',
+          field: 'comments' as any,
+          valueGetter: (params: any) =>
+            params.data?.changeSet?.comments || params.data?.comments || '—',
           tooltipValueGetter: (params: any) =>
-            `Title: ${params.data?.title || '-'}`,
+            params.data?.changeSet?.comments || params.data?.comments || '—',
           sortable: true,
           flex: 1,
         },
@@ -135,8 +146,11 @@ export const useColumnNewVoyagesDefs = (
         {
           headerName: 'Date',
           field: 'timestamp' as any,
+          valueGetter: (p: any) => p.data?.timestamp,
           valueFormatter: ({ value }: { value: number }) =>
-            dayjs(value).format('MM/DD/YYYY'),
+            value && dayjs(value).isValid()
+              ? dayjs(value).format('MM/DD/YYYY')
+              : '—',
           width: 200,
           sort: 'desc',
         },

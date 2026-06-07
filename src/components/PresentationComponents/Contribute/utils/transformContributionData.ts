@@ -20,14 +20,24 @@ export type TransformedContribution = Contribution & {
   type?: string;
 };
 
+const MIN_VALID_TIMESTAMP = new Date('2000-01-01').getTime();
+
 export const transformContributionData = (
   contribution: Contribution,
 ): TransformedContribution => {
   const changeSetData = contribution.changeSet || {};
 
+  // The backend sometimes returns a voyage's historical departure date instead
+  // of the contribution save time. Guard against pre-2000 values and fall back
+  // to 0 (sentinel) so the UI can render "—" and sort these rows to the bottom.
+  const rawTs = changeSetData.timestamp;
+  const ts =
+    rawTs && Number(new Date(rawTs)) >= MIN_VALID_TIMESTAMP ? rawTs : 0;
+
   return {
     ...contribution,
     ...changeSetData,
+    timestamp: ts,
     changeSetId: changeSetData?.id ?? '',
     id: contribution?.id ?? '',
     voyage_id: contribution?.root?.id ?? '',
